@@ -16,7 +16,6 @@ class Enemy {
 		for (let i = 0; i < board.height; i++) {
 			// console.log("b")
 			for (let j = 0; j < board.height; j++) {
-				// console.log(`x: ${j}, y: ${i}, cnt: ${board.countReversible(this.order, j, i, dc[i], dr[i])}`)
 				if (board.putJudgement(this.order, j, i)) {
 					console.log(`x: ${j}, y: ${i}`)
 					board.putDisk(this.order, j, i);
@@ -207,13 +206,116 @@ class Board {
 	}
 }
 
+class GameManager {
+	static BEFORE_START = 0;
+	static IN_GAME = 1;
+	static GAME_OVER = 2;
+	static GAME_STATE = this.BEFORE_START;
+
+	#board;
+	#current_turn = Disk.BLACK;
+	#enemy;
+
+	constructor (board, enemy) {
+		this.#board = board;
+		this.#enemy = enemy;
+	}
+
+	checkTable (order) {
+		for (let i = 0; i < board.height; i++) {
+			for (let j = 0; j < board.width; j++) {
+				if (board.putJudgement(order, j, i)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	put(x, y) {
+		if (this.current_turn != this.enemy.order) {
+			this.board.putDisk(board.getOpponent(this.enemy.order), x, y);
+			changeTurn();
+		} else {
+
+			console.log("not in your turn.");
+		}
+	}
+
+
+	async run () {
+		let turn = 0;
+		let point = 0;
+
+
+
+		// while (true) {
+
+
+		// 	turn += 1;
+		// }
+	}
+
+	get board () {return this.#board;}
+	get current_turn () {return this.#current_turn;}
+	get enemy () {return this.#enemy;}
+
+	changeTurn () {
+		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
+	}
+}
+
+const embedToTable = (board_table, table_doms) => {
+	let disk = '';
+	for (let i = 0; i < table_doms.length; i++) {
+		disk = '';
+		switch (board_table[i].state) {
+			case Disk.WHITE:
+				disk = '○';
+				break;
+			case Disk.BLACK:
+				disk = '◉';
+				break;
+		}
+		table_doms[i].innerText = disk;
+	}
+}
+
 const board = new Board(8, 8);
 const enemy = new Enemy(Disk.BLACK);
 
 window.addEventListener('load', () => {
-	board.view();
-	console.log(enemy.searchFirst(board));
-	board.view();
+	const gm = new GameManager(board, enemy);
+	enemy.searchFirst(gm.board);
+	gm.changeTurn();
+
+	let table_cells = document.querySelectorAll("td");
+	for (let i = 0; i < table_cells.length; i++) {
+		table_cells[i].addEventListener('click', () => {
+			let order = gm.board.getOpponent(gm.enemy.order);
+			let x = i%gm.board.width;
+			let y = Math.floor(i/gm.board.width);
+			if (gm.current_turn == order) {
+				if (gm.board.putJudgement(order, x, y)){
+					gm.board.putDisk(order, x, y);
+					embedToTable(gm.board.table, table_cells)
+					gm.changeTurn();
+					enemy.searchFirst(gm.board);
+					gm.changeTurn();
+					embedToTable(gm.board.table, table_cells)
+				} else {
+					console.log("Can't put there.");
+				}
+			}
+		});
+	}
+	// console.log(table_cells)
+	embedToTable(board.table, table_cells)
+
+
+	// board.view();
+	// console.log(enemy.searchFirst(board));
+	// gm.board.view();
 	// console.log(board.info());
 	// console.log(board.table);
 });
