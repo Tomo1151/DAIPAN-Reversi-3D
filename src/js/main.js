@@ -1,6 +1,33 @@
 "use strict";
 console.log("Hello, world!");
 
+class Enemy {
+	#order;
+
+	constructor (order) {
+		this.#order = order;
+	}
+
+	get order() {return this.#order;}
+
+	searchFirst(board) {
+		const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
+		const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
+		for (let i = 0; i < board.height; i++) {
+			// console.log("b")
+			for (let j = 0; j < board.height; j++) {
+				// console.log(`x: ${j}, y: ${i}, cnt: ${board.countReversible(this.order, j, i, dc[i], dr[i])}`)
+				if (board.putJudgement(this.order, j, i)) {
+					console.log(`x: ${j}, y: ${i}`)
+					board.putDisk(this.order, j, i);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}
+
 class Disk {
 	static WHITE = 0;
 	static BLACK = 1;
@@ -81,26 +108,34 @@ class Board {
 
 		while (0 <= r && r < this.height && 0 <= c && c < this.width) {
 			if (this.getDisk(c, r).state == this.getOpponent(order)) {
+				// console.log("a")
 				count += 1;
 			} else if (this.getDisk(c, r).state == order) {
+				// console.log("b")
 				return count;
 			} else {
+				// console.log("c")
 				return 0;
 			}
 
 			r += dr;
 			c += dc;
 		}
+		// console.log("d")
 		return 0;
 	}
 
 	putJudgement(order, x, y) {
-		if (this.getDisk(x, y) == Disk.EMPTY) return false;
-		const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
-		const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
-		for (let i = 0; i < 8; i++) {
-			if (this.countReversible(order, x, y, dc[i], dr[i]) > 0) return true;
+		// console.log(`x: ${x}, y: ${y}, dx: ${this.getDisk(x, y).x}, dy: ${this.getDisk(x, y).y}, state: ${this.getDisk(x, y).state}`)
+		if (this.getDisk(x, y).state == Disk.EMPTY) {
+		// console.log("b")
+			const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
+			const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
+			for (let i = 0; i < 8; i++) {
+				if (this.countReversible(order, x, y, dc[i], dr[i]) > 0) return true;
+			}
 		}
+
 		return false;
 	}
 
@@ -115,27 +150,43 @@ class Board {
 	}
 
 	putDisk(order, x, y) {
-		if (this.putJudgement(order, x, y)) {
-			const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
-			const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
-			if (this.getDisk(x, y).state != Disk.EMPTY) return;
+		// if (this.getDisk(x, y).state == Disk.EMPTY) {
+			if (this.putJudgement(order, x, y)) {
+				const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
+				const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
+				if (this.getDisk(x, y).state != Disk.EMPTY) return false;
 
-			this.getDisk(x, y).state = order;
+				this.getDisk(x, y).state = order;
 
-			for (let i = 0; i < 8; i++) {
-				let count = this.countReversible(order, x, y, dc[i], dr[i]);
-				if (count > 0) this.reverseDisks(x, y, dc[i], dr[i], count);
+				for (let i = 0; i < 8; i++) {
+					let count = this.countReversible(order, x, y, dc[i], dr[i]);
+					if (count > 0) this.reverseDisks(x, y, dc[i], dr[i], count);
+				}
+				this.view();
+				return true;
 			}
-			this.view();
-			return true;
-		}
+		// }
+
 		this.view();
 		return false;
 	}
 
+	info() {
+		let states = new Array(this.width * this.height);
+		for (let i = 0; i < states.length; i++) {
+			states[i] = this.table[i].state;
+		}
+
+		return {
+			"width": this.width,
+			"height": this.height,
+			"table": states
+		};
+	}
+
 	view() {
 		for (let i = 0; i < this.#height; i++) {
-			console.log();
+			// console.log();
 			let row = '';
 			for (let j = 0; j < this.#width; j++) {
 				let disk_state = this.#table[this.#width * i + j].state;
@@ -155,9 +206,14 @@ class Board {
 		}
 	}
 }
-	const board = new Board(8, 8);
+
+const board = new Board(8, 8);
+const enemy = new Enemy(Disk.BLACK);
 
 window.addEventListener('load', () => {
 	board.view();
+	console.log(enemy.searchFirst(board));
+	board.view();
+	// console.log(board.info());
 	// console.log(board.table);
 });
