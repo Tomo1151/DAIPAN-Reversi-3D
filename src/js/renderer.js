@@ -26,12 +26,12 @@ function init() {
 	// scene.add(box);
 
 	const l = new THREE.AmbientLight(0xffffff, 1);
-	const light = new THREE.DirectionalLight(0xffffff, 10);
+	const light = new THREE.DirectionalLight(0xffffff, 1);
 	light.intensity = 1;
 	light.position.set(0, 0, 40);
-	light.castShadow = true;
-	light.shadowMapWidth = 2048;
-	light.shadowMapHeight = 2048;
+	// light.castShadow = true;
+	// light.shadowMapWidth = 2048;
+	// light.shadowMapHeight = 2048;
 	// console.log(box)
 	// scene.add(new THREE.AxesHelper(500));
 	scene.add(l)
@@ -39,7 +39,7 @@ function init() {
 
 	let hitboxes = [];
 
-	const loader = new THREE.FBXLoader();
+	const loader = new THREE.GLTFLoader();
 	const model_load = async (fbx_path, on_load_func) => {
 		return new Promise(res => {
 			loader.load(fbx_path, (obj) => {
@@ -49,9 +49,9 @@ function init() {
 		})
 	}
 
-	model_load('model_data/Board_low.fbx', (obj) => {
-		obj.scale.set(5, 5, 5);
-		obj.position.set(0, 0.5, 0);
+	model_load('model_data/Board_low.gltf', (obj) => {
+		obj.scene.scale.set(5, 5, 5);
+		obj.scene.position.set(0, 0.5, 0);
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				const g = new THREE.BoxGeometry(9.99, 1.15, 9.99);
@@ -68,16 +68,16 @@ function init() {
 				scene.add(box);
 			}
 		}
-		scene.add(obj);
+		scene.add(obj.scene);
 	});
 
 	let disk_meshes = []
 
-	model_load('model_data/Stone_low.fbx', (obj) => {
+	model_load('model_data/Disk_low.gltf', (obj) => {
 		let disk;
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
-				disk = obj.clone();
+				disk = obj.scene.clone();
 				disk.scale.set(4, 4, 4);
 				disk.position.set(10*j - (10*3+5), 1, 10*i - (10*3+5));
 				disk.visible = false;
