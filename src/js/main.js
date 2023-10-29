@@ -284,33 +284,33 @@ const embedToTable = (board_table, table_doms) => {
 const board = new Board(8, 8);
 const enemy = new Enemy(Disk.BLACK);
 
-window.addEventListener('load', () => {
-	const gm = new GameManager(board, enemy);
-	enemy.searchFirst(gm.board);
-	gm.changeTurn();
+// window.addEventListener('load', () => {
+	// const gm = new GameManager(board, enemy);
+	// enemy.searchFirst(gm.board);
+	// gm.changeTurn();
 
-	let table_cells = document.querySelectorAll("td");
-	for (let i = 0; i < table_cells.length; i++) {
-		table_cells[i].addEventListener('click', () => {
-			let order = gm.board.getOpponent(gm.enemy.order);
-			let x = i%gm.board.width;
-			let y = Math.floor(i/gm.board.width);
-			if (gm.current_turn == order) {
-				if (gm.board.putJudgement(order, x, y)){
-					gm.board.putDisk(order, x, y);
-					embedToTable(gm.board.table, table_cells)
-					gm.changeTurn();
-					enemy.searchFirst(gm.board);
-					gm.changeTurn();
-					embedToTable(gm.board.table, table_cells)
-				} else {
-					console.log("Can't put there.");
-				}
-			}
-		});
-	}
+	// let table_cells = document.querySelectorAll("td");
+	// for (let i = 0; i < table_cells.length; i++) {
+	// 	table_cells[i].addEventListener('click', () => {
+	// 		let order = gm.board.getOpponent(gm.enemy.order);
+	// 		let x = i%gm.board.width;
+	// 		let y = Math.floor(i/gm.board.width);
+	// 		if (gm.current_turn == order) {
+	// 			if (gm.board.putJudgement(order, x, y)){
+	// 				gm.board.putDisk(order, x, y);
+	// 				embedToTable(gm.board.table, table_cells)
+	// 				gm.changeTurn();
+	// 				enemy.searchFirst(gm.board);
+	// 				gm.changeTurn();
+	// 				embedToTable(gm.board.table, table_cells)
+	// 			} else {
+	// 				console.log("Can't put there.");
+	// 			}
+	// 		}
+	// 	});
+	// }
 	// console.log(table_cells)
-	embedToTable(board.table, table_cells)
+	// embedToTable(board.table, table_cells)
 
 
 	// board.view();
@@ -318,4 +318,4 @@ window.addEventListener('load', () => {
 	// gm.board.view();
 	// console.log(board.info());
 	// console.log(board.table);
-});
+// });
