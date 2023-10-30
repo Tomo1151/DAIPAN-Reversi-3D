@@ -16,6 +16,14 @@ class GameStartEvent extends CustomEvent {
 	}
 }
 
+class GameOverEvent extends CustomEvent {
+	static EVENT_NAME = "game_over";
+
+	constructor () {
+		super (GameOverEvent.EVENT_NAME);
+	}
+}
+
 class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
 	#board;
@@ -59,6 +67,14 @@ class PutSuccessEvent extends CustomEvent {
 
 	constructor (data) {
 		super (PutSuccessEvent.EVENT_NAME);
+	}
+}
+
+class PutPassEvent extends CustomEvent {
+	static EVENT_NAME = "put_pass";
+
+	constructor () {
+		super (PutPassEvent.EVENT_NAME);
 	}
 }
 

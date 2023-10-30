@@ -33,9 +33,19 @@ class GameManager {
 					if (this.checkCanPut(x, y)) {
 						this.put(x, y);
 						this.object_update();
-						this.changeTurn();
+
+						if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
+							console.log("GAME_OVER");
+							const game_over = new GameOverEvent();
+
+							this.players[0].dispatchEvent(game_over);
+							this.players[1].dispatchEvent(game_over);
+
+							return;
+						}
 
 						let turn_notice = new TurnNoticeEvent(this.board);
+						this.changeTurn();
 						dest_o.dispatchEvent(turn_notice);
 
 						result_event = new PutSuccessEvent();
@@ -43,6 +53,7 @@ class GameManager {
 					} else {
 						result_event = new PutFailEvent();
 					}
+
 				} else {
 					result_event = new PutFailEvent();
 				}
@@ -51,11 +62,14 @@ class GameManager {
 			});
 
 			this.addEventListener('put_success', () => {
-				console.log(this.board)
+				// console.log(this.board)
 				// console.log("event: in gm")
 				this.object_update();
 			})
 
+			this.addEventListener('put_pass', () => {
+				this.changeTurn();
+			})
 
 			console.log("event: gamestart");
 			let turn_notice = new TurnNoticeEvent(this.board);

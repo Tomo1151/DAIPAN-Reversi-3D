@@ -123,7 +123,7 @@
 	})
 
 	const show_models = (board) => {
-		console.log(board);
+		// console.log(board);
 		for (let i = 0; i < board.table.length; i++) {
 			switch (board.table[i].state) {
 				case Disk.WHITE:
