@@ -1,0 +1,1 @@
+open -na "Google Chrome" --args --user-data-dir=/tmp/dev_chrome_profile --disable-web-security
