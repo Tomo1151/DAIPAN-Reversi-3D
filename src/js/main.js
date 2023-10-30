@@ -1,14 +1,59 @@
 "use strict";
 console.log("Hello, world!");
 
-class Enemy {
+const sleep = async (ms) => {return new Promise(res => setInterval(res, ms));}
+
+class Player {
 	#order;
+	#name = '';
+	#point = 0;
+
+	#event_manager = new EventManager();
 
 	constructor (order) {
 		this.#order = order;
+		this.addEventListener('turn_notice', ()=> {
+			console.log(`turn notice: ${order}`);
+		});
+		this.addEventListener('put_success', (e) => {
+			console.log(e);
+			// console.log("put successed.")
+		})
+		this.addEventListener('put_fail', (e) => {
+			console.log(e);
+			// console.log("put failed.")
+		})
+	}
+
+	addEventListener(event_name, callback) {
+		this.#event_manager.addEventListener(event_name, callback);
+	}
+
+	dispatchEvent(event, dispatch_object) {
+		this.#event_manager.dispatchEvent(event, dispatch_object);
 	}
 
 	get order() {return this.#order;}
+	get name() {return this.#name;}
+	set name(name) {this.#name = name;}
+}
+
+
+class Enemy extends Player {
+	constructor (order) {
+		super(order);
+		this.name = 'enemy';
+
+		this.addEventListener('turn_notice', async (e) => {
+			console.log(e);
+			const data = this.searchFirst(e.board);
+			const notice = new PutNoticeEvent(data);
+			// gm.dispatchEvent(e);
+			await sleep(1500);
+			gm.dispatchEvent(notice)
+			// console.log(e)
+		});
+	}
 
 	searchFirst(board) {
 		const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
@@ -18,8 +63,11 @@ class Enemy {
 			for (let j = 0; j < board.height; j++) {
 				if (board.putJudgement(this.order, j, i)) {
 					console.log(`x: ${j}, y: ${i}`)
-					board.putDisk(this.order, j, i);
-					return true;
+					return {
+						"order": this.order,
+						"x": j,
+						"y": i
+					};
 				}
 			}
 		}
@@ -161,12 +209,12 @@ class Board {
 					let count = this.countReversible(order, x, y, dc[i], dr[i]);
 					if (count > 0) this.reverseDisks(x, y, dc[i], dr[i], count);
 				}
-				this.view();
+				// this.view();
 				return true;
 			}
 		// }
 
-		this.view();
+		// this.view();
 		return false;
 	}
 
@@ -206,116 +254,12 @@ class Board {
 	}
 }
 
-class GameManager {
-	static BEFORE_START = 0;
-	static IN_GAME = 1;
-	static GAME_OVER = 2;
-	static GAME_STATE = this.BEFORE_START;
-
-	#board;
-	#current_turn = Disk.BLACK;
-	#enemy;
-
-	constructor (board, enemy) {
-		this.#board = board;
-		this.#enemy = enemy;
-	}
-
-	checkTable (order) {
-		for (let i = 0; i < board.height; i++) {
-			for (let j = 0; j < board.width; j++) {
-				if (board.putJudgement(order, j, i)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	put(x, y) {
-		if (this.current_turn != this.enemy.order) {
-			this.board.putDisk(board.getOpponent(this.enemy.order), x, y);
-			changeTurn();
-		} else {
-
-			console.log("not in your turn.");
-		}
-	}
-
-
-	async run () {
-		let turn = 0;
-		let point = 0;
-
-
-
-		// while (true) {
-
-
-		// 	turn += 1;
-		// }
-	}
-
-	get board () {return this.#board;}
-	get current_turn () {return this.#current_turn;}
-	get enemy () {return this.#enemy;}
-
-	changeTurn () {
-		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
-	}
-}
-
-const embedToTable = (board_table, table_doms) => {
-	let disk = '';
-	for (let i = 0; i < table_doms.length; i++) {
-		disk = '';
-		switch (board_table[i].state) {
-			case Disk.WHITE:
-				disk = '○';
-				break;
-			case Disk.BLACK:
-				disk = '◉';
-				break;
-		}
-		table_doms[i].innerText = disk;
-	}
-}
 
 const board = new Board(8, 8);
+const player = new Player(Disk.WHITE);
 const enemy = new Enemy(Disk.BLACK);
+const gm = new GameManager([player, enemy]);
 
-// window.addEventListener('load', () => {
-	// const gm = new GameManager(board, enemy);
-	// enemy.searchFirst(gm.board);
-	// gm.changeTurn();
+window.addEventListener('load', () => {
 
-	// let table_cells = document.querySelectorAll("td");
-	// for (let i = 0; i < table_cells.length; i++) {
-	// 	table_cells[i].addEventListener('click', () => {
-	// 		let order = gm.board.getOpponent(gm.enemy.order);
-	// 		let x = i%gm.board.width;
-	// 		let y = Math.floor(i/gm.board.width);
-	// 		if (gm.current_turn == order) {
-	// 			if (gm.board.putJudgement(order, x, y)){
-	// 				gm.board.putDisk(order, x, y);
-	// 				embedToTable(gm.board.table, table_cells)
-	// 				gm.changeTurn();
-	// 				enemy.searchFirst(gm.board);
-	// 				gm.changeTurn();
-	// 				embedToTable(gm.board.table, table_cells)
-	// 			} else {
-	// 				console.log("Can't put there.");
-	// 			}
-	// 		}
-	// 	});
-	// }
-	// console.log(table_cells)
-	// embedToTable(board.table, table_cells)
-
-
-	// board.view();
-	// console.log(enemy.searchFirst(board));
-	// gm.board.view();
-	// console.log(board.info());
-	// console.log(board.table);
-// });
+});
