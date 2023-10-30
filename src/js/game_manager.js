@@ -52,7 +52,7 @@ class GameManager {
 
 			this.addEventListener('put_success', () => {
 				console.log(this.board)
-				console.log("event: in gm")
+				// console.log("event: in gm")
 				this.object_update();
 			})
 
@@ -98,7 +98,7 @@ class GameManager {
 
 	put (x, y) {
 		this.board.putDisk(this.current_turn, x, y);
-		this.board.view();
+		// this.board.view();
 	}
 
 	object_update() {
@@ -111,5 +111,16 @@ class GameManager {
 
 	changeTurn () {
 		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
+
+		let div = document.getElementById('order_div');
+		if (this.current_turn == Disk.BLACK) {
+			div.children[0].innerText = 'BLACK';
+			div.classList.remove('order-white');
+			div.classList.add('order-black');
+		} else {
+			div.children[0].innerText = 'WHITE';
+			div.classList.remove('order-black');
+			div.classList.add('order-white');
+		}
 	}
 }

@@ -105,7 +105,7 @@
 		}
 	});
 
-	window.addEventListener('click', (e) => {
+	(document.getElementById('main-canvas')).addEventListener('click', (e) => {
 		if (selected_box) {
 			let order = Disk.WHITE;
 			let x = selected_box.cell_x

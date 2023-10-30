@@ -25,6 +25,29 @@
 			overflow: hidden;
 		}
 
+		.order {
+			position: absolute;
+			top: 5rem;
+			left: 1rem;
+			border: 1px solid #444;
+			border-radius: 5px;
+			padding: 0.5rem 1rem;
+			user-select: none;
+
+		}
+
+		.order-black {
+			color: white;
+			background: black;
+			font-weight: bold;
+		}
+
+		.order-white {
+			color: black;
+			background: white;
+			font-weight: bold;
+		}
+
 		.button {
 			position: absolute;
 			top: 1rem;
@@ -51,6 +74,9 @@
 <body>
 	<div class="button" id="start_button">
 		<p>Start</p>
+	</div>
+	<div class="order" id="order_div">
+		<p id="order">NONE</p>
 	</div>
 	<canvas id="main-canvas"></canvas>
 </body>

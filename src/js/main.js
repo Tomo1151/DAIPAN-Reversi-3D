@@ -261,5 +261,4 @@ const enemy = new Enemy(Disk.BLACK);
 const gm = new GameManager([player, enemy]);
 
 window.addEventListener('load', () => {
-
 });
