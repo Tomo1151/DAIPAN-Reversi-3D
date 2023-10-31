@@ -1,5 +1,15 @@
 // window.addEventListener('load', init);
 
+window.addEventListener('resize', () => {
+	const width = window.innerWidth;
+	const height = window.innerHeight;
+
+	renderer.setSize(width, height);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	camera.aspect = width / height;
+	camera.updateProjectionMatrix();
+});
+
 // function init() {
 	const canvas_element = document.getElementById('main-canvas');
 

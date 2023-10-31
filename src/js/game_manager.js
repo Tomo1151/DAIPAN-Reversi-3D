@@ -33,14 +33,11 @@ class GameManager {
 					if (this.checkCanPut(x, y)) {
 						this.put(x, y);
 						this.object_update();
-
-						if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
-							console.log("GAME_OVER");
+						console.log(`check game_over: ${this.checkGameOver()}`)
+						if (this.checkGameOver()) {
+							console.log("Game Over")
 							const game_over = new GameOverEvent();
-
-							this.players[0].dispatchEvent(game_over);
-							this.players[1].dispatchEvent(game_over);
-
+							this.boroadcastGameEvent(game_over);
 							return;
 						}
 
@@ -95,10 +92,24 @@ class GameManager {
 		return this.players.find(p => p.name == 'enemy');
 	}
 
+	checkGameOver () {
+		if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	boroadcastGameEvent (event) {
+		for (let player of this.players) {
+			player.dispatchEvent(event);
+		}
+	}
+
 	checkTable (order) {
-		for (let i = 0; i < board.height; i++) {
-			for (let j = 0; j < board.width; j++) {
-				if (board.putJudgement(order, j, i)) {
+		for (let i = 0; i < this.board.height; i++) {
+			for (let j = 0; j < this.board.width; j++) {
+				if (this.board.putJudgement(order, j, i)) {
 					return true;
 				}
 			}
