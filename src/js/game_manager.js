@@ -23,7 +23,7 @@ class GameManager {
 
 		// 石を置かれた時
 		this.addEventListener('put_notice', (data) => {
-			if (GAME_STATE != IN_GAME) return;
+			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
 			// 置かれた情報
 			let order = data["order"];
