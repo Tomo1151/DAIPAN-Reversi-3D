@@ -16,89 +16,34 @@ class GameManager {
 		this.#players[1] = players[1];
 
 		this.addEventListener('game_start', () => {
-			this.object_update();
-
-			// 石を置かれた時
-			this.addEventListener('put_notice', (data) => {
-				// 置かれた情報
-				let order = data["order"];
-				let result_event;
-				let x = data["x"];
-				let y = data["y"];
-
-				this.dest_o = this.findEventDest(this.board.getOpponent(this.current_turn));
-				this.dest_i = this.findEventDest(this.current_turn);
-
-				// もし手番なら
-				if (this.current_turn == order) {
-					// その場に置けるのであれば
-					if (this.checkCanPut(x, y)) {
-						this.put(x, y);
-						// this.object_update();
-
-						result_event = new PutSuccessEvent();
-
-						// gm に置けたことを報告，ターンチェンジの指示
-						this.dispatchEvent(result_event);
-						this.dispatchEvent(new TurnChangeEvent());
-					} else {
-						// 手番のプレイヤーに置けなかったことを報告
-						result_event = new PutFailEvent();
-					}
-
-				} else {
-					result_event = new PutFailEvent();
-				}
-
-				// 手番のプレイヤーに結果の報告
-				this.dest_i.dispatchEvent(result_event);
-			});
-
-			// ターンチェンジの指示があったら
-			this.addEventListener('turn_change', () => {
-				// 次の手番の人が置けるか確認し，その人に報告
-				if (this.checkTable(this.board.getOpponent(this.current_turn))) {
-					this.dest_o.dispatchEvent(new CanPutNotice());
-				} else {
-					this.dest_o.dispatchEvent(new CantPutNotice());
-				}
-			});
-
-			// 石をおけた時
-			this.addEventListener('put_success', (e) => {
-				console.log("[gm] received: put_success")
-				this.object_update();
-
-				this.dest_o = this.findEventDest(this.board.getOpponent(this.current_turn));
-				this.dest_i = this.findEventDest(this.current_turn);
-
-						console.log(`check game_over: ${this.checkGameOver()}`)
-
-						if (this.checkGameOver()) {
-							console.log("Game Over")
-							const game_over = new GameOverEvent();
-							this.boroadcastGameEvent(game_over);
-							return;
-						}
-
-						let turn_notice = new TurnNoticeEvent(this.board);
-						this.changeTurn();
-						this.dest_o.dispatchEvent(turn_notice);
-
-			})
-
-			// プレイヤーからパスの指示を受けたら
-			this.addEventListener('put_pass', () => {
-				this.changeTurn();
-			})
-
 			// 初回
 			console.log("[event] : gamestart");
-			let turn_notice = new TurnNoticeEvent(this.board);
-			this.findEventDest(this.current_turn).dispatchEvent(turn_notice);
-			this.findEventDest(this.current_turn).dispatchEvent(new CanPutNotice());
-
+			this.GAME_STATE = GameManager.IN_GAME;
 		});
+
+		// 石を置かれた時
+		this.addEventListener('put_notice', (data) => {
+			if (GAME_STATE != IN_GAME) return;
+
+			// 置かれた情報
+			let order = data["order"];
+			let result_event;
+			let x = data["x"];
+			let y = data["y"];
+		});
+
+		// ターンチェンジの指示があったら
+		this.addEventListener('turn_change', () => {
+		});
+
+		// 石をおけた時
+		this.addEventListener('put_success', (e) => {
+		})
+
+		// プレイヤーからパスの指示を受けたら
+		this.addEventListener('put_pass', () => {
+			this.changeTurn();
+		})
 	}
 
 	addEventListener(event_name, callback) {

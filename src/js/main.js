@@ -12,9 +12,9 @@ class Player {
 
 	constructor (order) {
 		this.#order = order;
-		this.addEventListener('turn_notice', ()=> {
+
+		this.addEventListener('turn_notice', () => {
 			console.log(this.name + " received: turn_notice");
-			// console.log(`turn notice: ${order}`);
 		});
 
 		this.addEventListener('can_put', (e) => {
@@ -30,17 +30,16 @@ class Player {
 		this.addEventListener('put_success', (e) => {
 			console.log(this.name + " received: put_success");
 			// console.log(e);
-			// console.log("put successed.")
 		});
 
 		this.addEventListener('put_fail', (e) => {
 			console.log(this.name + " received: put_fail");
 			// console.log(e);
-			// console.log("put failed.")
 		});
 
 		this.addEventListener('game_over', (e) => {
-			console.log(`received: ${e}`)
+			console.log(e);
+			console.log(`${this.name} received: game_over`)
 		});
 	}
 
@@ -102,7 +101,7 @@ class Enemy extends Player {
 			// console.log("b")
 			for (let j = 0; j < board.height; j++) {
 				if (board.putJudgement(this.order, j, i)) {
-					console.log(`x: ${j}, y: ${i}`)
+					// console.log(`x: ${j}, y: ${i}`)
 					return {
 						"order": this.order,
 						"x": j,
