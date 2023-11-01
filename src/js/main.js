@@ -13,29 +13,29 @@ class Player {
 	constructor (order) {
 		this.#order = order;
 		this.addEventListener('turn_notice', ()=> {
-			console.log(this.name + ":");
-			console.log(`turn notice: ${order}`);
+			console.log(this.name + " received: turn_notice");
+			// console.log(`turn notice: ${order}`);
 		});
 
 		this.addEventListener('can_put', (e) => {
-			console.log(this.name + ":");
-			console.log(e)
+			console.log(this.name + " received: can_put");
+			// console.log(e)
 		});
 
 		this.addEventListener('cant_put', (e) => {
-			console.log(this.name + ":");
-			console.log(e)
+			console.log(this.name + " received: cant_put");
+			// console.log(e)
 		});
 
 		this.addEventListener('put_success', (e) => {
-			console.log(this.name + ":");
-			console.log(e);
+			console.log(this.name + " received: put_success");
+			// console.log(e);
 			// console.log("put successed.")
 		});
 
 		this.addEventListener('put_fail', (e) => {
-			console.log(this.name + ":");
-			console.log(e);
+			console.log(this.name + " received: put_fail");
+			// console.log(e);
 			// console.log("put failed.")
 		});
 
@@ -64,7 +64,7 @@ class Enemy extends Player {
 		this.name = 'enemy';
 
 		this.addEventListener('turn_notice', async (e) => {
-			console.log(e);
+			// console.log(e);
 
 			this.addEventListener('can_put', async () => {
 				const data = this.searchFirst(e.board);

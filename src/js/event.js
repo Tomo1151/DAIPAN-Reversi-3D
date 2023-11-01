@@ -24,6 +24,22 @@ class GameOverEvent extends CustomEvent {
 	}
 }
 
+class ConfirmationEvent extends CustomEvent {
+	static EVENT_NAME = "confirmed";
+
+	constructor () {
+		super (ConfirmationEvent.EVENT_NAME);
+	}
+}
+
+class TurnChangeEvent extends CustomEvent {
+	static EVENT_NAME = "turn_change";
+
+	constructor () {
+		super (TurnChangeEvent.EVENT_NAME);
+	}
+}
+
 class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
 	#board;

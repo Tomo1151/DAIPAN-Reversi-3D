@@ -7,6 +7,8 @@ class GameManager {
 	#board = new Board(8, 8);
 	#players = new Array(2);
 	#current_turn = Disk.BLACK;
+	#dest_i;
+	#dest_o;
 	#event_manager = new EventManager();
 
 	constructor (players) {
@@ -16,29 +18,59 @@ class GameManager {
 		this.addEventListener('game_start', () => {
 			this.object_update();
 
+			// 石を置かれた時
 			this.addEventListener('put_notice', (data) => {
+				// 置かれた情報
 				let order = data["order"];
 				let result_event;
 				let x = data["x"];
 				let y = data["y"];
 
-				console.log(data)
+				this.dest_o = this.findEventDest(this.board.getOpponent(this.current_turn));
+				this.dest_i = this.findEventDest(this.current_turn);
 
-				// let player = this.findEventDest(order);
-				// let enemy = this.findEnemy();
-				let dest_o = this.findEventDest(this.board.getOpponent(this.current_turn));
-				let dest_i = this.findEventDest(this.current_turn);
-
+				// もし手番なら
 				if (this.current_turn == order) {
-					if (this.checkTable(this.board.getOpponent(this.current_turn))) {
-						dest_o.dispatchEvent(new CanPutNotice());
-					} else {
-						dest_o.dispatchEvent(new CantPutNotice());
-					}
-
+					// その場に置けるのであれば
 					if (this.checkCanPut(x, y)) {
 						this.put(x, y);
-						this.object_update();
+						// this.object_update();
+
+						result_event = new PutSuccessEvent();
+
+						// gm に置けたことを報告，ターンチェンジの指示
+						this.dispatchEvent(result_event);
+						this.dispatchEvent(new TurnChangeEvent());
+					} else {
+						// 手番のプレイヤーに置けなかったことを報告
+						result_event = new PutFailEvent();
+					}
+
+				} else {
+					result_event = new PutFailEvent();
+				}
+
+				// 手番のプレイヤーに結果の報告
+				this.dest_i.dispatchEvent(result_event);
+			});
+
+			// ターンチェンジの指示があったら
+			this.addEventListener('turn_change', () => {
+				// 次の手番の人が置けるか確認し，その人に報告
+				if (this.checkTable(this.board.getOpponent(this.current_turn))) {
+					this.dest_o.dispatchEvent(new CanPutNotice());
+				} else {
+					this.dest_o.dispatchEvent(new CantPutNotice());
+				}
+			});
+
+			// 石をおけた時
+			this.addEventListener('put_success', (e) => {
+				console.log("[gm] received: put_success")
+				this.object_update();
+
+				this.dest_o = this.findEventDest(this.board.getOpponent(this.current_turn));
+				this.dest_i = this.findEventDest(this.current_turn);
 
 						console.log(`check game_over: ${this.checkGameOver()}`)
 
@@ -51,31 +83,16 @@ class GameManager {
 
 						let turn_notice = new TurnNoticeEvent(this.board);
 						this.changeTurn();
-						dest_o.dispatchEvent(turn_notice);
+						this.dest_o.dispatchEvent(turn_notice);
 
-						result_event = new PutSuccessEvent();
-						this.dispatchEvent(result_event);
-					} else {
-						result_event = new PutFailEvent();
-					}
-
-				} else {
-					result_event = new PutFailEvent();
-				}
-
-				dest_i.dispatchEvent(result_event);
-			});
-
-			this.addEventListener('put_success', () => {
-				// console.log(this.board)
-				// console.log("event: in gm")
-				this.object_update();
 			})
 
+			// プレイヤーからパスの指示を受けたら
 			this.addEventListener('put_pass', () => {
 				this.changeTurn();
 			})
 
+			// 初回
 			console.log("[event] : gamestart");
 			let turn_notice = new TurnNoticeEvent(this.board);
 			this.findEventDest(this.current_turn).dispatchEvent(turn_notice);
@@ -138,9 +155,14 @@ class GameManager {
 		show_models(this.board);
 	}
 
+	get dest_i () {return this.#dest_i;}
+	get dest_o () {return this.#dest_o;}
 	get board () {return this.#board;}
 	get players () {return this.#players;}
 	get current_turn () {return this.#current_turn;}
+
+	set dest_i (dest_i) {this.#dest_i = dest_i;}
+	set dest_o (dest_o) {this.#dest_o = dest_o;}
 
 	changeTurn () {
 		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
