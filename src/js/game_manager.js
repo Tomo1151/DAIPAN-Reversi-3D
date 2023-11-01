@@ -30,10 +30,18 @@ class GameManager {
 				let dest_i = this.findEventDest(this.current_turn);
 
 				if (this.current_turn == order) {
+					if (this.checkTable(this.board.getOpponent(this.current_turn))) {
+						dest_o.dispatchEvent(new CanPutNotice());
+					} else {
+						dest_o.dispatchEvent(new CantPutNotice());
+					}
+
 					if (this.checkCanPut(x, y)) {
 						this.put(x, y);
 						this.object_update();
+
 						console.log(`check game_over: ${this.checkGameOver()}`)
+
 						if (this.checkGameOver()) {
 							console.log("Game Over")
 							const game_over = new GameOverEvent();
@@ -68,10 +76,10 @@ class GameManager {
 				this.changeTurn();
 			})
 
-			console.log("event: gamestart");
+			console.log("[event] : gamestart");
 			let turn_notice = new TurnNoticeEvent(this.board);
 			this.findEventDest(this.current_turn).dispatchEvent(turn_notice);
-
+			this.findEventDest(this.current_turn).dispatchEvent(new CanPutNotice());
 
 		});
 	}

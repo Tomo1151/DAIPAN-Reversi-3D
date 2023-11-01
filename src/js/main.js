@@ -5,7 +5,7 @@ const sleep = async (ms) => {return new Promise(res => setInterval(res, ms));}
 
 class Player {
 	#order;
-	#name = '';
+	#name = 'player';
 	#point = 0;
 
 	#event_manager = new EventManager();
@@ -13,15 +13,28 @@ class Player {
 	constructor (order) {
 		this.#order = order;
 		this.addEventListener('turn_notice', ()=> {
+			console.log(this.name + ":");
 			console.log(`turn notice: ${order}`);
 		});
 
+		this.addEventListener('can_put', (e) => {
+			console.log(this.name + ":");
+			console.log(e)
+		});
+
+		this.addEventListener('cant_put', (e) => {
+			console.log(this.name + ":");
+			console.log(e)
+		});
+
 		this.addEventListener('put_success', (e) => {
+			console.log(this.name + ":");
 			console.log(e);
 			// console.log("put successed.")
 		});
 
 		this.addEventListener('put_fail', (e) => {
+			console.log(this.name + ":");
 			console.log(e);
 			// console.log("put failed.")
 		});
@@ -52,15 +65,18 @@ class Enemy extends Player {
 
 		this.addEventListener('turn_notice', async (e) => {
 			console.log(e);
-			let event;
-			if (this.checkCanPut(e.board)) {
+
+			this.addEventListener('can_put', async () => {
 				const data = this.searchFirst(e.board);
-				event = new PutNoticeEvent(data);
-			} else {
-				event = new PutPassEvent();
-			}
-			await sleep(1500);
-			gm.dispatchEvent(event);
+
+				await sleep(1500);
+				gm.dispatchEvent(new PutNoticeEvent(data));
+			});
+
+			this.addEventListener('cant_put', async () => {
+				await sleep(1000);
+				gm.dispatchEvent(new PutPassEvent());
+			});
 		});
 	}
 
