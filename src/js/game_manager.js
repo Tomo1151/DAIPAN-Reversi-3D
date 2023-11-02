@@ -28,15 +28,18 @@ class GameManager {
 
 		// 石を置かれた時
 		this.addEventListener('put_notice', (data) => {
-			console.log("[gm] received: put_notice");
-
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
-			// console.log(data);
+
 			// 置かれた情報
 			let order = data["order"];
 			let result_event;
 			let x = data["x"];
 			let y = data["y"];
+
+			// 手番じゃないプレイヤーからのイベントは無視
+			if (order !== this.current_turn) return;
+
+			console.log("[gm] received: put_notice");
 
 			if (this.checkCanPut(x, y)) {
 				this.put(x, y);
@@ -46,8 +49,7 @@ class GameManager {
 				this.dest_i.dispatchEvent(new PutSuccessEvent());
 				this.object_update();
 			} else {
-				// イベントの発火元へ返答
-				this.findEventDest(order).dispatchEvent(new PutFailEvent());
+				this.dest_i.dispatchEvent(new PutFailEvent());
 			}
 		});
 
@@ -61,11 +63,14 @@ class GameManager {
 		this.addEventListener('turn_change', () => {
 			console.log("[gm] received: turn_change");
 			console.log("");
+
+			// 情報書き換え
 			this.changeTurn();
 
 			if (this.checkGameOver()) {
 				this.boroadcastGameEvent(new GameOverEvent());
 			} else {
+				// 新たな手番へターンを報告
 				this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, this.checkTable(this.current_turn)));
 			}
 
@@ -101,6 +106,7 @@ class GameManager {
 
 	checkGameOver () {
 		if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
+			this.GAME_STATE = GameManager.GAME_OVER;
 			return true;
 		} else {
 			return false;
@@ -150,6 +156,16 @@ class GameManager {
 
 	set dest_i (dest_i) {this.#dest_i = dest_i;}
 	set dest_o (dest_o) {this.#dest_o = dest_o;}
+
+	pass () {
+		let button = document.getElementById('pass_button');
+		button.addEventListener('click', () => {
+
+		});
+		if (this.current_turn = Disk.WHITE) {
+		}
+		this.dispatchEvent(new PutPassEvent());
+	}
 
 	changeTurn () {
 		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;

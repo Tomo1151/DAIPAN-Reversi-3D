@@ -18,16 +18,6 @@ class Player {
 			// console.log(e)
 		});
 
-		this.addEventListener('can_put', (e) => {
-			console.log(this.name + " received: can_put");
-			// console.log(e)
-		});
-
-		this.addEventListener('cant_put', (e) => {
-			console.log(this.name + " received: cant_put");
-			// console.log(e)
-		});
-
 		this.addEventListener('put_success', (e) => {
 			console.log(this.name + " received: put_success");
 			// console.log(e);
@@ -80,23 +70,7 @@ class Enemy extends Player {
 			await sleep(1000);
 			console.log(`enemy send: ${event.name}`);
 			gm.dispatchEvent(event);
-
-			// this.addEventListener('can_put', async () => {
-			// 	const data = this.searchFirst(e.board);
-
-			// 	await sleep(1500);
-			// 	gm.dispatchEvent(new PutNoticeEvent(data));
-			// });
-
-			// this.addEventListener('cant_put', async () => {
-			// 	await sleep(1000);
-			// 	gm.dispatchEvent(new PutPassEvent());
-			// });
 		});
-
-		// this.addEventListener('put_success', () => {
-
-		// });
 	}
 
 	checkCanPut (board) {
