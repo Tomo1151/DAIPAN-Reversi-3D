@@ -19,29 +19,60 @@ class GameManager {
 			// 初回
 			console.log("[event] : gamestart");
 			this.GAME_STATE = GameManager.IN_GAME;
+			this.setDests();
+			this.object_update();
+
+			// 初回はDisk.BLACK に turn_notice
+			this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, true));
 		});
 
 		// 石を置かれた時
 		this.addEventListener('put_notice', (data) => {
-			if (this.GAME_STATE != GameManager.IN_GAME) return;
+			console.log("[gm] received: put_notice");
 
+			if (this.GAME_STATE != GameManager.IN_GAME) return;
+			// console.log(data);
 			// 置かれた情報
 			let order = data["order"];
 			let result_event;
 			let x = data["x"];
 			let y = data["y"];
+
+			if (this.checkCanPut(x, y)) {
+				this.put(x, y);
+
+				// self と dest_i へ置けた報告
+				this.dispatchEvent(new PutSuccessEvent());
+				this.dest_i.dispatchEvent(new PutSuccessEvent());
+				this.object_update();
+			} else {
+				// イベントの発火元へ返答
+				this.findEventDest(order).dispatchEvent(new PutFailEvent());
+			}
+		});
+
+		// player が put_success を受け取ったら
+		this.addEventListener('confirmed', () => {
+			console.log("[gm] received: confirmed");
+			this.dispatchEvent(new TurnChangeEvent());
 		});
 
 		// ターンチェンジの指示があったら
 		this.addEventListener('turn_change', () => {
+			console.log("[gm] received: turn_change");
+			console.log("");
+			this.changeTurn();
+			this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, this.checkTable(this.current_turn)));
 		});
 
 		// 石をおけた時
 		this.addEventListener('put_success', (e) => {
-		})
+			console.log("[gm] received: put_success");
+		});
 
 		// プレイヤーからパスの指示を受けたら
 		this.addEventListener('put_pass', () => {
+			console.log("[gm] received: put_pass");
 			this.changeTurn();
 		})
 	}
@@ -100,6 +131,11 @@ class GameManager {
 		show_models(this.board);
 	}
 
+	setDests () {
+		this.dest_i = this.findEventDest(this.current_turn);
+		this.dest_o = this.findEventDest(board.getOpponent(this.current_turn));
+	}
+
 	get dest_i () {return this.#dest_i;}
 	get dest_o () {return this.#dest_o;}
 	get board () {return this.#board;}
@@ -111,6 +147,8 @@ class GameManager {
 
 	changeTurn () {
 		this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
+
+		this.setDests();
 
 		let div = document.getElementById('order_div');
 		if (this.current_turn == Disk.BLACK) {

@@ -42,14 +42,17 @@ class TurnChangeEvent extends CustomEvent {
 
 class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
+	#can_put;
 	#board;
 
-	constructor (data) {
+	constructor (board, can_put) {
 		super (TurnNoticeEvent.EVENT_NAME);
-		this.#board = data;
+		this.#board = board;
+		this.#can_put = can_put;
 	}
 
 	get board () {return this.#board;}
+	get can_put () {return this.#can_put;}
 }
 
 class PutNoticeEvent extends CustomEvent {

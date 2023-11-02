@@ -31,6 +31,8 @@ class Player {
 		this.addEventListener('put_success', (e) => {
 			console.log(this.name + " received: put_success");
 			// console.log(e);
+			console.log(`${this.name} send: confirmed`);
+			gm.dispatchEvent(new ConfirmationEvent());
 		});
 
 		this.addEventListener('put_fail', (e) => {
@@ -65,19 +67,36 @@ class Enemy extends Player {
 
 		this.addEventListener('turn_notice', async (e) => {
 			// console.log(e);
+			let board = e.board;
+			let event;
 
-			this.addEventListener('can_put', async () => {
-				const data = this.searchFirst(e.board);
+			if (e.can_put) {
+				const data = this.searchFirst(board);
+				event = new PutNoticeEvent(data);
+			} else {
+				event = new PutPassEvent();
+			}
 
-				await sleep(1500);
-				gm.dispatchEvent(new PutNoticeEvent(data));
-			});
+			await sleep(1000);
+			console.log(`enemy send: ${event.name}`);
+			gm.dispatchEvent(event);
 
-			this.addEventListener('cant_put', async () => {
-				await sleep(1000);
-				gm.dispatchEvent(new PutPassEvent());
-			});
+			// this.addEventListener('can_put', async () => {
+			// 	const data = this.searchFirst(e.board);
+
+			// 	await sleep(1500);
+			// 	gm.dispatchEvent(new PutNoticeEvent(data));
+			// });
+
+			// this.addEventListener('cant_put', async () => {
+			// 	await sleep(1000);
+			// 	gm.dispatchEvent(new PutPassEvent());
+			// });
 		});
+
+		// this.addEventListener('put_success', () => {
+
+		// });
 	}
 
 	checkCanPut (board) {
