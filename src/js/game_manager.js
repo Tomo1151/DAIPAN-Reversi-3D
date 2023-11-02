@@ -62,7 +62,13 @@ class GameManager {
 			console.log("[gm] received: turn_change");
 			console.log("");
 			this.changeTurn();
-			this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, this.checkTable(this.current_turn)));
+
+			if (this.checkGameOver()) {
+				this.boroadcastGameEvent(new GameOverEvent());
+			} else {
+				this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, this.checkTable(this.current_turn)));
+			}
+
 		});
 
 		// 石をおけた時
@@ -73,7 +79,7 @@ class GameManager {
 		// プレイヤーからパスの指示を受けたら
 		this.addEventListener('put_pass', () => {
 			console.log("[gm] received: put_pass");
-			this.changeTurn();
+			this.dispatchEvent(new TurnChangeEvent());
 		})
 	}
 
