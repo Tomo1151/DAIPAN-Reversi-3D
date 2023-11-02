@@ -73,6 +73,10 @@ class GameManager {
 			} else {
 				// 新たな手番へターンを報告
 				this.dest_i.dispatchEvent(new TurnNoticeEvent(this.board, this.checkTable(this.current_turn)));
+
+				if (this.current_turn == Disk.WHITE && !this.checkTable(this.current_turn)) {
+					this.pass();
+				}
 			}
 
 		});
@@ -160,12 +164,11 @@ class GameManager {
 
 	pass () {
 		let button = document.getElementById('pass_button');
+		button.style.display = 'block';
 		button.addEventListener('click', () => {
-
+			this.dispatchEvent(new PutPassEvent());
+			button.style.display = 'none';
 		});
-		if (this.current_turn = Disk.WHITE) {
-		}
-		this.dispatchEvent(new PutPassEvent());
 	}
 
 	changeTurn () {
