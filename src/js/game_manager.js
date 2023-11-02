@@ -63,6 +63,7 @@ class GameManager {
 		this.addEventListener('turn_change', () => {
 			console.log("[gm] received: turn_change");
 			console.log("");
+			console.log(`[${this.current_turn == 0 ? "Enemy's" : "Player's"} turn]`);
 
 			// 情報書き換え
 			this.changeTurn();
