@@ -89,22 +89,6 @@ class PutSuccessEvent extends CustomEvent {
 	}
 }
 
-// class CanPutNotice extends CustomEvent {
-// 	static EVENT_NAME = "can_put";
-
-// 	constructor () {
-// 		super (CanPutNotice.EVENT_NAME);
-// 	}
-// }
-
-// class CantPutNotice extends CustomEvent {
-// 	static EVENT_NAME = "cant_put";
-
-// 	constructor () {
-// 		super (CanPutNotice.EVENT_NAME);
-// 	}
-// }
-
 class PutPassEvent extends CustomEvent {
 	static EVENT_NAME = "put_pass";
 

@@ -28,6 +28,11 @@ window.addEventListener('resize', () => {
 	camera.position.set(50, 50, 50);
 
 	const controls = new THREE.OrbitControls(camera, canvas_element);
+	controls.maxDistance = 125;
+	controls.minDistance = 30;
+	controls.maxZoom = 2;
+	controls.minZoom = 1.25;
+
 
 	const l = new THREE.AmbientLight(0xffffff, 1);
 	const light = new THREE.DirectionalLight(0xffffff, 1);
