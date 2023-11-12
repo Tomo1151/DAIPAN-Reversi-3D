@@ -119,7 +119,6 @@ window.addEventListener('resize', () => {
 			selected_box = undefined;
 		}
 	});
-
 	(document.getElementById('main-canvas')).addEventListener('click', (e) => {
 		if (selected_box) {
 			let order = Disk.WHITE;
