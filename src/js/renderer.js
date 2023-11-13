@@ -1,6 +1,16 @@
-window.addEventListener('load', init);
+// window.addEventListener('load', init);
 
-function init() {
+window.addEventListener('resize', () => {
+	const width = window.innerWidth;
+	const height = window.innerHeight;
+
+	renderer.setSize(width, height);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	camera.aspect = width / height;
+	camera.updateProjectionMatrix();
+});
+
+// function init() {
 	const canvas_element = document.getElementById('main-canvas');
 
 	const renderer = new THREE.WebGLRenderer({
@@ -18,21 +28,16 @@ function init() {
 	camera.position.set(50, 50, 50);
 
 	const controls = new THREE.OrbitControls(camera, canvas_element);
+	controls.maxDistance = 125;
+	controls.minDistance = 30;
+	controls.maxZoom = 2;
+	controls.minZoom = 1.25;
 
-	// const geometry = new THREE.BoxGeometry(10, 10, 10);
-	// const material = new THREE.MeshPhongMaterial({color: 0x0000ff});
-	// const box = new THREE.Mesh(geometry, material);
-	// box.castShadow = true;
-	// scene.add(box);
 
 	const l = new THREE.AmbientLight(0xffffff, 1);
 	const light = new THREE.DirectionalLight(0xffffff, 1);
 	light.intensity = 1;
 	light.position.set(0, 0, 40);
-	// light.castShadow = true;
-	// light.shadowMapWidth = 2048;
-	// light.shadowMapHeight = 2048;
-	// console.log(box)
 	// scene.add(new THREE.AxesHelper(500));
 	scene.add(l)
 	scene.add(light);
@@ -114,20 +119,25 @@ function init() {
 			selected_box = undefined;
 		}
 	});
-
-	window.addEventListener('click', (e) => {
+	(document.getElementById('main-canvas')).addEventListener('click', (e) => {
 		if (selected_box) {
+			let order = Disk.WHITE;
 			let x = selected_box.cell_x
 			let y = selected_box.cell_y
-			console.log(`x: ${x}, y: ${y}`);
-			board.putDisk(Disk.WHITE, x, y)
-			show_models();
-			enemy.searchFirst(board);
-			show_models();
+			// console.log(`x: ${x}, y: ${y}`);
+			let data = {
+				"order": order,
+				"x": x,
+				"y": y
+			};
+
+			const e = new PutNoticeEvent(data);
+			gm.dispatchEvent(e);
 		}
 	})
 
-	const show_models = () => {
+	const show_models = (board) => {
+		// console.log(board);
 		for (let i = 0; i < board.table.length; i++) {
 			switch (board.table[i].state) {
 				case Disk.WHITE:
@@ -139,25 +149,21 @@ function init() {
 					disk_meshes[i].visible = true;
 					break;
 			}
-			// if (disk_meshes[i].visible)	console.log(disk_meshes[i])
 		}
+		// board.view();
 	}
 
 	const start_button = document.getElementById('start_button');
 	start_button.addEventListener('click', () => {
-		console.log("start");
-		show_models();
+		gm.dispatchEvent(new GameStartEvent());
+		// show_models();
 	});
 
 	tick();
-
 	function tick() {
 		controls.update();
-
-		// box.rotation.x += 0.01;
-		// box.rotation.y += 0.01;
 
 		renderer.render(scene, camera);
 		requestAnimationFrame(tick);
 	}
-}
+// }
