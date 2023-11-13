@@ -1,4 +1,4 @@
-class Section {
+export default class Section {
 	#game_manager;
 	#renderer_manager;
 	#scene;

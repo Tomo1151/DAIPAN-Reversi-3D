@@ -1,4 +1,12 @@
-class GameManager {
+import * as THREE from "three";
+
+import RendererManager from "./renderer_manager.js";
+import SectionManager from "./section_manager.js";
+import Section from "./section/section.js";
+import TitleSection from "./section/TitleSection/title_section.js";
+import GameSection from "./section/GameSection/game_section.js";
+
+export default class GameManager {
 	static BEFORE_START = 0;
 	static IN_GAME = 1;
 	static GAME_OVER = 2;
@@ -22,7 +30,7 @@ class GameManager {
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
-		this.#current_section = new Game(this, this.#renderer_manager, this.#scene);
+		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
 	}
 

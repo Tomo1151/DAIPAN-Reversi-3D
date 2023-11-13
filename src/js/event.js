@@ -8,7 +8,7 @@ class CustomEvent {
 	get name() {return this.#name;}
 }
 
-class GameStartEvent extends CustomEvent {
+export class GameStartEvent extends CustomEvent {
 	static EVENT_NAME = "game_start";
 
 	constructor () {
@@ -16,7 +16,7 @@ class GameStartEvent extends CustomEvent {
 	}
 }
 
-class GameOverEvent extends CustomEvent {
+export class GameOverEvent extends CustomEvent {
 	static EVENT_NAME = "game_over";
 
 	constructor () {
@@ -24,7 +24,7 @@ class GameOverEvent extends CustomEvent {
 	}
 }
 
-class ConfirmationEvent extends CustomEvent {
+export class ConfirmationEvent extends CustomEvent {
 	static EVENT_NAME = "confirmed";
 
 	constructor () {
@@ -32,7 +32,7 @@ class ConfirmationEvent extends CustomEvent {
 	}
 }
 
-class TurnChangeEvent extends CustomEvent {
+export class TurnChangeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_change";
 
 	constructor () {
@@ -40,7 +40,7 @@ class TurnChangeEvent extends CustomEvent {
 	}
 }
 
-class TurnNoticeEvent extends CustomEvent {
+export class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
 	#can_put;
 	#board;
@@ -55,7 +55,7 @@ class TurnNoticeEvent extends CustomEvent {
 	get can_put () {return this.#can_put;}
 }
 
-class PutNoticeEvent extends CustomEvent {
+export class PutNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "put_notice";
 	#order;
 	#x;
@@ -73,7 +73,7 @@ class PutNoticeEvent extends CustomEvent {
 	get y () {return this.#y;}
 }
 
-class PutFailEvent extends CustomEvent {
+export class PutFailEvent extends CustomEvent {
 	static EVENT_NAME = "put_fail";
 
 	constructor (data) {
@@ -81,7 +81,7 @@ class PutFailEvent extends CustomEvent {
 	}
 }
 
-class PutSuccessEvent extends CustomEvent {
+export class PutSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "put_success";
 
 	constructor (data) {
@@ -89,7 +89,7 @@ class PutSuccessEvent extends CustomEvent {
 	}
 }
 
-class PutPassEvent extends CustomEvent {
+export class PutPassEvent extends CustomEvent {
 	static EVENT_NAME = "put_pass";
 
 	constructor () {
@@ -97,7 +97,7 @@ class PutPassEvent extends CustomEvent {
 	}
 }
 
-class EventManager {
+export class EventManager {
 	#listeners = [];
 
 	constructor () {}

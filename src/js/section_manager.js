@@ -1,4 +1,4 @@
-class SectionManager {
+export default class SectionManager {
 	static TITLE = 0;
 	static SELECT = 1;
 	static PLAYING = 2;

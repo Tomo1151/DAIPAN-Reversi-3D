@@ -1,6 +1,9 @@
-'use strict';
+import * as THREE from "three";
 
-class RendererManager {
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+
+export default class RendererManager {
 	static SCREEN_WIDTH;
 	static SCREEN_HEIGHT;
 
@@ -28,7 +31,7 @@ class RendererManager {
 		this.#camera.position.set(25, 25, 25);
 
 		// def controls
-		this.#controls = new THREE.OrbitControls(this.#camera, this.#renderer.domElement);
+		this.#controls = new OrbitControls(this.#camera, this.#renderer.domElement);
 		this.#controls.maxDistance = 125;
 		this.#controls.minDistance = 30;
 		this.#controls.maxZoom = 2;
