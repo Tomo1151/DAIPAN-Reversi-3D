@@ -12,7 +12,7 @@ export default class GameSection extends Section {
 	#disk_meshes = [];
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
-	#hitboxe_color = new THREE.Color(0x000000);
+	#hitboxe_color = new THREE.Color(0xffffff);
 	#canvas;
 
 	constructor(game_manager, renderer_manager, scene) {
@@ -24,29 +24,29 @@ export default class GameSection extends Section {
 	}
 
 	init() {
-		const ambient_light = new THREE.AmbientLight(0xffffff, 1);
+		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
 		const directional_light = new THREE.DirectionalLight(0xffffff, 1);
 		directional_light.intensity = 1;
 		directional_light.position.set(0, 0, 40);
 
-		this.scene.add(new THREE.AxesHelper(500));
+		// this.scene.add(new THREE.AxesHelper(500));
 		this.scene.add(ambient_light)
 		this.scene.add(directional_light);
 
 		model_load('model_data/Board_low.gltf', (obj) => {
-			obj.scene.scale.set(5, 5, 5);
+			obj.scene.scale.set(5.05, 5.05, 5.05);
 			obj.scene.position.set(0, 0.5, 0);
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
-					const g = new THREE.BoxGeometry(9.99, 1.15, 9.99);
+					const g = new THREE.BoxGeometry(10, 1.15, 10);
 					const m = new THREE.MeshStandardMaterial({
-						color:0x000000,
-						opacity: 0.5,
+						color:0xff0000,
+						opacity: 0.0,
 						transparent: true
 					});
 
 					const box = new THREE.Mesh(g, m);
-					box.position.set(10*j - (10*3+5), 0, 10*i - (10*3+5));
+					box.position.set(10*j - (10*3+5), -0.02, 10*i - (10*3+5));
 					box.cell_x = j;
 					box.cell_y = i;
 					box.is_mousedown = false;
@@ -81,10 +81,10 @@ export default class GameSection extends Section {
 			if (intersects.length > 0) {
 				for (let hitbox of this.#hitboxes) {
 					if (hitbox == intersects[0].object) {
-						hitbox.material.color = this.#selected_color;
+						hitbox.material.opacity = 0.75;
 						this.#selected_hitbox = hitbox;
 					} else {
-						hitbox.material.color = this.#hitboxe_color;
+						hitbox.material.opacity = 0;
 					}
 
 				}
