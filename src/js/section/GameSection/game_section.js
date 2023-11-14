@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { model_load } from "../../utils.js";
 // import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-import { Disk, Board } from "../../object.js"
+import { Disk, Board } from "../../object.js";
 import Section from "../section.js";
+import * as Event from "../../event.js";
 
 export default class GameSection extends Section {
 	#selected_hitbox;
@@ -106,9 +107,10 @@ export default class GameSection extends Section {
 						"y": y
 					};
 
-					console.log(data)
+					// console.log(data)
 					this.#selected_hitbox = undefined;
 
+					this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
 					// const e = new PutNoticeEvent(data);
 					// gm.dispatchEvent(e);
 				}

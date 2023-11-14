@@ -1,11 +1,11 @@
 class CustomEvent {
-	type;
-	time;
+	#type;
 
 	constructor (type) {
-		this.type = type;
-		this.time = new Date();
+		this.#type = type;
 	}
+
+	get type() {return this.#type;}
 }
 
 export class GameStartEvent extends CustomEvent {
@@ -26,11 +26,9 @@ export class GameOverEvent extends CustomEvent {
 
 export class ConfirmationEvent extends CustomEvent {
 	static EVENT_NAME = "confirmed";
-	order;
 
-	constructor (order) {
+	constructor () {
 		super (ConfirmationEvent.EVENT_NAME);
-		this.order = order;
 	}
 }
 
@@ -44,16 +42,17 @@ export class TurnChangeEvent extends CustomEvent {
 
 export class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
-	board;
-	can_put;
-	order;
+	#can_put;
+	#board;
 
-	constructor (order, board, can_put) {
+	constructor (board, can_put) {
 		super (TurnNoticeEvent.EVENT_NAME);
-		this.board = board;
-		this.can_put = can_put;
-		this.order = order;
+		this.#board = board;
+		this.#can_put = can_put;
 	}
+
+	get board () {return this.#board;}
+	get can_put () {return this.#can_put;}
 }
 
 export class PutNoticeEvent extends CustomEvent {
@@ -76,21 +75,17 @@ export class PutNoticeEvent extends CustomEvent {
 
 export class PutFailEvent extends CustomEvent {
 	static EVENT_NAME = "put_fail";
-	order;
 
-	constructor (order) {
+	constructor (data) {
 		super (PutFailEvent.EVENT_NAME);
-		this.order = order;
 	}
 }
 
 export class PutSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "put_success";
-	order;
 
-	constructor (order) {
+	constructor (data) {
 		super (PutSuccessEvent.EVENT_NAME);
-		this.order = order
 	}
 }
 

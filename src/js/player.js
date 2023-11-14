@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { EventManager } from "./event.js";
-
+import * as Event from "./event.js";
+import { Disk } from "./object.js"
 export default class Player {
 	#game_manager;
 	#order;
@@ -8,30 +8,34 @@ export default class Player {
 	#point = 0;
 
 	constructor (game_manager, order) {
-		this.#order = order;
 		this.#game_manager = game_manager;
+		this.#order = order;
 
-		// this.addEventListener('turn_notice', () => {
-		// 	console.log(this.name + " received: turn_notice");
-		// 	// console.log(e)
-		// });
+		this.#game_manager.addEventListener('turn_notice', (e) => {
+			if (e.order != this.order) return;
+			console.log(this.name + " received: turn_notice");
+			// console.log(e)
+		});
 
-		// this.addEventListener('put_success', (e) => {
-		// 	console.log(this.name + " received: put_success");
-		// 	// console.log(e);
-		// 	console.log(`${this.name} send: confirmed`);
-		// 	gm.dispatchEvent(new ConfirmationEvent());
-		// });
+		this.#game_manager.addEventListener('put_success', (e) => {
+			if (e.order != this.order) return;
+			console.log(this.name + " received: put_success");
 
-		// this.addEventListener('put_fail', (e) => {
-		// 	console.log(this.name + " received: put_fail");
-		// 	// console.log(e);
-		// });
+			console.log(`${this.name} send: confirmed`);
+			if (e.order != this.order) return;
+			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
+		});
 
-		// this.addEventListener('game_over', (e) => {
-		// 	console.log(`${this.name} received: game_over`)
-		// 	console.log(e);
-		// });
+		this.#game_manager.addEventListener('put_fail', (e) => {
+			if (e.order != this.order) return;
+			console.log(this.name + " received: put_fail");
+			// console.log(e);
+		});
+
+		this.#game_manager.addEventListener('game_over', (e) => {
+			console.log(`${this.name} received: game_over`)
+			console.log(e);
+		});
 	}
 
 	// addEventListener(event_name, callback) {

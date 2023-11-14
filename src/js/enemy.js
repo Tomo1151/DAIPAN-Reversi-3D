@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { sleep } from "./utils.js"
 import Player from "./player.js";
+import * as Event from "./event.js";
 
 export default class Enemy extends Player {
 
@@ -8,25 +9,25 @@ export default class Enemy extends Player {
 		super(game_manager, order);
 		this.name = 'enemy';
 
-		// console.log(this.game_manager)
-		// this.game_manager.addEventListener('test', (e) => {console.log(e)})
+		this.game_manager.addEventListener('turn_notice', async (e) => {
+			if (e.order != this.order) return;
+			let board = e.board;
+			let event;
 
-		// this.game_manager.addEventListener('turn_notice', async (e) => {
-		// 	// console.log(e);
-		// 	let board = e.board;
-		// 	let event;
+			if (e.can_put) {
+				const data = this.searchFirst(board);
+				event = new Event.PutNoticeEvent(data);
+			} else {
+				event = new Event.PutPassEvent();
+			}
 
-		// 	if (e.can_put) {
-		// 		const data = this.searchFirst(board);
-		// 		event = new PutNoticeEvent(data);
-		// 	} else {
-		// 		event = new PutPassEvent();
-		// 	}
+			await sleep(1000);
+			console.log(`enemy send: ${event.type}`);
+			this.game_manager.dispatchEvent(event);
+		});
+	}
 
-		// 	await sleep(1000);
-		// 	console.log(`enemy send: ${event.name}`);
-		// 	gm.dispatchEvent(event);
-		// });
+	init() {
 	}
 
 	checkCanPut (board) {

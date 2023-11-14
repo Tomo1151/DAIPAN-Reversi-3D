@@ -13,5 +13,6 @@ export default class Section {
 	init() {}
 
 	get scene() {return this.#scene;}
+	get game_manager() {return this.#game_manager;}
 	get renderer_manager() {return this.#renderer_manager;}
 }

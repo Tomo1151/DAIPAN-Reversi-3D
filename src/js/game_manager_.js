@@ -5,7 +5,9 @@ import SectionManager from "./section_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
+import Player from "./player.js";
 import Enemy from "./enemy.js";
+import * as Event from "./event.js";
 import { Disk, Board } from "./object.js";
 
 export default class GameManager extends THREE.EventDispatcher {
@@ -24,6 +26,10 @@ export default class GameManager extends THREE.EventDispatcher {
 	#section_manager;
 
 	#board;
+	#player;
+	#enemy;
+
+	#current_turn = Disk.BLACK;
 
 	constructor() {
 		super();
@@ -49,18 +55,81 @@ export default class GameManager extends THREE.EventDispatcher {
 		document.getElementById('start_button').addEventListener('click', () => {
 			let time = new Date();
 			this.#start_time = time;
-			let event = {
-				"type": "game_start",
-				"time": time,
-			}
-			this.dispatchEvent(event);
+
+			this.dispatchEvent(new Event.GameStartEvent());
 		});
 
-		this.addEventListener('game_start', (e) => {
-			console.log(e);
+		this.addEventListener('game_start', async (e) => {
+			console.log("\n[Event]: game_start");
+			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
+			this.#enemy = new Enemy(this, Disk.BLACK);
+			this.#player = new Player(this, Disk.WHITE);
+
 			this.#current_section.disk_mesh_update(this.#board.table);
+			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
+
+		this.addEventListener('turn_notice', (e) => {
+			// console.log(`[Event] : ${e.type}`)
+		});
+
+		this.addEventListener('put_notice', (data) => {
+			if (this.GAME_STATE != GameManager.IN_GAME) return;
+
+			// 置かれた情報
+			let order = data["order"];
+			let result_event;
+			let x = data["x"];
+			let y = data["y"];
+
+			// 手番じゃないプレイヤーからのイベントは無視
+			if (order !== this.#current_turn) return;
+
+			console.log("game_manager received: put_notice");
+
+			if (this.checkCanPut(x, y)) {
+				this.put(x, y);
+				console.log("game_manager send: put_success");
+				this.dispatchEvent(new Event.PutSuccessEvent(this.#current_turn));
+			} else {
+				console.log("game_manager send: put_fail");
+				this.dispatchEvent(new Event.PutFailEvent(this.#current_turn));
+			}
+		});
+
+		this.addEventListener('confirmed', (e) => {
+			console.log("game_manager received: confirmed");
+			this.#current_section.disk_mesh_update(this.#board.table);
+			this.dispatchEvent(new Event.TurnChangeEvent());
+		});
+
+		this.addEventListener('put_pass', () => {
+			console.log("game_manager received: put_pass");
+			this.dispatchEvent(new Event.TurnChangeEvent());
+		})
+
+		this.addEventListener('turn_change', () => {
+			console.log("game_manager received: turn_change");
+			console.log("");
+			console.log(`[${this.#current_turn == 0 ? "Enemy's" : "Player's"} turn]`);
+
+			// 情報書き換え
+			this.changeTurn();
+
+			if (this.checkGameOver()) {
+				this.dispatchEvent(new Event.GameOverEvent());
+			} else {
+				// 新たな手番へターンを報告
+				this.dispatchEvent(new Event.TurnNoticeEvent(this.#current_turn, this.#board, this.checkTable(this.#current_turn)));
+
+				if (this.#current_turn == Disk.WHITE && !this.checkTable(this.#current_turn)) {
+					this.pass();
+				}
+			}
+
+		});
+
 	}
 
 	run() {
@@ -75,13 +144,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	game_init() {
 	}
-
-	// #board = new Board(8, 8);
-	// #players = new Array(2);
-	// #current_turn = Disk.BLACK;
-	// #dest_i;
-	// #dest_o;
-	// #event_manager = new EventManager();
 
 	// constructor (players) {
 	// 	this.#players[0] = players[0];
@@ -165,98 +227,56 @@ export default class GameManager extends THREE.EventDispatcher {
 	// 	})
 	// }
 
-	// addEventListener(event_name, callback) {
-	// 	this.#event_manager.addEventListener(event_name, callback);
-	// }
+	checkGameOver () {
+		if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
+			this.GAME_STATE = GameManager.GAME_OVER;
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-	// dispatchEvent (event, dispatch_object) {
-	// 	this.#event_manager.dispatchEvent(event, dispatch_object);
-	// }
+	checkTable (order) {
+		for (let i = 0; i < this.#board.height; i++) {
+			for (let j = 0; j < this.#board.width; j++) {
+				if (this.#board.putJudgement(order, j, i)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-	// findEventDest (order) {
-	// 	return this.players.find(p => p.order == order);
-	// }
+	checkCanPut(x, y) {
+		return this.#board.putJudgement(this.#current_turn, x, y);
+	}
 
-	// findEnemy () {
-	// 	return this.players.find(p => p.name == 'enemy');
-	// }
+	put (x, y) {
+		this.#board.putDisk(this.#current_turn, x, y);
+		// this.board.view();
+	}
 
-	// checkGameOver () {
-	// 	if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
-	// 		this.GAME_STATE = GameManager.GAME_OVER;
-	// 		return true;
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
+	pass () {
+		let button = document.getElementById('pass_button');
+		button.style.display = 'block';
+		button.addEventListener('click', () => {
+			this.dispatchEvent(new Event.PutPassEvent());
+			button.style.display = 'none';
+		});
+	}
 
-	// boroadcastGameEvent (event) {
-	// 	for (let player of this.players) {
-	// 		player.dispatchEvent(event);
-	// 	}
-	// }
+	changeTurn () {
+		this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 
-	// checkTable (order) {
-	// 	for (let i = 0; i < this.board.height; i++) {
-	// 		for (let j = 0; j < this.board.width; j++) {
-	// 			if (this.board.putJudgement(order, j, i)) {
-	// 				return true;
-	// 			}
-	// 		}
-	// 	}
-	// 	return false;
-	// }
-
-	// checkCanPut(x, y) {
-	// 	return this.#board.putJudgement(this.current_turn, x, y);
-	// }
-
-	// put (x, y) {
-	// 	this.board.putDisk(this.current_turn, x, y);
-	// 	// this.board.view();
-	// }
-
-	// object_update() {
-	// 	show_models(this.board);
-	// }
-
-	// setDests () {
-	// 	this.dest_i = this.findEventDest(this.current_turn);
-	// 	this.dest_o = this.findEventDest(board.getOpponent(this.current_turn));
-	// }
-
-	// get dest_i () {return this.#dest_i;}
-	// get dest_o () {return this.#dest_o;}
-	// get board () {return this.#board;}
-	// get players () {return this.#players;}
-	// get current_turn () {return this.#current_turn;}
-
-	// set dest_i (dest_i) {this.#dest_i = dest_i;}
-	// set dest_o (dest_o) {this.#dest_o = dest_o;}
-
-	// pass () {
-	// 	let button = document.getElementById('pass_button');
-	// 	button.style.display = 'block';
-	// 	button.addEventListener('click', () => {
-	// 		this.dispatchEvent(new PutPassEvent());
-	// 		button.style.display = 'none';
-	// 	});
-	// }
-
-	// changeTurn () {
-	// 	this.current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
-
-	// 	this.setDests();
-
-	// 	let div = document.getElementById('order_div');
-	// 	if (this.current_turn == Disk.BLACK) {
-	// 		div.children[0].innerText = 'BLACK';
-	// 		div.classList.remove('order-white');
-	// 		div.classList.add('order-black');
-	// 	} else {
-	// 		div.children[0].innerText = 'WHITE';
-	// 		div.classList.remove('order-black');
-	// 		div.classList.add('order-white');
-	// 	}
-	// }
+		let div = document.getElementById('order_div');
+		if (this.#current_turn == Disk.BLACK) {
+			div.children[0].innerText = 'BLACK';
+			div.classList.remove('order-white');
+			div.classList.add('order-black');
+		} else {
+			div.children[0].innerText = 'WHITE';
+			div.classList.remove('order-black');
+			div.classList.add('order-white');
+		}
+	}
 }
