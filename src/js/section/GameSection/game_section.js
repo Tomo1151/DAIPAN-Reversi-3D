@@ -25,13 +25,21 @@ export default class GameSection extends Section {
 
 	init() {
 		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
-		const directional_light = new THREE.DirectionalLight(0xffffff, 1);
-		directional_light.intensity = 1;
-		directional_light.position.set(0, 0, 40);
+		const directional_light0 = new THREE.DirectionalLight(0xffffff, 1);
+		const directional_light1 = new THREE.DirectionalLight(0xffffff, 1);
+		const directional_light2 = new THREE.DirectionalLight(0xffffff, 1);
+		const directional_light3 = new THREE.DirectionalLight(0xffffff, 1);
+		const lights = [directional_light0, directional_light1, directional_light2, directional_light3];
+		directional_light0.position.set(25, 25, -25);
+		directional_light1.position.set(-25, 25, -25);
+		directional_light2.position.set(-25, 25, 25);
+		directional_light3.position.set(-25, 25, -25);
+		for (let light of lights) {
+			light.intensity = 0.75;
+			this.scene.add(light);
+		}
 
 		// this.scene.add(new THREE.AxesHelper(500));
-		this.scene.add(ambient_light)
-		this.scene.add(directional_light);
 
 		model_load('model_data/Board_low.gltf', (obj) => {
 			obj.scene.scale.set(5.05, 5.05, 5.05);
@@ -64,7 +72,7 @@ export default class GameSection extends Section {
 				for (let j = 0; j < 8; j++) {
 					disk = obj.scene.clone();
 					disk.scale.set(4, 4, 4);
-					disk.position.set(10*j - (10*3+5), 1, 10*i - (10*3+5));
+					disk.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
 					disk.visible = false;
 
 					this.#disk_meshes.push(disk);
