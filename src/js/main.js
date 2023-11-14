@@ -1,4 +1,4 @@
-import GameManager from "./game_manager_.js";
+import GameManager from "./game_manager.js";
 console.log("Hello, world!");
 
 const game_manager = new GameManager();
