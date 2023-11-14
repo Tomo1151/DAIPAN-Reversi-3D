@@ -20,6 +20,9 @@ export default class GameSection extends Section {
 	}
 
 	run() {
+	}
+
+	init() {
 		window.addEventListener('mousemove', (e) => {
 			this.renderer_manager.setCursorPoint(e);
 			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
@@ -62,9 +65,7 @@ export default class GameSection extends Section {
 				}
 			})
 		})
-	}
 
-	init() {
 		const ambient_light = new THREE.AmbientLight(0xffffff, 1);
 		const directional_light = new THREE.DirectionalLight(0xffffff, 1);
 		directional_light.intensity = 1;

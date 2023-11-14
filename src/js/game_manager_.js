@@ -44,10 +44,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	run() {
 		const tick = () => {
 			this.#frame += 1;
-
-			if (this.#frame % 10 == 0) {this.#current_section.run();}
 			this.#renderer_manager.render(this.#scene);
-
 			requestAnimationFrame(tick)
 		}
 
