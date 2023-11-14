@@ -12,10 +12,11 @@ export default class GameSection extends Section {
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0x000000);
-
+	#canvas;
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
+		this.#canvas = document.getElementById('main-canvas');
 	}
 
 	run() {
@@ -39,24 +40,27 @@ export default class GameSection extends Section {
 			}
 		});
 
-		(document.getElementById('main-canvas')).addEventListener('click', (e) => {
-			if (this.#selected_hitbox) {
-				let order = Disk.WHITE;
-				let x = this.#selected_hitbox.cell_x
-				let y = this.#selected_hitbox.cell_y
-				// console.log(`x: ${x}, y: ${y}`);
-				let data = {
-					"order": order,
-					"x": x,
-					"y": y
-				};
+		this.#canvas.addEventListener('mousedown', () => {
+			let box = this.#selected_hitbox;
+			this.#canvas.addEventListener('mouseup', (e) => {
+				if (this.#selected_hitbox == box && box != undefined) {
+					let order = Disk.WHITE;
+					let x = this.#selected_hitbox.cell_x
+					let y = this.#selected_hitbox.cell_y
+					// console.log(`x: ${x}, y: ${y}`);
+					let data = {
+						"order": order,
+						"x": x,
+						"y": y
+					};
 
-				console.log(data)
-				this.#selected_hitbox = undefined;
+					console.log(data)
+					this.#selected_hitbox = undefined;
 
-				// const e = new PutNoticeEvent(data);
-				// gm.dispatchEvent(e);
-			}
+					// const e = new PutNoticeEvent(data);
+					// gm.dispatchEvent(e);
+				}
+			})
 		})
 	}
 
