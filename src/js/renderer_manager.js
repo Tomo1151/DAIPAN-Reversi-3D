@@ -31,7 +31,7 @@ export default class RendererManager {
 
 		// def camera
 		this.#camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight);
-		this.#camera.position.set(25, 25, 25);
+		this.#camera.position.set(50, 50, 50);
 
 		// def controls
 		this.#controls = new OrbitControls(this.#camera, this.#renderer.domElement);
@@ -46,6 +46,13 @@ export default class RendererManager {
 
 		// def raycaster
 		this.#raycaster = new THREE.Raycaster()
+
+		window.addEventListener('resize', () => {
+			this.#renderer.setSize(window.innerWidth, window.innerHeight);
+			this.#renderer.setPixelRatio(window.devicePixelRatio);
+			this.#camera.aspect = window.innerWidth / window.innerHeight;
+			this.#camera.updateProjectionMatrix();
+		})
 	}
 
 	getIntersectObject(objects) {
