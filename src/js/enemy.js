@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { sleep } from "./utils.js"
 import Player from "./player.js";
 
 export default class Enemy extends Player {
@@ -10,7 +11,7 @@ export default class Enemy extends Player {
 		// console.log(this.game_manager)
 		// this.game_manager.addEventListener('test', (e) => {console.log(e)})
 
-		// this.addEventListener('turn_notice', async (e) => {
+		// this.game_manager.addEventListener('turn_notice', async (e) => {
 		// 	// console.log(e);
 		// 	let board = e.board;
 		// 	let event;
@@ -61,12 +62,4 @@ export default class Enemy extends Player {
 		}
 		return false;
 	}
-
-	// addEventListener(type, callback) {
-	// 	this.#event_dispatcher.addEventListener(type, callback);
-	// }
-
-	// dispatchEvent(event) {
-	// 	this.#event_dispatcher.dispatchEvent(e);
-	// }
 }

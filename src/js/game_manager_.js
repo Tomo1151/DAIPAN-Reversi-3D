@@ -31,9 +31,6 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#frame = 0;
 		this.#time = 0;
 
-		const e = new Enemy(this, 1);
-		// e.dispatchEvent({'type': 'test', 'msg': 'from game_manager to enemy'})
-
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 

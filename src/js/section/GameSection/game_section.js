@@ -16,7 +16,7 @@ export default class GameSection extends Section {
 		const light = new THREE.DirectionalLight(0xffffff, 1);
 		light.intensity = 1;
 		light.position.set(0, 0, 40);
-		// scene.add(new THREE.AxesHelper(500));
+		this.scene.add(new THREE.AxesHelper(500));
 		this.scene.add(l)
 		this.scene.add(light);
 
