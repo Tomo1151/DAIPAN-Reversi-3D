@@ -1,4 +1,4 @@
-class Disk {
+export class Disk {
 	static WHITE = 0;
 	static BLACK = 1;
 	static EMPTY = 2;
@@ -31,7 +31,7 @@ class Disk {
 	}
 }
 
-class Board {
+export class Board {
 	#width;
 	#height;
 	#table = new Array();
