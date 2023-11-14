@@ -79,13 +79,11 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('put_notice', (data) => {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
-			// 置かれた情報
 			let order = data["order"];
 			let result_event;
 			let x = data["x"];
 			let y = data["y"];
 
-			// 手番じゃないプレイヤーからのイベントは無視
 			if (order !== this.#current_turn) return;
 
 			console.log("game_manager received: put_notice");
