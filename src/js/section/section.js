@@ -13,4 +13,5 @@ export default class Section {
 	init() {}
 
 	get scene() {return this.#scene;}
+	get renderer_manager() {return this.#renderer_manager;}
 }

@@ -14,7 +14,6 @@ export default class RendererManager {
 	#camera;
 	#controls;
 	#mouse;
-	#pointer;
 	#raycaster;
 
 	constructor (game_manager, object_pool) {
@@ -53,8 +52,19 @@ export default class RendererManager {
 		return this.#raycaster.intersectObjects(objects);
 	}
 
+	setCursorPoint(mousemove_event) {
+		this.#mouse.x = (mousemove_event.clientX / window.innerWidth) * 2 - 1;
+		this.#mouse.y = (mousemove_event.clientY / window.innerHeight) * -2 + 1;
+
+		return this.#mouse;
+	}
+
 	render(scene) {
 		// console.log(this.#camera)
 		this.#renderer.render(scene, this.#camera);
 	}
+
+	get raycaster() {return this.#raycaster;}
+	get mouse() {return this.#mouse;}
+	get camera() {return this.#camera;}
 }
