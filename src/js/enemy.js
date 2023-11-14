@@ -1,26 +1,31 @@
+import * as THREE from 'three';
 import Player from "./player.js";
 
 export default class Enemy extends Player {
-	constructor (order) {
-		super(order);
+
+	constructor (game_manager, order) {
+		super(game_manager, order);
 		this.name = 'enemy';
 
-		this.addEventListener('turn_notice', async (e) => {
-			// console.log(e);
-			let board = e.board;
-			let event;
+		// console.log(this.game_manager)
+		// this.game_manager.addEventListener('test', (e) => {console.log(e)})
 
-			if (e.can_put) {
-				const data = this.searchFirst(board);
-				event = new PutNoticeEvent(data);
-			} else {
-				event = new PutPassEvent();
-			}
+		// this.addEventListener('turn_notice', async (e) => {
+		// 	// console.log(e);
+		// 	let board = e.board;
+		// 	let event;
 
-			await sleep(1000);
-			console.log(`enemy send: ${event.name}`);
-			gm.dispatchEvent(event);
-		});
+		// 	if (e.can_put) {
+		// 		const data = this.searchFirst(board);
+		// 		event = new PutNoticeEvent(data);
+		// 	} else {
+		// 		event = new PutPassEvent();
+		// 	}
+
+		// 	await sleep(1000);
+		// 	console.log(`enemy send: ${event.name}`);
+		// 	gm.dispatchEvent(event);
+		// });
 	}
 
 	checkCanPut (board) {
@@ -56,4 +61,12 @@ export default class Enemy extends Player {
 		}
 		return false;
 	}
+
+	// addEventListener(type, callback) {
+	// 	this.#event_dispatcher.addEventListener(type, callback);
+	// }
+
+	// dispatchEvent(event) {
+	// 	this.#event_dispatcher.dispatchEvent(e);
+	// }
 }

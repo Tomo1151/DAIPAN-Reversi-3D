@@ -7,6 +7,7 @@ export default class RendererManager {
 	static SCREEN_WIDTH;
 	static SCREEN_HEIGHT;
 
+	#game_manager;
 	#object_pool;
 
 	#renderer;
@@ -16,7 +17,10 @@ export default class RendererManager {
 	#pointer;
 	#raycaster;
 
-	constructor (object_pool) {
+	constructor (game_manager, object_pool) {
+		// set game manager
+		this.#game_manager = game_manager;
+
 		// def renderer
 		this.#renderer = new THREE.WebGLRenderer({
 			canvas: document.getElementById('main-canvas'),

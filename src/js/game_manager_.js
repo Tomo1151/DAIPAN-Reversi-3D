@@ -5,8 +5,9 @@ import SectionManager from "./section_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
+import Enemy from "./enemy.js";
 
-export default class GameManager {
+export default class GameManager extends THREE.EventDispatcher {
 	static BEFORE_START = 0;
 	static IN_GAME = 1;
 	static GAME_OVER = 2;
@@ -21,10 +22,19 @@ export default class GameManager {
 	#section_manager;
 
 	constructor() {
+		super();
+		this.addEventListener('test', (e) => {
+			console.log(e)
+			console.log(this)
+			this.dispatchEvent({'type': 'test2', 'data': {'x': 1, 'y': 2}})
+		})
 		this.#frame = 0;
 		this.#time = 0;
 
-		this.#renderer_manager = new RendererManager();
+		const e = new Enemy(this, 1);
+		// e.dispatchEvent({'type': 'test', 'msg': 'from game_manager to enemy'})
+
+		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 
 		this.#scene = new THREE.Scene();

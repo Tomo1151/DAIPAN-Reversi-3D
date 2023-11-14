@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { model_load } from "../../utils.js";
+// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import Section from "../section.js";
 
 export default class GameSection extends Section {
-
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
 	}
@@ -21,16 +21,6 @@ export default class GameSection extends Section {
 		this.scene.add(light);
 
 		let hitboxes = [];
-
-		const loader = new GLTFLoader();
-		const model_load = async (fbx_path, on_load_func) => {
-			return new Promise(res => {
-				loader.load(fbx_path, (obj) => {
-					on_load_func(obj);
-					res();
-				});
-			})
-		}
 
 		model_load('model_data/Board_low.gltf', (obj) => {
 			obj.scene.scale.set(5, 5, 5);
