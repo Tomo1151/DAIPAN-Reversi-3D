@@ -102,24 +102,24 @@ export class PutPassEvent extends CustomEvent {
 	}
 }
 
-export class EventManager {
-	#listeners = [];
+// export class EventManager {
+// 	#listeners = [];
 
-	constructor () {}
+// 	constructor () {}
 
-	addEventListener(event_name, callback) {
-		if (event_name in this.#listeners) {
-			this.#listeners[event_name].push(callback);
-		} else {
-			this.#listeners[event_name] = [callback];
-		}
-	}
+// 	addEventListener(event_name, callback) {
+// 		if (event_name in this.#listeners) {
+// 			this.#listeners[event_name].push(callback);
+// 		} else {
+// 			this.#listeners[event_name] = [callback];
+// 		}
+// 	}
 
-	dispatchEvent(event, dispatch_object) {
-		if (event.name in this.#listeners) {
-			this.#listeners[event.name].forEach((func) => {func(event)});
-		} else {
-			console.log(`this object doen't has listener: ${event.name}`);
-		}
-	}
-}
+// 	dispatchEvent(event, dispatch_object) {
+// 		if (event.name in this.#listeners) {
+// 			this.#listeners[event.name].forEach((func) => {func(event)});
+// 		} else {
+// 			console.log(`this object doen't has listener: ${event.name}`);
+// 		}
+// 	}
+// }
