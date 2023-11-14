@@ -23,49 +23,6 @@ export default class GameSection extends Section {
 	}
 
 	init() {
-		window.addEventListener('mousemove', (e) => {
-			this.renderer_manager.setCursorPoint(e);
-			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-			// console.log(this.#hitboxes)
-			let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
-			if (intersects.length > 0) {
-				for (let hitbox of this.#hitboxes) {
-					if (hitbox == intersects[0].object) {
-						hitbox.material.color = this.#selected_color;
-						this.#selected_hitbox = hitbox;
-					} else {
-						hitbox.material.color = this.#hitboxe_color;
-					}
-
-				}
-			} else {
-				this.#selected_hitbox = undefined;
-			}
-		});
-
-		this.#canvas.addEventListener('mousedown', () => {
-			let box = this.#selected_hitbox;
-			this.#canvas.addEventListener('mouseup', (e) => {
-				if (this.#selected_hitbox == box && box != undefined) {
-					let order = Disk.WHITE;
-					let x = this.#selected_hitbox.cell_x
-					let y = this.#selected_hitbox.cell_y
-					// console.log(`x: ${x}, y: ${y}`);
-					let data = {
-						"order": order,
-						"x": x,
-						"y": y
-					};
-
-					console.log(data)
-					this.#selected_hitbox = undefined;
-
-					// const e = new PutNoticeEvent(data);
-					// gm.dispatchEvent(e);
-				}
-			})
-		})
-
 		const ambient_light = new THREE.AmbientLight(0xffffff, 1);
 		const directional_light = new THREE.DirectionalLight(0xffffff, 1);
 		directional_light.intensity = 1;
@@ -115,5 +72,62 @@ export default class GameSection extends Section {
 			}
 		});
 
+		window.addEventListener('mousemove', (e) => {
+			this.renderer_manager.setCursorPoint(e);
+			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
+			// console.log(this.#hitboxes)
+			let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
+			if (intersects.length > 0) {
+				for (let hitbox of this.#hitboxes) {
+					if (hitbox == intersects[0].object) {
+						hitbox.material.color = this.#selected_color;
+						this.#selected_hitbox = hitbox;
+					} else {
+						hitbox.material.color = this.#hitboxe_color;
+					}
+
+				}
+			} else {
+				this.#selected_hitbox = undefined;
+			}
+		});
+
+		this.#canvas.addEventListener('mousedown', () => {
+			let box = this.#selected_hitbox;
+			this.#canvas.addEventListener('mouseup', (e) => {
+				if (this.#selected_hitbox == box && box != undefined) {
+					let order = Disk.WHITE;
+					let x = this.#selected_hitbox.cell_x
+					let y = this.#selected_hitbox.cell_y
+					// console.log(`x: ${x}, y: ${y}`);
+					let data = {
+						"order": order,
+						"x": x,
+						"y": y
+					};
+
+					console.log(data)
+					this.#selected_hitbox = undefined;
+
+					// const e = new PutNoticeEvent(data);
+					// gm.dispatchEvent(e);
+				}
+			});
+		});
+	}
+
+	disk_mesh_update(table) {
+		for (let i = 0; i < table.length; i++) {
+			switch (table[i].state) {
+				case Disk.WHITE:
+					this.#disk_meshes[i].rotation.z = 0;
+					this.#disk_meshes[i].visible = true;
+					break;
+				case Disk.BLACK:
+					this.#disk_meshes[i].rotation.z = Math.PI;
+					this.#disk_meshes[i].visible = true;
+					break;
+			}
+		}
 	}
 }

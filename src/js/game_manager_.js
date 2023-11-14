@@ -6,6 +6,7 @@ import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
 import Enemy from "./enemy.js";
+import { Disk, Board } from "./object.js";
 
 export default class GameManager extends THREE.EventDispatcher {
 	static BEFORE_START = 0;
@@ -14,12 +15,15 @@ export default class GameManager extends THREE.EventDispatcher {
 	static GAME_STATE = this.BEFORE_START;
 
 	#frame;
-	#time;
+	#start_time;
+	#end_time;
 	#scene;
 	#current_section;
 
 	#renderer_manager;
 	#section_manager;
+
+	#board;
 
 	constructor() {
 		super();
@@ -27,9 +31,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log(e)
 			console.log(this)
 			this.dispatchEvent({'type': 'test2', 'data': {'x': 1, 'y': 2}})
-		})
+		});
+
 		this.#frame = 0;
-		this.#time = 0;
 
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
@@ -39,6 +43,24 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager.renderer_manager = this.#renderer_manager;
 		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
+
+
+		// def Game Events
+		document.getElementById('start_button').addEventListener('click', () => {
+			let time = new Date();
+			this.#start_time = time;
+			let event = {
+				"type": "game_start",
+				"time": time,
+			}
+			this.dispatchEvent(event);
+		});
+
+		this.addEventListener('game_start', (e) => {
+			console.log(e);
+			this.#board = new Board(8, 8);
+			this.#current_section.disk_mesh_update(this.#board.table);
+		});
 	}
 
 	run() {
