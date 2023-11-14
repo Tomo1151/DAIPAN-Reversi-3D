@@ -14,7 +14,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	static BEFORE_START = 0;
 	static IN_GAME = 1;
 	static GAME_OVER = 2;
-	static GAME_STATE = this.BEFORE_START;
+	static GAME_STATE;
 
 	#frame;
 	#start_time;
@@ -49,7 +49,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager.renderer_manager = this.#renderer_manager;
 		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
-
+		this.GAME_STATE = GameManager.BEFORE_START;
 
 		// def Game Events
 		document.getElementById('start_button').addEventListener('click', () => {
@@ -60,6 +60,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('game_start', async (e) => {
+			if (this.GAME_STATE != GameManager.BEFORE_START) return;
+
 			console.log("\n[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
