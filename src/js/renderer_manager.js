@@ -35,7 +35,7 @@ export default class RendererManager {
 
 		// def controls
 		this.#controls = new OrbitControls(this.#camera, this.#renderer.domElement);
-		this.#controls.maxDistance = 125;
+		this.#controls.maxDistance = 135;
 		this.#controls.minDistance = 30;
 		this.#controls.maxZoom = 2;
 		this.#controls.minZoom = 1.25;
@@ -45,7 +45,7 @@ export default class RendererManager {
 		this.#mouse = new THREE.Vector2({x: 0, y: 0});
 
 		// def raycaster
-		this.#raycaster = new THREE.Raycaster()
+		this.#raycaster = new THREE.Raycaster();
 
 		window.addEventListener('resize', () => {
 			this.#renderer.setSize(window.innerWidth, window.innerHeight);
@@ -67,7 +67,6 @@ export default class RendererManager {
 	}
 
 	render(scene) {
-		// console.log(this.#camera)
 		this.#renderer.render(scene, this.#camera);
 	}
 

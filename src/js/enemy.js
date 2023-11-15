@@ -4,7 +4,6 @@ import Player from "./player.js";
 import * as Event from "./event.js";
 
 export default class Enemy extends Player {
-
 	constructor (game_manager, order) {
 		super(game_manager, order);
 		this.name = 'enemy';
@@ -13,6 +12,7 @@ export default class Enemy extends Player {
 			if (e.order != this.order) return;
 			let board = e.board;
 			let event;
+			console.log(e)
 
 			if (e.can_put) {
 				const data = this.searchFirst(board);

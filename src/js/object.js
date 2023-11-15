@@ -61,6 +61,14 @@ export class Board {
 		this.getDisk(4, 4).put(Disk.WHITE);
 	}
 
+	count(order) {
+		if (order == Disk.WHITE || order == Disk.BLACK) {
+			return this.#table.filter(e => e.state == order).length;
+		} else {
+			return false;
+		}
+	}
+
 	getOpponent(order) {
 		if (!(order == Disk.WHITE || order == Disk.BLACK)) return false;
 		return (order == Disk.WHITE ? Disk.BLACK : Disk.WHITE);

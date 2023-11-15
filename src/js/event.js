@@ -18,9 +18,11 @@ export class GameStartEvent extends CustomEvent {
 
 export class GameOverEvent extends CustomEvent {
 	static EVENT_NAME = "game_over";
+	result;
 
-	constructor () {
+	constructor (result) {
 		super (GameOverEvent.EVENT_NAME);
+		this.result = result;
 	}
 }
 

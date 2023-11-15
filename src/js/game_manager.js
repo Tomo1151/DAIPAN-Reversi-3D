@@ -31,6 +31,8 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	#current_turn = Disk.BLACK;
 
+	#result;
+
 	constructor() {
 		super();
 		this.addEventListener('test', (e) => {
@@ -116,7 +118,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : "Player's"} turn]`);
 
 			if (this.checkGameOver()) {
-				this.dispatchEvent(new Event.GameOverEvent());
+				const res = this.get_result();
+				this.#result = res;
+				this.dispatchEvent(new Event.GameOverEvent(res));
 			} else {
 				this.dispatchEvent(new Event.TurnNoticeEvent(this.#current_turn, this.#board, this.checkTable(this.#current_turn)));
 
@@ -178,6 +182,24 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.dispatchEvent(new Event.PutPassEvent());
 			button.style.display = 'none';
 		});
+	}
+
+	get_result() {
+		let black =  this.#board.count(Disk.BLACK);
+		let white =  this.#board.count(Disk.WHITE);
+		let res;
+		if (black == white) {
+			res = "draw";
+		} else if (black < white) {
+			res = "player";
+		} else {
+			res = "enemy"
+		}
+		return {
+			"black": black,
+			"white": white,
+			"result": res
+		}
 	}
 
 	changeTurn () {

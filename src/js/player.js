@@ -14,7 +14,6 @@ export default class Player {
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: turn_notice");
-			// console.log(e)
 		});
 
 		this.#game_manager.addEventListener('put_success', (e) => {
@@ -29,7 +28,6 @@ export default class Player {
 		this.#game_manager.addEventListener('put_fail', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: put_fail");
-			// console.log(e);
 		});
 
 		this.#game_manager.addEventListener('game_over', (e) => {

@@ -18,6 +18,52 @@ export default class GameSection extends Section {
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
 		this.#canvas = document.getElementById('main-canvas');
+
+		this.game_manager.addEventListener('game_start', () => {
+			window.addEventListener('mousemove', (e) => {
+				this.renderer_manager.setCursorPoint(e);
+				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
+				// console.log(this.#hitboxes)
+				let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
+				if (intersects.length > 0) {
+					for (let hitbox of this.#hitboxes) {
+						if (hitbox == intersects[0].object) {
+							hitbox.material.opacity = 0.75;
+							this.#selected_hitbox = hitbox;
+						} else {
+							hitbox.material.opacity = 0;
+						}
+
+					}
+				} else {
+					this.#selected_hitbox = undefined;
+				}
+			});
+
+			this.#canvas.addEventListener('mousedown', () => {
+				let box = this.#selected_hitbox;
+				this.#canvas.addEventListener('mouseup', (e) => {
+					if (this.#selected_hitbox == box && box != undefined) {
+						let order = Disk.WHITE;
+						let x = this.#selected_hitbox.cell_x
+						let y = this.#selected_hitbox.cell_y
+						// console.log(`x: ${x}, y: ${y}`);
+						let data = {
+							"order": order,
+							"x": x,
+							"y": y
+						};
+
+						// console.log(data)
+						this.#selected_hitbox = undefined;
+
+						this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
+						// const e = new PutNoticeEvent(data);
+						// gm.dispatchEvent(e);
+					}
+				});
+			});
+		});
 	}
 
 	run() {
@@ -79,50 +125,6 @@ export default class GameSection extends Section {
 					this.scene.add(disk);
 				}
 			}
-		});
-
-		window.addEventListener('mousemove', (e) => {
-			this.renderer_manager.setCursorPoint(e);
-			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-			// console.log(this.#hitboxes)
-			let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
-			if (intersects.length > 0) {
-				for (let hitbox of this.#hitboxes) {
-					if (hitbox == intersects[0].object) {
-						hitbox.material.opacity = 0.75;
-						this.#selected_hitbox = hitbox;
-					} else {
-						hitbox.material.opacity = 0;
-					}
-
-				}
-			} else {
-				this.#selected_hitbox = undefined;
-			}
-		});
-
-		this.#canvas.addEventListener('mousedown', () => {
-			let box = this.#selected_hitbox;
-			this.#canvas.addEventListener('mouseup', (e) => {
-				if (this.#selected_hitbox == box && box != undefined) {
-					let order = Disk.WHITE;
-					let x = this.#selected_hitbox.cell_x
-					let y = this.#selected_hitbox.cell_y
-					// console.log(`x: ${x}, y: ${y}`);
-					let data = {
-						"order": order,
-						"x": x,
-						"y": y
-					};
-
-					// console.log(data)
-					this.#selected_hitbox = undefined;
-
-					this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
-					// const e = new PutNoticeEvent(data);
-					// gm.dispatchEvent(e);
-				}
-			});
 		});
 	}
 
