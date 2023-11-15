@@ -110,11 +110,10 @@ export default class GameManager extends THREE.EventDispatcher {
 		})
 
 		this.addEventListener('turn_change', () => {
-			console.log("game_manager received: turn_change");
-			console.log("");
-			console.log(`[${this.#current_turn == 0 ? "Enemy's" : "Player's"} turn]`);
+			console.log("game_manager received: turn_change");console.log("");
 
 			this.changeTurn();
+			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : "Player's"} turn]`);
 
 			if (this.checkGameOver()) {
 				this.dispatchEvent(new Event.GameOverEvent());
