@@ -5,6 +5,7 @@ import SectionManager from "./section_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
+import ResultSection from "./section/ResultSection/result_section.js";
 import Player from "./player.js";
 import Enemy from "./enemy.js";
 import * as Event from "./event.js";
@@ -128,6 +129,12 @@ export default class GameManager extends THREE.EventDispatcher {
 					this.pass();
 				}
 			}
+
+			this.addEventListener('game_over', (e) => {
+				this.GAME_STATE = GameManager.GAME_OVER;
+				this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene);
+				this.#section_manager.change_section(this.#current_section);
+			})
 
 		});
 
