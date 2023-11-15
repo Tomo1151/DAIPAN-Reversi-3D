@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import { model_load } from "../../utils.js";
-// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-
 import { Disk, Board } from "../../object.js";
 import Section from "../section.js";
 import * as Event from "../../event.js";
@@ -13,11 +11,9 @@ export default class GameSection extends Section {
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
-	#canvas;
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
-		this.#canvas = document.getElementById('main-canvas');
 
 		this.game_manager.addEventListener('game_start', () => {
 			window.addEventListener('mousemove', (e) => {
@@ -41,9 +37,9 @@ export default class GameSection extends Section {
 				}
 			});
 
-			this.#canvas.addEventListener('mousedown', () => {
+			this.canvas.addEventListener('mousedown', () => {
 				let box = this.#selected_hitbox;
-				this.#canvas.addEventListener('mouseup', (e) => {
+				this.canvas.addEventListener('mouseup', (e) => {
 					if (this.#selected_hitbox == box && box != undefined) {
 						let order = Disk.WHITE;
 						let x = this.#selected_hitbox.cell_x
