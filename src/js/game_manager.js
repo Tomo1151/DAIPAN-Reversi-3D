@@ -9,6 +9,7 @@ import Player from "./player.js";
 import Enemy from "./enemy.js";
 import * as Event from "./event.js";
 import { Disk, Board } from "./object.js";
+import { sleep } from "./utils.js";
 
 export default class GameManager extends THREE.EventDispatcher {
 	static BEFORE_START = 0;
@@ -35,11 +36,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	constructor() {
 		super();
-		this.addEventListener('test', (e) => {
-			console.log(e)
-			console.log(this)
-			this.dispatchEvent({'type': 'test2', 'data': {'x': 1, 'y': 2}})
-		});
 
 		this.#frame = 0;
 
@@ -71,6 +67,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#player = new Player(this, Disk.WHITE);
 
 			this.#current_section.disk_mesh_update(this.#board.table);
+			sleep(2500);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
 
@@ -106,7 +103,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
 
-		this.addEventListener('put_pass', () => {
+		this.addEventListener('put_pass', (e) => {
+			if (e.order !== this.#current_turn) return;
+			console.log(e);
+
 			console.log("game_manager received: put_pass");
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		})
@@ -179,7 +179,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		let button = document.getElementById('pass_button');
 		button.style.display = 'block';
 		button.addEventListener('click', () => {
-			this.dispatchEvent(new Event.PutPassEvent());
+			this.dispatchEvent(new Event.PutPassEvent(this.#player.order));
 			button.style.display = 'none';
 		});
 	}

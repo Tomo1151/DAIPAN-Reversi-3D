@@ -98,9 +98,11 @@ export class PutSuccessEvent extends CustomEvent {
 
 export class PutPassEvent extends CustomEvent {
 	static EVENT_NAME = "put_pass";
+	order;
 
-	constructor () {
+	constructor (order) {
 		super (PutPassEvent.EVENT_NAME);
+		this.order = order;
 	}
 }
 
