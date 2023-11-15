@@ -216,4 +216,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			div.classList.add('order-white');
 		}
 	}
+
+	get player() {return this.#player;}
+	get current_turn() {return this.#current_turn;}
 }

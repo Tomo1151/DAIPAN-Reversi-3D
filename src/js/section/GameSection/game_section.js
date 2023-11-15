@@ -21,6 +21,7 @@ export default class GameSection extends Section {
 
 		this.game_manager.addEventListener('game_start', () => {
 			window.addEventListener('mousemove', (e) => {
+				if (this.game_manager.player.order != this.game_manager.current_turn) return;
 				this.renderer_manager.setCursorPoint(e);
 				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
 				// console.log(this.#hitboxes)
@@ -62,6 +63,13 @@ export default class GameSection extends Section {
 						// gm.dispatchEvent(e);
 					}
 				});
+			});
+
+			this.game_manager.addEventListener('turn_notice', (e) => {
+				if (this.game_manager.player.order != e.order) {
+					for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
+					return;
+				}
 			});
 		});
 	}
