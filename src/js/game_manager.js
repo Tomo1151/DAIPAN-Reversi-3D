@@ -62,6 +62,9 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
 
+			let div = document.getElementById('order_div');
+			div.style.display = 'flex';
+
 			console.log("\n[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
