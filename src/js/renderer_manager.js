@@ -73,4 +73,5 @@ export default class RendererManager {
 	get raycaster() {return this.#raycaster;}
 	get mouse() {return this.#mouse;}
 	get camera() {return this.#camera;}
+	get controls() {return this.#controls;}
 }

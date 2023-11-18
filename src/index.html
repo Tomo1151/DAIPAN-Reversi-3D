@@ -22,32 +22,70 @@
 
 
 	<style type="text/css">
+		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600&display=swap');
+		:root {
+			--font-main-black: #444444;
+			--font-main-white: #FAFAFA;
+			--color-bg-board: #00e62e;
+		}
+		* {margin: 0; box-sizing: border-box;}
+
 		body {
 			margin: 0;
+			font-family: 'Noto Sans JP', sans-serif;
 			overflow: hidden;
 		}
 
 		.order {
+			display: flex;
+			background: var(--color-bg-board);
+			font-size: 1.25rem;
+			font-weight: bold;
+			justify-content: center;
+			align-items: center;
 			position: absolute;
-			top: 5rem;
-			left: 1rem;
-			border: 1px solid #444;
-			border-radius: 5px;
+			top: -3px;
+			left: 50%;
+			border: 3px solid #444;
+			border-radius: 0 0 10px 10px;
 			padding: 0.5rem 1rem;
+			opacity: 0.75;
 			user-select: none;
 
+			max-width: 350px;
+			width: 20%;
+			height: 75px;
+			transform: translateX(-50%);
+		}
+
+		#order {
+			display: flex;
+			position: relative;
+			font-size: 2rem;
+			justify-content: center;
+			align-items: center;
+			border-radius: 50%;
+			width: 55px;
+			height: 55px;
+			margin-right: 1rem;
+		}
+
+		#order span {
+			position: relative;
+			top: -3px;
+			left: 0.5px;
 		}
 
 		.order-black {
-			color: white;
-			background: black;
-			font-weight: bold;
+			color: var(--font-main-white);
+			background: var(--font-main-black);
+/*			border: 2px solid var(--font-main-white);*/
 		}
 
 		.order-white {
-			color: black;
-			background: white;
-			font-weight: bold;
+			color: var(--font-main-black);
+			background: var(--font-main-white);
+			border: 2px solid var(--font-main-black);
 		}
 
 		.button {
@@ -76,6 +114,43 @@
 		}
 
 		canvas {margin: 0; width: 100%; height: 100%;}
+		#result_screen {
+			display: none;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+
+			background: #fafafa;
+
+			border: 1px solid #AAA;
+			border-radius: 5px;
+
+			width: 720px;
+			height: 480px;
+
+			padding: 2rem;
+		}
+
+		#result_screen h2 {
+			font-family: monospace;
+			font-size: 2rem;
+			font-weight: normal;
+			text-align: center;
+		}
+
+		#score::before {
+			content: 'Score : ';
+		}
+
+		#order_black::before {
+			content: 'Black : ';
+		}
+
+		#order_white::before {
+			content: 'White : ';
+		}
+
 	</style>
 </head>
 <body>
@@ -86,7 +161,15 @@
 		<p>Pass</p>
 	</div>
 	<div class="order" id="order_div">
-		<p id="order">NONE</p>
+		<p id="order" class="order-black"><span>黒</span></p><p>の手番です</p>
+	</div>
+	<div id="result_screen">
+		<h2>Result</h2>
+		<div id="result">
+			<p id="score"></p>
+			<p id="order_black"></p>
+			<p id="order_white"></p>
+		</div>
 	</div>
 	<canvas id="main-canvas"></canvas>
 </body>

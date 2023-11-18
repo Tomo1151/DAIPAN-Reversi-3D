@@ -5,6 +5,7 @@ import SectionManager from "./section_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
+import ResultSection from "./section/ResultSection/result_section.js";
 import Player from "./player.js";
 import Enemy from "./enemy.js";
 import * as Event from "./event.js";
@@ -47,6 +48,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager.renderer_manager = this.#renderer_manager;
 		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
+		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
 
 		// def Game Events
@@ -129,6 +131,12 @@ export default class GameManager extends THREE.EventDispatcher {
 				}
 			}
 
+			this.addEventListener('game_over', (e) => {
+				this.GAME_STATE = GameManager.GAME_OVER;
+				this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
+				this.#section_manager.change_section(this.#current_section);
+			})
+
 		});
 
 	}
@@ -206,14 +214,15 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 
 		let div = document.getElementById('order_div');
+		let p = document.getElementById('order');
 		if (this.#current_turn == Disk.BLACK) {
-			div.children[0].innerText = 'BLACK';
-			div.classList.remove('order-white');
-			div.classList.add('order-black');
+			p.children[0].innerText = '黒';
+			p.classList.remove('order-white');
+			p.classList.add('order-black');
 		} else {
-			div.children[0].innerText = 'WHITE';
-			div.classList.remove('order-black');
-			div.classList.add('order-white');
+			p.children[0].innerText = '白';
+			p.classList.remove('order-black');
+			p.classList.add('order-white');
 		}
 	}
 

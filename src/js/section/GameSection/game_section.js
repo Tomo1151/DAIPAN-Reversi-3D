@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import { model_load } from "../../utils.js";
-// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-
 import { Disk, Board } from "../../object.js";
 import Section from "../section.js";
 import * as Event from "../../event.js";
@@ -13,18 +11,15 @@ export default class GameSection extends Section {
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
-	#canvas;
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
-		this.#canvas = document.getElementById('main-canvas');
 
 		this.game_manager.addEventListener('game_start', () => {
 			window.addEventListener('mousemove', (e) => {
 				if (this.game_manager.player.order != this.game_manager.current_turn) return;
 				this.renderer_manager.setCursorPoint(e);
 				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-				// console.log(this.#hitboxes)
 				let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
 				if (intersects.length > 0) {
 					for (let hitbox of this.#hitboxes) {
@@ -34,16 +29,15 @@ export default class GameSection extends Section {
 						} else {
 							hitbox.material.opacity = 0;
 						}
-
 					}
 				} else {
 					this.#selected_hitbox = undefined;
 				}
 			});
 
-			this.#canvas.addEventListener('mousedown', () => {
+			this.canvas.addEventListener('mousedown', () => {
 				let box = this.#selected_hitbox;
-				this.#canvas.addEventListener('mouseup', (e) => {
+				this.canvas.addEventListener('mouseup', (e) => {
 					if (this.#selected_hitbox == box && box != undefined) {
 						let order = Disk.WHITE;
 						let x = this.#selected_hitbox.cell_x
@@ -59,8 +53,6 @@ export default class GameSection extends Section {
 						this.#selected_hitbox = undefined;
 
 						this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
-						// const e = new PutNoticeEvent(data);
-						// gm.dispatchEvent(e);
 					}
 				});
 			});
