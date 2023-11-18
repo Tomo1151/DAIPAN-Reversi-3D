@@ -14,11 +14,11 @@ export default class Enemy extends Player {
 			let event;
 
 			if (e.can_put) {
-				console.log(`put ${e.can_put}`)
+				// console.log(`put ${e.can_put}`)
 				const data = this.searchFirst(board);
 				event = new Event.PutNoticeEvent(data);
 			} else {
-				console.log(`pass ${e.can_put}`)
+				// console.log(`pass ${e.can_put}`)
 				event = new Event.PutPassEvent(this.order);
 			}
 

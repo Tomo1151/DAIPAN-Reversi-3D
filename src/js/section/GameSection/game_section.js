@@ -14,8 +14,9 @@ export default class GameSection extends Section {
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
+		this.renderer_manager.controls.enabled = true;
 
-		this.game_manager.addEventListener('game_start', () => {
+		this.game_manager.addEventListener('game_start', (e) => {
 			window.addEventListener('mousemove', (e) => {
 				if (this.game_manager.player.order != this.game_manager.current_turn) return;
 				this.renderer_manager.setCursorPoint(e);
@@ -69,7 +70,7 @@ export default class GameSection extends Section {
 	run() {
 	}
 
-	init() {
+	async init() {
 		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
 		const directional_light0 = new THREE.DirectionalLight(0xffffff, 1);
 		const directional_light1 = new THREE.DirectionalLight(0xffffff, 1);
@@ -87,7 +88,12 @@ export default class GameSection extends Section {
 
 		// this.scene.add(new THREE.AxesHelper(500));
 
-		model_load('model_data/Board_low.gltf', (obj) => {
+		this.object_load();
+		// await this.object_load();
+	}
+
+	async object_load() {
+		await model_load('model_data/Board_low.gltf', (obj) => {
 			obj.scene.scale.set(5.05, 5.05, 5.05);
 			obj.scene.position.set(0, 0.5, 0);
 			for (let i = 0; i < 8; i++) {
@@ -112,7 +118,7 @@ export default class GameSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		model_load('model_data/Disk_low.gltf', (obj) => {
+		await model_load('model_data/Disk_low.gltf', (obj) => {
 			let disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
@@ -126,7 +132,10 @@ export default class GameSection extends Section {
 				}
 			}
 		});
+
+		this.disk_mesh_update(this.game_manager.board.table);
 	}
+
 
 	disk_mesh_update(table) {
 		for (let i = 0; i < table.length; i++) {

@@ -46,15 +46,21 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
-		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+		// this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
 		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
 
 		// def Game Events
 		document.getElementById('start_button').addEventListener('click', () => {
+			let div = document.getElementById('title_screen');
+			div.style.display = 'none';
 			let time = new Date();
 			this.#start_time = time;
+
+			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+			this.#section_manager.change_section(this.#current_section);
 
 			this.dispatchEvent(new Event.GameStartEvent());
 		});
@@ -71,7 +77,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 
-			this.#current_section.disk_mesh_update(this.#board.table);
 			sleep(2500);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
@@ -147,6 +152,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	run() {
 		const tick = () => {
 			this.#frame += 1;
+			this.#current_section.run();
 			this.#renderer_manager.render(this.#scene);
 			requestAnimationFrame(tick)
 		}
@@ -231,4 +237,5 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	get player() {return this.#player;}
 	get current_turn() {return this.#current_turn;}
+	get board() {return this.#board;}
 }
