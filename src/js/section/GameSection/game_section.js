@@ -20,7 +20,6 @@ export default class GameSection extends Section {
 				if (this.game_manager.player.order != this.game_manager.current_turn) return;
 				this.renderer_manager.setCursorPoint(e);
 				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-				// console.log(this.#hitboxes)
 				let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
 				if (intersects.length > 0) {
 					for (let hitbox of this.#hitboxes) {
@@ -30,7 +29,6 @@ export default class GameSection extends Section {
 						} else {
 							hitbox.material.opacity = 0;
 						}
-
 					}
 				} else {
 					this.#selected_hitbox = undefined;
@@ -55,8 +53,6 @@ export default class GameSection extends Section {
 						this.#selected_hitbox = undefined;
 
 						this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
-						// const e = new PutNoticeEvent(data);
-						// gm.dispatchEvent(e);
 					}
 				});
 			});
