@@ -5,33 +5,53 @@ import Section from "../section.js";
 import * as Event from "../../event.js";
 
 export default class GameSection extends Section {
+	static MODE_NONE = -1;
+	static MODE_PUT = 0;
+	static MODE_BANG = 1;
+
 	#selected_hitbox;
 	#hitboxes = [];
 	#disk_meshes = [];
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
+	#mode;
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
+		this.renderer_manager.controls.enabled = true;
 
-		this.game_manager.addEventListener('game_start', () => {
+		let buttons = document.querySelector('.buttons-wrapper');
+		buttons.style.display = 'block';
+
+		this.game_manager.addEventListener('game_start', (e) => {
 			window.addEventListener('mousemove', (e) => {
 				if (this.game_manager.player.order != this.game_manager.current_turn) return;
 				this.renderer_manager.setCursorPoint(e);
 				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-				let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
-				if (intersects.length > 0) {
-					for (let hitbox of this.#hitboxes) {
-						if (hitbox == intersects[0].object) {
-							hitbox.material.opacity = 0.75;
-							this.#selected_hitbox = hitbox;
+
+				switch (this.#mode) {
+					case GameSection.MODE_PUT:
+						let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
+						if (intersects.length > 0) {
+							for (let hitbox of this.#hitboxes) {
+								if (hitbox == intersects[0].object) {
+									hitbox.material.opacity = 0.75;
+									this.#selected_hitbox = hitbox;
+								} else {
+									hitbox.material.opacity = 0;
+								}
+							}
 						} else {
-							hitbox.material.opacity = 0;
+							this.#selected_hitbox = undefined;
 						}
-					}
-				} else {
-					this.#selected_hitbox = undefined;
+
+						break;
+					case GameSection.MODE_BANG:
+						for (let hitbox of this.#hitboxes) hitbox.opacity = 0;
+						break;
+					default:
+						break;
 				}
 			});
 
@@ -69,7 +89,7 @@ export default class GameSection extends Section {
 	run() {
 	}
 
-	init() {
+	async init() {
 		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
 		const directional_light0 = new THREE.DirectionalLight(0xffffff, 1);
 		const directional_light1 = new THREE.DirectionalLight(0xffffff, 1);
@@ -87,7 +107,12 @@ export default class GameSection extends Section {
 
 		// this.scene.add(new THREE.AxesHelper(500));
 
-		model_load('model_data/Board_low.gltf', (obj) => {
+		this.object_load();
+		// await this.object_load();
+	}
+
+	async object_load() {
+		await model_load('model_data/Board_low.gltf', (obj) => {
 			obj.scene.scale.set(5.05, 5.05, 5.05);
 			obj.scene.position.set(0, 0.5, 0);
 			for (let i = 0; i < 8; i++) {
@@ -112,7 +137,7 @@ export default class GameSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		model_load('model_data/Disk_low.gltf', (obj) => {
+		await model_load('model_data/Disk_low.gltf', (obj) => {
 			let disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
@@ -126,7 +151,10 @@ export default class GameSection extends Section {
 				}
 			}
 		});
+
+		this.disk_mesh_update(this.game_manager.board.table);
 	}
+
 
 	disk_mesh_update(table) {
 		for (let i = 0; i < table.length; i++) {
@@ -142,4 +170,6 @@ export default class GameSection extends Section {
 			}
 		}
 	}
+
+	set mode(mode) {this.#mode = mode;}
 }

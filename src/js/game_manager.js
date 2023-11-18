@@ -46,15 +46,41 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
-		this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+		// this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
 		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
+
 
 		// def Game Events
 		document.getElementById('start_button').addEventListener('click', () => {
 			let time = new Date();
 			this.#start_time = time;
+
+			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+			this.#section_manager.change_section(this.#current_section);
+
+			// Setting DOMs
+			let div = document.getElementById('title_screen');
+			div.style.display = 'none';
+			let action_buttons = document.getElementById('action_button');
+
+			action_buttons.children[0].addEventListener('click', () => {
+				if (this.#current_turn != this.#player.order) return;
+				this.#current_section.mode = GameSection.MODE_PUT;
+			});
+			action_buttons.children[1].addEventListener('click', () => {
+				if (this.#current_turn != this.#player.order || this.checkTable(this.#player.order)) return;
+				console.log(this.checkTable(this.#player.order))
+				this.dispatchEvent(new Event.PutPassEvent(this.#player.order));
+				document.getElementById('pass_button').classList.add('disabled');
+			});
+			action_buttons.children[2].addEventListener('click', () => {
+				if (this.#current_turn != this.#player.order) return;
+				this.#current_section.mode = GameSection.MODE_PUT;
+				// this.#current_section.mode = GameSection.MODE_BANG;
+			});
 
 			this.dispatchEvent(new Event.GameStartEvent());
 		});
@@ -62,13 +88,15 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
 
+			let div = document.getElementById('order_div');
+			div.style.display = 'flex';
+
 			console.log("\n[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 
-			this.#current_section.disk_mesh_update(this.#board.table);
 			sleep(2500);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
@@ -101,6 +129,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
+			this.#current_section.mode = GameSection.MODE_NONE;
 			this.#current_section.disk_mesh_update(this.#board.table);
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
@@ -125,9 +154,15 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.dispatchEvent(new Event.GameOverEvent(res));
 			} else {
 				this.dispatchEvent(new Event.TurnNoticeEvent(this.#current_turn, this.#board, this.checkTable(this.#current_turn)));
+				if (this.#current_turn == Disk.WHITE) {
+					document.getElementById('put_button').classList.remove('disabled');
 
-				if (this.#current_turn == Disk.WHITE && !this.checkTable(this.#current_turn)) {
-					this.pass();
+					if (!this.checkTable(this.#current_turn)) {
+						let pass_button = document.getElementById('pass_button');
+						pass_button.classList.remove('disabled');
+					}
+				} else {
+					document.getElementById('put_button').classList.add('disabled');
 				}
 			}
 
@@ -144,6 +179,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	run() {
 		const tick = () => {
 			this.#frame += 1;
+			this.#current_section.run();
 			this.#renderer_manager.render(this.#scene);
 			requestAnimationFrame(tick)
 		}
@@ -181,6 +217,10 @@ export default class GameManager extends THREE.EventDispatcher {
 	put (x, y) {
 		this.#board.putDisk(this.#current_turn, x, y);
 		// this.board.view();
+	}
+
+	user_action() {
+
 	}
 
 	pass () {
@@ -228,4 +268,5 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	get player() {return this.#player;}
 	get current_turn() {return this.#current_turn;}
+	get board() {return this.#board;}
 }

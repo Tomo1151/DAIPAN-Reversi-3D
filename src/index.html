@@ -22,7 +22,7 @@
 
 
 	<style type="text/css">
-		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&display=swap');
 		:root {
 			--font-main-black: #444444;
 			--font-main-white: #FAFAFA;
@@ -33,11 +33,12 @@
 		body {
 			margin: 0;
 			font-family: 'Noto Sans JP', sans-serif;
+			font-weight: 600;
 			overflow: hidden;
 		}
 
 		.order {
-			display: flex;
+			display: none;
 			background: var(--color-bg-board);
 			font-size: 1.25rem;
 			font-weight: bold;
@@ -88,15 +89,21 @@
 			border: 2px solid var(--font-main-black);
 		}
 
+
 		.button {
-			position: absolute;
+/*			position: absolute;
 			top: 1rem;
-			left: 1rem;
-			border: 1px solid #444;
+			left: 1rem;*/
+			border: 2px solid #444;
 			border-radius: 5px;
 			padding: 0.5rem 1rem;
+			margin: 0 0 1rem;
+			width: fit-content;
 			user-select: none;
 			transition-duration: 0.25s;
+
+			text-align-last: justify;
+			text-justify: inter-ideograph;
 		}
 
 		.button:hover {
@@ -108,12 +115,50 @@
 			transform: scale(0.95);
 		}
 
-		.pass {
+		.buttons-wrapper {
 			display: none;
-			top: 9rem;
+			position: absolute;
+			top: 1rem;
+			left: 1rem;
+
+			padding: 2rem;
+		}
+
+		.buttons-wrapper .button {
+			font-size: 2rem;
+			font-weight: normal;
+			padding: 0.5rem 1.75rem;
+			width: 10rem;
+		}
+
+		.button:hover {
+			filter: brightness(0.8);
+			transform: scale(1.05);
+		}
+
+		.button:active {
+			transform: scale(0.975);
 		}
 
 		canvas {margin: 0; width: 100%; height: 100%;}
+		#title_screen {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: var(--font-main-white);
+
+			border: 5px solid #AAA;
+			border-radius: 5px;
+
+			width: 720px;
+			height: 470px;
+
+			opacity: 0.75;
+
+			padding: 2rem;
+		}
+
 		#result_screen {
 			display: none;
 			position: absolute;
@@ -121,7 +166,7 @@
 			left: 50%;
 			transform: translate(-50%, -50%);
 
-			background: #fafafa;
+			background: var(--font-main-white);
 
 			border: 1px solid #AAA;
 			border-radius: 5px;
@@ -151,17 +196,39 @@
 			content: 'White : ';
 		}
 
+		.disabled {
+			filter: opacity(0.25);
+		}
+
+		.disabled:hover, .disabled:active {
+			filter: opacity(0.2);
+			transform: scale(1.0);
+		}
+
 	</style>
 </head>
 <body>
-	<div class="button" id="start_button">
-		<p>Start</p>
+
+	<div class="buttons-wrapper" id="action_button">
+		<div class="button disabled" id="put_button">
+			<p>おく</p>
+		</div>
+		<div class="button disabled" id="pass_button">
+			<p>パス</p>
+		</div>
+		<div class="button disabled" id="bang_button">
+			<p>台パン</p>
+		</div>
 	</div>
-	<div class="button pass" id="pass_button">
-		<p>Pass</p>
-	</div>
+
 	<div class="order" id="order_div">
 		<p id="order" class="order-black"><span>黒</span></p><p>の手番です</p>
+	</div>
+	<div id="title_screen">
+		<h1>オセロ</h1>
+		<div class="button" id="start_button">
+			<p>はじめる</p>
+		</div>
 	</div>
 	<div id="result_screen">
 		<h2>Result</h2>
