@@ -77,7 +77,9 @@ export default class GameManager extends THREE.EventDispatcher {
 				document.getElementById('pass_button').classList.add('disabled');
 			});
 			action_buttons.children[2].addEventListener('click', () => {
-				this.#current_section.mode = GameSection.MODE_BANG;
+				if (this.#current_turn != this.#player.order) return;
+				this.#current_section.mode = GameSection.MODE_PUT;
+				// this.#current_section.mode = GameSection.MODE_BANG;
 			});
 
 			this.dispatchEvent(new Event.GameStartEvent());
