@@ -41,7 +41,6 @@ export default class GameManager extends THREE.EventDispatcher {
 		super();
 
 		this.#frame = 0;
-
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#dom_manager = new DOMManager(this);
@@ -106,7 +105,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
-			this.#current_section.mode = GameSection.MODE_NONE;
+			// this.#current_section.mode = GameSection.MODE_NONE;
 			this.#current_section.disk_mesh_update(this.#board.table);
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
@@ -148,6 +147,14 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.GAME_STATE = GameManager.GAME_OVER;
 				this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 				this.#section_manager.change_section(this.#current_section);
+			});
+
+			this.addEventListener('game_restart', (e) => {
+				console.log('cur_gm: ');
+				console.log(this);
+				this.game_init()
+				console.log('res_gm');
+				console.log(this);
 			})
 
 		});
@@ -166,6 +173,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	game_init() {
+		console.log("[game init]")
 	}
 
 	checkGameOver () {

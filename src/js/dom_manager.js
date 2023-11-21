@@ -1,4 +1,5 @@
 import * as Event from "./event.js"
+import GameManager from "./game_manager.js";
 import GameSection from "./section/GameSection/game_section.js";
 
 export default class DOMManager {
@@ -21,7 +22,7 @@ export default class DOMManager {
 		this.#order_dom = document.getElementById('order_div');
 		this.#ingame_buttons = document.getElementById('action_button');
 		this.#result_screen_dom = document.getElementById('result_screen');
-		// this.#title_screen_dom = document.getElementById();
+		this.#restart_button = document.getElementById('restart_button');
 		// this.#title_screen_dom = document.getElementById();
 
 		// def Game Events
@@ -32,6 +33,10 @@ export default class DOMManager {
 			div.style.display = 'none';
 			let action_buttons = document.getElementById('action_button');
 			action_buttons.style.display = 'block';
+
+			/*
+			 * GameSection
+			 */
 
 			action_buttons.children[0].addEventListener('click', () => {
 				if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
@@ -47,6 +52,19 @@ export default class DOMManager {
 				if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 				this.#game_manager.current_section.mode = GameSection.MODE_PUT;
 				// this.#current_section.mode = GameSection.MODE_BANG;
+			});
+
+			/*
+			 * ResultSection
+			 */
+			// this.#reset_button.addEventListener('click', () => {
+			// 	this.#game_manager.dispatchEvent(new Event.GameRestartEvent());
+			// });
+
+			this.#game_manager.addEventListener('game_restart', () => {
+				console.log('GAME RESTART');
+				this.#result_screen_dom.style.display = 'none';
+				this.#title_screen_dom.style.display = 'block';
 			});
 
 			this.#game_manager.dispatchEvent(new Event.GameStartEvent());
