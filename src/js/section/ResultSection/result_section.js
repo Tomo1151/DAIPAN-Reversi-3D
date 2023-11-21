@@ -9,6 +9,8 @@ export default class ResultSection extends Section {
 	constructor(game_manager, renderer_manager, scene, result) {
 		super(game_manager, renderer_manager, scene);
 		this.#result = result;
+		console.log("\n-- RESULT SECTION --");
+
 	}
 
 	run() {}
