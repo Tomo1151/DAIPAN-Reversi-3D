@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import RendererManager from "./renderer_manager.js";
 import SectionManager from "./section_manager.js";
+import DOMManager from "./dom_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
@@ -26,6 +27,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	#renderer_manager;
 	#section_manager;
+	#dom_manager;
 
 	#board;
 	#player;
@@ -42,6 +44,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
+		this.#dom_manager = new DOMManager(this);
 
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
@@ -53,45 +56,19 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.GAME_STATE = GameManager.BEFORE_START;
 
 
-		// def Game Events
-		document.getElementById('start_button').addEventListener('click', () => {
-			let time = new Date();
-			this.#start_time = time;
+		this.addEventListener('game_start', async (e) => {
+			if (this.GAME_STATE != GameManager.BEFORE_START) return;
+
+			this.#start_time = e.time;
 
 			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 			this.#section_manager.change_section(this.#current_section);
 
-			// Setting DOMs
-			let div = document.getElementById('title_screen');
-			div.style.display = 'none';
-			let action_buttons = document.getElementById('action_button');
-
-			action_buttons.children[0].addEventListener('click', () => {
-				if (this.#current_turn != this.#player.order) return;
-				this.#current_section.mode = GameSection.MODE_PUT;
-			});
-			action_buttons.children[1].addEventListener('click', () => {
-				if (this.#current_turn != this.#player.order || this.checkTable(this.#player.order)) return;
-				console.log(this.checkTable(this.#player.order))
-				this.dispatchEvent(new Event.PutPassEvent(this.#player.order));
-				document.getElementById('pass_button').classList.add('disabled');
-			});
-			action_buttons.children[2].addEventListener('click', () => {
-				if (this.#current_turn != this.#player.order) return;
-				this.#current_section.mode = GameSection.MODE_PUT;
-				// this.#current_section.mode = GameSection.MODE_BANG;
-			});
-
-			this.dispatchEvent(new Event.GameStartEvent());
-		});
-
-		this.addEventListener('game_start', async (e) => {
-			if (this.GAME_STATE != GameManager.BEFORE_START) return;
 
 			let div = document.getElementById('order_div');
 			div.style.display = 'flex';
 
-			console.log("\n[Event]: game_start");
+			console.log("[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
@@ -167,6 +144,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			}
 
 			this.addEventListener('game_over', (e) => {
+				if (this.GAME_STATE != GameManager.IN_GAME) return;
 				this.GAME_STATE = GameManager.GAME_OVER;
 				this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 				this.#section_manager.change_section(this.#current_section);
@@ -192,7 +170,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	checkGameOver () {
 		if (!this.checkTable(Disk.BLACK) && !this.checkTable(Disk.WHITE)) {
-			this.GAME_STATE = GameManager.GAME_OVER;
 			return true;
 		} else {
 			return false;
@@ -268,5 +245,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	get player() {return this.#player;}
 	get current_turn() {return this.#current_turn;}
+	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
 }
