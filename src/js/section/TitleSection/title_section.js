@@ -9,6 +9,8 @@ export default class TitleSection extends Section {
 		super(game_manager, renderer_manager, scene);
 		this.renderer_manager.controls.enabled = false;
 		// this.scene.add(new THREE.AxesHelper(500))
+		console.log("-- TITLE SECTION --");console.log();
+
 	}
 
 	run() {

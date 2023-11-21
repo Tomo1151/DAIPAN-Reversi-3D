@@ -1,4 +1,6 @@
 import * as THREE from "three";
+
+import GameManager from "../../game_manager.js";
 import { model_load } from "../../utils.js";
 import { Disk, Board } from "../../object.js";
 import Section from "../section.js";
@@ -20,70 +22,79 @@ export default class GameSection extends Section {
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
 		this.renderer_manager.controls.enabled = true;
+		const click_controller = new AbortController();
+		const mousemove_controller = new AbortController();
 
-		let buttons = document.querySelector('.buttons-wrapper');
-		buttons.style.display = 'block';
+		console.log("-- GAME SECTION --");
+		window.addEventListener('mousemove', (e) => {
+			// console.log("mousemove");
+			if (this.game_manager.player.order != this.game_manager.current_turn) return;
+			this.renderer_manager.setCursorPoint(e);
+			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
 
-		this.game_manager.addEventListener('game_start', (e) => {
-			window.addEventListener('mousemove', (e) => {
-				if (this.game_manager.player.order != this.game_manager.current_turn) return;
-				this.renderer_manager.setCursorPoint(e);
-				this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
-
-				switch (this.#mode) {
-					case GameSection.MODE_PUT:
-						let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
-						if (intersects.length > 0) {
-							for (let hitbox of this.#hitboxes) {
-								if (hitbox == intersects[0].object) {
-									hitbox.material.opacity = 0.75;
-									this.#selected_hitbox = hitbox;
-								} else {
-									hitbox.material.opacity = 0;
-								}
+			switch (this.#mode) {
+				case GameSection.MODE_PUT:
+					console.log("MODE: PUT")
+					let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
+					if (intersects.length > 0) {
+						for (let hitbox of this.#hitboxes) {
+							if (hitbox == intersects[0].object) {
+								hitbox.material.opacity = 0.75;
+								this.#selected_hitbox = hitbox;
+							} else {
+								hitbox.material.opacity = 0;
 							}
-						} else {
-							this.#selected_hitbox = undefined;
 						}
-
-						break;
-					case GameSection.MODE_BANG:
-						for (let hitbox of this.#hitboxes) hitbox.opacity = 0;
-						break;
-					default:
-						break;
-				}
-			});
-
-			this.canvas.addEventListener('mousedown', () => {
-				let box = this.#selected_hitbox;
-				this.canvas.addEventListener('mouseup', (e) => {
-					if (this.#selected_hitbox == box && box != undefined) {
-						let order = Disk.WHITE;
-						let x = this.#selected_hitbox.cell_x
-						let y = this.#selected_hitbox.cell_y
-						// console.log(`x: ${x}, y: ${y}`);
-						let data = {
-							"order": order,
-							"x": x,
-							"y": y
-						};
-
-						// console.log(data)
+					} else {
 						this.#selected_hitbox = undefined;
-
-						this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
 					}
-				});
-			});
 
-			this.game_manager.addEventListener('turn_notice', (e) => {
-				if (this.game_manager.player.order != e.order) {
-					for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
-					return;
+					break;
+				case GameSection.MODE_BANG:
+					for (let hitbox of this.#hitboxes) hitbox.opacity = 0;
+					break;
+				default:
+					break;
+			}
+		}, {signal: mousemove_controller.signal});
+
+		this.canvas.addEventListener('mousedown', () => {
+			let box = this.#selected_hitbox;
+			this.canvas.addEventListener('mouseup', (e) => {
+				if (this.#selected_hitbox == box && box != undefined) {
+					let order = Disk.WHITE;
+					let x = this.#selected_hitbox.cell_x
+					let y = this.#selected_hitbox.cell_y
+					// console.log(`x: ${x}, y: ${y}`);
+					let data = {
+						"order": order,
+						"x": x,
+						"y": y
+					};
+
+					// console.log(data)
+					this.#selected_hitbox = undefined;
+
+					this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
 				}
-			});
+			}, {signal: click_controller.signal});
+		}, {signal: click_controller.signal});
+
+		this.game_manager.addEventListener('turn_notice', (e) => {
+			if (this.game_manager.player.order != e.order) {
+				for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
+				return;
+			}
 		});
+
+		// Listener delete
+		this.game_manager.addEventListener('game_over', () => {
+				console.log("delete click callback");
+				click_controller.abort();
+				console.log("delete mousemove callback");
+				mousemove_controller.abort();
+		})
+
 	}
 
 	run() {
@@ -171,5 +182,6 @@ export default class GameSection extends Section {
 		}
 	}
 
+	get mode() {return this.#mode;}
 	set mode(mode) {this.#mode = mode;}
 }
