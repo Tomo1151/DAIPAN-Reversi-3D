@@ -40,22 +40,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	constructor() {
 		super();
-
 		this.init();
-		// this.#frame = 0;
-		// this.#renderer_manager = new RendererManager(this);
-		// this.#section_manager = new SectionManager();
-		// this.#dom_manager = new DOMManager(this);
-
-		// this.#scene = new THREE.Scene();
-		// this.#section_manager.scene = this.#scene;
-		// this.#section_manager.renderer_manager = this.#renderer_manager;
-		// // this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
-		// this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
-		// this.#section_manager.change_section(this.#current_section);
-		// // this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
-		// this.GAME_STATE = GameManager.BEFORE_START;
-
 	}
 
 	run() {
@@ -80,33 +65,26 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#dom_manager = new DOMManager(this);
-		console.log(this.GAME_PLAY_COUNT)
+
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
 
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
-		// this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
-		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
 		this.#current_turn = Disk.BLACK;
 
 		this.addIngameListener();
-
 	}
 
 	addIngameListener() {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
-			// console.log(this);
-
 			this.#start_time = e.time;
-
 			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 			this.#section_manager.change_section(this.#current_section);
-
 
 			console.log("[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
@@ -123,8 +101,6 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('put_notice', (data) => {
-			console.log(data);
-			console.log(this)
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
 			let order = data["order"];
@@ -191,6 +167,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('game_over', (e) => {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
+			this.#end_time = e.time;
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
 		});
