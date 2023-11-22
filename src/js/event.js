@@ -26,6 +26,14 @@ export class GameOverEvent extends CustomEvent {
 	}
 }
 
+export class GameRestartEvent extends CustomEvent {
+	static EVENT_NAME = "game_restart";
+
+	constructor () {
+		super (GameRestartEvent.EVENT_NAME);
+	}
+}
+
 export class ConfirmationEvent extends CustomEvent {
 	static EVENT_NAME = "confirmed";
 	order;

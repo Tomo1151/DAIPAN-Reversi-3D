@@ -17,7 +17,9 @@ export default class GameManager extends THREE.EventDispatcher {
 	static BEFORE_START = 0;
 	static IN_GAME = 1;
 	static GAME_OVER = 2;
-	static GAME_STATE;
+
+	GAME_STATE;
+	GAME_PLAY_COUNT = 0;
 
 	#frame;
 	#start_time;
@@ -33,18 +35,53 @@ export default class GameManager extends THREE.EventDispatcher {
 	#player;
 	#enemy;
 
-	#current_turn = Disk.BLACK;
-
+	#current_turn;
 	#result;
 
 	constructor() {
 		super();
 
-		this.#frame = 0;
+		this.init();
+		// this.#frame = 0;
+		// this.#renderer_manager = new RendererManager(this);
+		// this.#section_manager = new SectionManager();
+		// this.#dom_manager = new DOMManager(this);
 
+		// this.#scene = new THREE.Scene();
+		// this.#section_manager.scene = this.#scene;
+		// this.#section_manager.renderer_manager = this.#renderer_manager;
+		// // this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+		// this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
+		// this.#section_manager.change_section(this.#current_section);
+		// // this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
+		// this.GAME_STATE = GameManager.BEFORE_START;
+
+	}
+
+	run() {
+		const tick = () => {
+			this.#frame += 1;
+			this.#current_section.run();
+			this.#renderer_manager.render(this.#scene);
+			requestAnimationFrame(tick)
+		}
+
+		tick();
+	}
+
+	restart() {
+		this._listeners = {};
+		this.init();
+	}
+
+	init() {
+		// console.log("[game init]")
+		this.#frame = 0;
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#dom_manager = new DOMManager(this);
+		console.log(this.GAME_PLAY_COUNT)
+		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
 
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
@@ -54,19 +91,22 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager.change_section(this.#current_section);
 		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
+		this.#current_turn = Disk.BLACK;
 
+		this.addIngameListener();
 
+	}
+
+	addIngameListener() {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
+			// console.log(this);
 
 			this.#start_time = e.time;
 
 			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
 			this.#section_manager.change_section(this.#current_section);
 
-
-			let div = document.getElementById('order_div');
-			div.style.display = 'flex';
 
 			console.log("[Event]: game_start");
 			this.GAME_STATE = GameManager.IN_GAME;
@@ -83,6 +123,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('put_notice', (data) => {
+			console.log(data);
+			console.log(this)
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
 			let order = data["order"];
@@ -106,7 +148,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
-			this.#current_section.mode = GameSection.MODE_NONE;
+			// this.#current_section.mode = GameSection.MODE_NONE;
 			this.#current_section.disk_mesh_update(this.#board.table);
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
@@ -122,7 +164,9 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('turn_change', () => {
 			console.log("game_manager received: turn_change");console.log("");
 
-			this.changeTurn();
+			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
+			this.#dom_manager.order_update();
+
 			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : "Player's"} turn]`);
 
 			if (this.checkGameOver()) {
@@ -142,30 +186,20 @@ export default class GameManager extends THREE.EventDispatcher {
 					document.getElementById('put_button').classList.add('disabled');
 				}
 			}
-
-			this.addEventListener('game_over', (e) => {
-				if (this.GAME_STATE != GameManager.IN_GAME) return;
-				this.GAME_STATE = GameManager.GAME_OVER;
-				this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
-				this.#section_manager.change_section(this.#current_section);
-			})
-
 		});
 
-	}
+		this.addEventListener('game_over', (e) => {
+			if (this.GAME_STATE != GameManager.IN_GAME) return;
+			this.GAME_STATE = GameManager.GAME_OVER;
+			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
+			this.#section_manager.change_section(this.#current_section);
+		});
 
-	run() {
-		const tick = () => {
-			this.#frame += 1;
-			this.#current_section.run();
-			this.#renderer_manager.render(this.#scene);
-			requestAnimationFrame(tick)
-		}
-
-		tick();
-	}
-
-	game_init() {
+		this.addEventListener('game_restart', (e) => {
+			if (this.GAME_STATE != GameManager.GAME_OVER) return;
+			this.GAME_PLAY_COUNT++;
+			this.restart();
+		});
 	}
 
 	checkGameOver () {
@@ -228,19 +262,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	changeTurn () {
-		this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 
-		let div = document.getElementById('order_div');
-		let p = document.getElementById('order');
-		if (this.#current_turn == Disk.BLACK) {
-			p.children[0].innerText = '黒';
-			p.classList.remove('order-white');
-			p.classList.add('order-black');
-		} else {
-			p.children[0].innerText = '白';
-			p.classList.remove('order-black');
-			p.classList.add('order-white');
-		}
 	}
 
 	get player() {return this.#player;}

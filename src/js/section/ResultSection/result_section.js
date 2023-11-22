@@ -15,7 +15,7 @@ export default class ResultSection extends Section {
 
 	run() {}
 	init() {
-		this.renderer_manager.controls.enabled = false;
+		// this.renderer_manager.controls.enabled = false;
 		this.drawResultScreen();
 	}
 

@@ -34,7 +34,6 @@ export default class GameSection extends Section {
 
 			switch (this.#mode) {
 				case GameSection.MODE_PUT:
-					console.log("MODE: PUT")
 					let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
 					if (intersects.length > 0) {
 						for (let hitbox of this.#hitboxes) {
