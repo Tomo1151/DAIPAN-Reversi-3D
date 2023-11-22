@@ -70,7 +70,7 @@ export default class DOMManager {
 		 * ResultSection
 		 */
 		this.#restart_button.addEventListener('click', (e) => {
-			console.log(e);
+			// console.log(e);
 			this.#game_manager.dispatchEvent(new Event.GameRestartEvent());
 		});
 	}
@@ -85,7 +85,7 @@ export default class DOMManager {
 
 	order_update(){
 		let p = document.getElementById('order');
-		console.log(p)
+		// console.log(p)
 		if (this.#game_manager.current_turn == Disk.BLACK) {
 			p.children[0].innerText = '黒';
 			p.classList.remove('order-white');

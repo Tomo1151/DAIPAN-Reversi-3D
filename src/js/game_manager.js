@@ -35,7 +35,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	#player;
 	#enemy;
 
-	#current_turn = Disk.BLACK;
+	#current_turn;
 	#result;
 
 	constructor() {
@@ -91,6 +91,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager.change_section(this.#current_section);
 		// this.#section_manager.change_section(new ResultSection(this, this.#renderer_manager, this.#scene));
 		this.GAME_STATE = GameManager.BEFORE_START;
+		this.#current_turn = Disk.BLACK;
+
 		this.addIngameListener();
 
 	}
@@ -98,7 +100,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	addIngameListener() {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
-			console.log(this);
+			// console.log(this);
 
 			this.#start_time = e.time;
 
@@ -121,6 +123,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('put_notice', (data) => {
+			console.log(data);
+			console.log(this)
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
 			let order = data["order"];
