@@ -33,10 +33,17 @@ export default class DOMManager {
 		this.#bang_button = this.#ingame_buttons.children[2];
 		this.#result_screen_dom = document.getElementById('result_screen');
 		this.#restart_button = document.getElementById('restart_button');
-		// this.#title_screen_dom = document.getElementById();
 
-		this.#game_manager.addEventListener('game_start', () => {
 
+		this.#game_manager.addEventListener('turn_notice', (e) => {
+			if (e.order != this.#game_manager.player.order) return;
+			if (e.can_put) {
+				this.#put_button.classList.remove('disabled');
+				this.#pass_button.classList.add('disabled');
+			} else {
+				this.#put_button.classList.add('disabled');
+				this.#pass_button.classList.remove('disabled');
+			}
 		});
 
 		this.#game_manager.addEventListener('game_over', async (e) => {

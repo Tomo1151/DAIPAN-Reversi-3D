@@ -87,7 +87,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#player = new Player(this, Disk.WHITE);
 			this.#player.name = this.#dom_manager.get_player_name();
 
-			console.log(this.#player);
 			await sleep(1000);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
@@ -143,18 +142,6 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.dispatchEvent(new Event.GameOverEvent(res));
 			} else {
 				this.dispatchEvent(new Event.TurnNoticeEvent(this.#current_turn, this.#board, this.checkTable(this.#current_turn)));
-
-				// @TODO move to DOMManager
-				if (this.#current_turn == Disk.WHITE) {
-					document.getElementById('put_button').classList.remove('disabled');
-
-					if (!this.checkTable(this.#current_turn)) {
-						let pass_button = document.getElementById('pass_button');
-						pass_button.classList.remove('disabled');
-					}
-				} else {
-					document.getElementById('put_button').classList.add('disabled');
-				}
 			}
 		});
 
@@ -204,7 +191,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	put (x, y) {
 		this.#board.putDisk(this.#current_turn, x, y);
-		// this.board.view();
 	}
 
 	get_result() {
