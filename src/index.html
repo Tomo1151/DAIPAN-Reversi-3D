@@ -22,9 +22,10 @@
 
 
 	<style type="text/css">
-		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Sans+Mono:wght@400;600&display=swap');
 		:root {
 			--font-main-black: #333;
+			--color-border-black: #444;
 			--font-main-white: #FAFAFA;
 			--color-bg-board: #00e62e;
 		}
@@ -113,14 +114,15 @@
 			top: 1rem;
 			left: 1rem;*/
 			background: var(--font-main-white);
-			border: 2px solid #444;
+			border: 2px solid var(--color-border-black);
 			border-radius: 5px;
 			padding: 0.5rem 1rem;
-			margin: 0 0 1rem;
+			margin: 1rem 0;
 			width: fit-content;
 			user-select: none;
 			transition-duration: 0.25s;
 			opacity: 0.85;
+			font-family: 'Noto Sans JP', sans-serif;
 
 			text-align-last: justify;
 			text-justify: inter-ideograph;
@@ -186,6 +188,7 @@
 			position: absolute;
 			top: 50%;
 			left: 50%;
+			font-family: 'Noto Sans Mono', monospace;
 			transform: translate(-50%, -50%);
 
 			background: var(--font-main-white);
@@ -204,8 +207,13 @@
 		}
 
 		#result_screen h2 {
-			font-family: monospace;
-			font-size: 2rem;
+			font-size: 1.5rem;
+			font-weight: normal;
+			text-align: center;
+		}
+
+		#result_screen h3 {
+			font-size: 2.5rem;
 			font-weight: normal;
 			text-align: center;
 		}
@@ -215,11 +223,11 @@
 		}
 
 		#order_black::before {
-			content: 'Black : ';
+			content: '[ Black ] ';
 		}
 
 		#order_white::before {
-			content: 'White : ';
+			content: '[ White ] ';
 		}
 
 		.disabled {
@@ -234,6 +242,16 @@
 		.active, .active:hover, .active:active{
 			background: #AAA;
 			transform: scale(1.0);
+		}
+
+		#player_name {
+			font-size: 1rem;
+			padding: 1rem;
+			border: 2px solid var(--color-border-black);
+			border-radius: 5px;
+			width: 17.25rem;
+			margin: 1rem 0;
+			opacity: 0.85;
 		}
 
 		@media (max-width: 768px) {
@@ -260,13 +278,18 @@
 		<p id="order" class="order-black"><span>黒</span></p><p>の手番です</p>
 	</div>
 	<div class="fadeIn" id="title_screen">
-		<h1>オセロ</h1>
+		<h1 style="margin-bottom: 1rem;">オセロ</h1>
+		<div>
+			<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
+			<p>※ Player名はランキングに使用します</p>
+		</div>
 		<div class="button" id="start_button">
 			<p>はじめる</p>
 		</div>
 	</div>
 	<div class="fadeIn" id="result_screen">
 		<h2>Result</h2>
+		<h3 id="winner">Player の勝ち！</h3>
 		<div id="result">
 			<p id="score"></p>
 			<p id="order_black"></p>

@@ -6,7 +6,7 @@ import * as Event from "./event.js";
 export default class Enemy extends Player {
 	constructor (game_manager, order) {
 		super(game_manager, order);
-		this.name = 'enemy';
+		this.name = 'COM';
 
 		this.game_manager.addEventListener('turn_notice', async (e) => {
 			if (e.order != this.order) return;

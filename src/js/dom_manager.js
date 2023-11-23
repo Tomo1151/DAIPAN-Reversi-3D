@@ -33,6 +33,10 @@ export default class DOMManager {
 		this.#restart_button = document.getElementById('restart_button');
 		// this.#title_screen_dom = document.getElementById();
 
+		this.#game_manager.addEventListener('game_start', () => {
+
+		});
+
 		this.#game_manager.addEventListener('game_over', async (e) => {
 			console.log(e)
 			await sleep(1500);
@@ -97,18 +101,26 @@ export default class DOMManager {
 	}
 
 	draw_result_screen(result) {
+		let dom_result_winner = document.getElementById('winner');
 		let dom_result_score = document.getElementById('score');
 		let dom_result_black = document.getElementById('order_black');
 		let dom_result_white = document.getElementById('order_white');
+
+		let result_str = '';
 
 		this.hide(this.#order_dom);
 		this.hide(this.#ingame_buttons);
 		this.show(this.#result_screen_dom);
 
-		console.log(result);
+		if (result.result == 'draw') {
+			result_str = '引き分け!';
+		} else {
+			result_str = `${result.result}の勝ち!`;
+		}
 
-		dom_result_white.innerText = result.white;
-		dom_result_black.innerText = result.black;
+		dom_result_winner.innerText = result_str;
+		dom_result_white.innerText = `${this.get_player_name()} : ${result.white}`;
+		dom_result_black.innerText = `${this.#game_manager.enemy.name} : ${result.black}`;
 		dom_result_score.innerText = -1;
 	}
 
@@ -118,6 +130,10 @@ export default class DOMManager {
 		} else {
 			dom.style.display = "block";
 		}
+	}
+
+	get_player_name() {
+		return document.getElementById('player_name').value || 'Player';
 	}
 
 	order_update(){

@@ -85,7 +85,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
+			this.#player.name = this.#dom_manager.get_player_name();
 
+			console.log(this.#player);
 			await sleep(1000);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
@@ -133,7 +135,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
 
-			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : "Player's"} turn]`);
+			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
 
 			if (this.checkGameOver()) {
 				const res = this.get_result();
@@ -224,6 +226,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	get player() {return this.#player;}
+	get enemy() {return this.#enemy;}
 	get current_turn() {return this.#current_turn;}
 	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
