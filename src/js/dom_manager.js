@@ -1,5 +1,6 @@
 import * as Event from "./event.js"
 import { Disk } from "./object.js";
+import { sleep } from "./utils.js";
 import GameManager from "./game_manager.js";
 import GameSection from "./section/GameSection/game_section.js";
 
@@ -32,6 +33,12 @@ export default class DOMManager {
 		this.#restart_button = document.getElementById('restart_button');
 		// this.#title_screen_dom = document.getElementById();
 
+		this.#game_manager.addEventListener('game_over', async (e) => {
+			console.log(e)
+			await sleep(1500);
+			this.draw_result_screen(e.result);
+		});
+
 		this.#game_manager.addEventListener('game_restart', () => {
 			console.log('GAME RESTART');
 			this.hide(this.#order_dom);
@@ -58,6 +65,8 @@ export default class DOMManager {
 		 */
 		this.#put_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
+			this.#bang_button.classList.remove('active');
+			this.#put_button.classList.add('active');
 			this.#game_manager.current_section.mode = GameSection.MODE_PUT;
 		});
 		this.#pass_button.addEventListener('click', () => {
@@ -68,6 +77,8 @@ export default class DOMManager {
 		this.#bang_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 			this.#game_manager.current_section.mode = GameSection.MODE_PUT;
+			this.#put_button.classList.remove('active');
+			this.#bang_button.classList.add('active');
 			// this.#current_section.mode = GameSection.MODE_BANG;
 		});
 
@@ -78,6 +89,22 @@ export default class DOMManager {
 			// console.log(e);
 			this.#game_manager.dispatchEvent(new Event.GameRestartEvent());
 		});
+	}
+
+	draw_result_screen(result) {
+		let dom_result_score = document.getElementById('score');
+		let dom_result_black = document.getElementById('order_black');
+		let dom_result_white = document.getElementById('order_white');
+
+		this.hide(this.#order_dom);
+		this.hide(this.#ingame_buttons);
+		this.show(this.#result_screen_dom);
+
+		console.log(result);
+
+		dom_result_white.innerText = result.white;
+		dom_result_black.innerText = result.black;
+		dom_result_score.innerText = -1;
 	}
 
 	show(dom, is_flex = false) {

@@ -25,21 +25,6 @@ export default class ResultSection extends Section {
 	}
 	init() {
 		this.renderer_manager.controls.enabled = false;
-		this.drawResultScreen();
-	}
-
-	drawResultScreen() {
-		let container = document.getElementById('result_screen');
-		let dom_score = document.getElementById('score');
-		let dom_order_black = document.getElementById('order_black');
-		let dom_order_white = document.getElementById('order_white');
-
-		container.style.display = 'block';
-
-		console.log(this.#result);
-
-		dom_order_white.innerText = this.#result.white;
-		dom_order_black.innerText = this.#result.black;
-		dom_score.innerText = -1;
+		// this.drawResultScreen();
 	}
 }

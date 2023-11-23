@@ -160,7 +160,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#end_time = e.time;
-			await sleep(1500);
+			await sleep(1000);
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
 		});
