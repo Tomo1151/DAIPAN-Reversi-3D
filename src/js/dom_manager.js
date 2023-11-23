@@ -36,6 +36,10 @@ export default class DOMManager {
 		this.#game_manager.addEventListener('game_over', async (e) => {
 			console.log(e)
 			await sleep(1500);
+			this.#put_button.classList.remove('active');
+			this.#put_button.classList.add('disabled');
+			this.#bang_button.classList.remove('active');
+			this.#bang_button.classList.add('disabled');
 			this.draw_result_screen(e.result);
 		});
 
@@ -53,6 +57,7 @@ export default class DOMManager {
 		document.getElementById('start_button').addEventListener('click', () => {
 			// Setting DOMs
 			console.log("* send: game_start");console.log("");
+			this.order_update();
 			this.hide(this.#title_screen_dom);
 			this.show(this.#ingame_buttons);
 			this.show(this.#order_dom, true);
