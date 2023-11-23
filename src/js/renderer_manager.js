@@ -54,7 +54,7 @@ export default class RendererManager {
 			this.#renderer.setPixelRatio(window.devicePixelRatio);
 			this.#camera.aspect = window.innerWidth / window.innerHeight;
 			this.#camera.updateProjectionMatrix();
-		})
+		});
 	}
 
 	getIntersectObject(objects) {
@@ -72,6 +72,7 @@ export default class RendererManager {
 		this.#renderer.render(scene, this.#camera);
 	}
 
+	get renderer() {return this.#renderer;}
 	get raycaster() {return this.#raycaster;}
 	get mouse() {return this.#mouse;}
 	get camera() {return this.#camera;}

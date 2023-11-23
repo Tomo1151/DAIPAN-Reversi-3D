@@ -54,6 +54,13 @@
 			opacity:0;
 		}
 
+		.fadeOut {
+			animation-name: fadeOutAnimation;
+			animation-duration: 1s;
+			animation-fill-mode: forwards;
+			opacity: 1;
+		}
+
 		@keyframes fadeInAnimation{
 			from {
 				opacity: 0;
@@ -61,6 +68,16 @@
 
 			to {
 				opacity: 0.85;
+			}
+		}
+
+		@keyframes fadeOutAnimation {
+			from {
+				opacity: 1;
+			}
+
+			to {
+				opacity: 0;
 			}
 		}
 

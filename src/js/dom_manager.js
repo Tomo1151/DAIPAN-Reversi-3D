@@ -6,6 +6,7 @@ import GameSection from "./section/GameSection/game_section.js";
 
 export default class DOMManager {
 	#game_manager;
+	#renderer_manager;
 
 	#title_screen_dom;
 	#start_button;
@@ -19,8 +20,9 @@ export default class DOMManager {
 	#result_screen_dom;
 	#restart_button;
 
-	constructor(game_manager) {
+	constructor(game_manager, renderer_manager) {
 		this.#game_manager = game_manager;
+		this.#renderer_manager = renderer_manager;
 
 		this.#title_screen_dom = document.getElementById('title_screen');
 		this.#start_button = document.getElementById('start_button');
@@ -57,17 +59,35 @@ export default class DOMManager {
 	}
 
 	addDOMEventListener() {
+		const caution_screen = document.querySelector('.caution');
+		const on_orientation_change = () => {
+			let width = window.innerWidth;
+			let height = window.innerHeight;
+			if (width < height) [width, height] = [height, width];
+			document.getElementById('main-canvas').style.width = width;
+			document.getElementById('main-canvas').style.height = height;
+
+			this.#renderer_manager.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.#renderer_manager.renderer.setPixelRatio(window.devicePixelRatio);
+			this.#renderer_manager.camera.aspect = window.innerWidth / window.innerHeight;
+			this.#renderer_manager.camera.updateProjectionMatrix();
+		}
+
 		window.addEventListener('DOMContentLoaded', () => {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
-				this.show(document.querySelector('.caution'), true);
+				this.show(caution_screen, true);
 			}
 		});
 
-		window.addEventListener('orientationchange', () => {
+		screen.orientation.addEventListener('change', async () => {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
-				this.show(document.querySelector('.caution'), true);
+				caution_screen.classList.remove('fadeOut');
+				this.show(caution_screen, true);
 			} else {
-				this.hide(document.querySelector('.caution'));
+				await sleep(200);
+				on_orientation_change();
+				caution_screen.classList.add('fadeOut');
+				// this.hide(caution_screen);
 			}
 		});
 

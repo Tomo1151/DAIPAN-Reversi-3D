@@ -58,7 +58,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#frame = 0;
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
-		this.#dom_manager = new DOMManager(this);
+		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
 
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
 
