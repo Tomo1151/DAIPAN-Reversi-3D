@@ -214,9 +214,9 @@ export default class GameManager extends THREE.EventDispatcher {
 		if (black == white) {
 			res = "draw";
 		} else if (black < white) {
-			res = "player";
+			res = this.#player.name;
 		} else {
-			res = "enemy"
+			res = this.#enemy.name;
 		}
 		return {
 			"black": black,
