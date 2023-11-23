@@ -64,6 +64,16 @@
 			}
 		}
 
+		@keyframes shake {
+			50% {
+				transform: rotate(-10deg);
+			}
+
+			100% {
+				transform: rotate(10deg);
+			}
+		}
+
 		.order {
 			display: none;
 			background: var(--color-bg-board);
@@ -262,6 +272,34 @@
 			opacity: 0.85;
 		}
 
+		.caution {
+			display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background: white;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			font-size: 2.5rem;
+			color: var(--font-main-black);
+			width: 100vw;
+			height: 100vh;
+			z-index: 999;
+		}
+
+		.phone_image {
+			margin-top: 5rem;
+			width: 30%;
+			opacity: 0.85;
+		}
+
+		.phone_image img {
+			width: 100%;
+			animation: shake 2s infinite;
+			transform: rotate(10deg);
+		}
+
 		@media (max-width: 768px) {
 			html {font-size: 10px;}
 		}
@@ -269,6 +307,12 @@
 	</style>
 </head>
 <body>
+	<div class="caution">
+		<p>スマホを横向きにしてください</p>
+		<div class="phone_image">
+			<img src="img/phone_rotation.png">
+		</div>
+	</div>
 
 	<div class="buttons-wrapper" id="action_button">
 		<div class="button disabled" id="put_button">

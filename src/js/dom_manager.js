@@ -57,6 +57,20 @@ export default class DOMManager {
 	}
 
 	addDOMEventListener() {
+		window.addEventListener('DOMContentLoaded', () => {
+			if (screen.orientation.type.indexOf('landscape') == -1) {
+				this.show(document.querySelector('.caution'), true);
+			}
+		});
+
+		window.addEventListener('orientationchange', () => {
+			if (screen.orientation.type.indexOf('landscape') == -1) {
+				this.show(document.querySelector('.caution'), true);
+			} else {
+				this.hide(document.querySelector('.caution'));
+			}
+		});
+
 		// def Game Events
 		document.getElementById('start_button').addEventListener('click', () => {
 			// Setting DOMs
