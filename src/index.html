@@ -38,6 +38,23 @@
 			user-select: none;
 		}
 
+		.fadeIn{
+			animation-name:fadeInAnimation;
+			animation-duration:1s;
+			animation-fill-mode:forwards;
+			opacity:0;
+		}
+
+		@keyframes fadeInAnimation{
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 0.85;
+			}
+		}
+
 		.order {
 			display: none;
 			background: var(--color-bg-board);
@@ -214,6 +231,10 @@
 			transform: scale(1.0);
 		}
 
+		.active {
+			background: #AAA;
+		}
+
 		@media (max-width: 768px) {
 			html {font-size: 10px;}
 		}
@@ -237,13 +258,13 @@
 	<div class="order" id="order_div">
 		<p id="order" class="order-black"><span>黒</span></p><p>の手番です</p>
 	</div>
-	<div id="title_screen">
+	<div class="fadeIn" id="title_screen">
 		<h1>オセロ</h1>
 		<div class="button" id="start_button">
 			<p>はじめる</p>
 		</div>
 	</div>
-	<div id="result_screen">
+	<div class="fadeIn" id="result_screen">
 		<h2>Result</h2>
 		<div id="result">
 			<p id="score"></p>

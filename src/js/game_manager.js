@@ -86,7 +86,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 
-			await sleep(1500);
+			await sleep(1000);
 			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
 
@@ -116,8 +116,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
 
-			// @TODO move to GameSection
-			this.#current_section.disk_mesh_update(this.#board.table);
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
 
@@ -158,10 +156,11 @@ export default class GameManager extends THREE.EventDispatcher {
 			}
 		});
 
-		this.addEventListener('game_over', (e) => {
+		this.addEventListener('game_over', async (e) => {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#end_time = e.time;
+			await sleep(1500);
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
 		});

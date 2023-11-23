@@ -11,6 +11,9 @@ export default class DOMManager {
 
 	#order_dom;
 	#ingame_buttons;
+	#put_button;
+	#pass_button;
+	#bang_button;
 
 	#result_screen_dom;
 	#restart_button;
@@ -22,6 +25,9 @@ export default class DOMManager {
 		this.#start_button = document.getElementById('start_button');
 		this.#order_dom = document.getElementById('order_div');
 		this.#ingame_buttons = document.getElementById('action_button');
+		this.#put_button = this.#ingame_buttons.children[0];
+		this.#pass_button = this.#ingame_buttons.children[1];
+		this.#bang_button = this.#ingame_buttons.children[2];
 		this.#result_screen_dom = document.getElementById('result_screen');
 		this.#restart_button = document.getElementById('restart_button');
 		// this.#title_screen_dom = document.getElementById();
@@ -50,17 +56,16 @@ export default class DOMManager {
 		/*
 		 * GameSection
 		 */
-		this.#ingame_buttons.children[0].addEventListener('click', () => {
+		this.#put_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 			this.#game_manager.current_section.mode = GameSection.MODE_PUT;
-			console.log(this.#game_manager.current_section.mode);
 		});
-		this.#ingame_buttons.children[1].addEventListener('click', () => {
+		this.#pass_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order || this.#game_manager.checkTable(this.#game_manager.player.order)) return;
 			this.#game_manager.dispatchEvent(new Event.PutPassEvent(this.#game_manager.player.order));
 			document.getElementById('pass_button').classList.add('disabled');
 		});
-		this.#ingame_buttons.children[2].addEventListener('click', () => {
+		this.#bang_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 			this.#game_manager.current_section.mode = GameSection.MODE_PUT;
 			// this.#current_section.mode = GameSection.MODE_BANG;

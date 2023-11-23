@@ -86,13 +86,17 @@ export default class GameSection extends Section {
 			}
 		});
 
+		this.game_manager.addEventListener('confirmed', () => {
+			this.disk_mesh_update(this.game_manager.board.table);
+		});
+
 		// Listener delete
 		this.game_manager.addEventListener('game_over', () => {
 				console.log("delete click callback");
 				click_controller.abort();
 				console.log("delete mousemove callback");
 				mousemove_controller.abort();
-		})
+		});
 
 	}
 
