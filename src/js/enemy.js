@@ -91,7 +91,6 @@ export default class Enemy extends Player {
 	}
 
 	next_search(table, order) {
-		this.view(table);
 		let score;
 		let max_score = Number.NEGATIVE_INFINITY;
 		let positions = this.get_playable_position(table, order);
@@ -99,16 +98,20 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			this.view(put_table);
+			// this.view(put_table);
 			score = this.evaluate(put_table, order);
-			console.log(`score: ${score}\n`);
+			console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 
-			if (max_score < score) {
+			if (max_score == score) {
+				if (Math.random() > 0.5) {
+					max_score = score;
+					eval_pos = pos;
+				}
+			} else if (max_score < score) {
 				max_score = score;
 				eval_pos = pos;
 			}
 		}
-
 		return Object.assign({"order": order}, eval_pos);
 	}
 
