@@ -98,7 +98,6 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			// this.view(put_table);
 			score = this.evaluate(put_table, order);
 			console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 
@@ -111,6 +110,97 @@ export default class Enemy extends Player {
 				max_score = score;
 				eval_pos = pos;
 			}
+		}
+		return Object.assign({"order": order}, eval_pos);
+	}
+
+	next2_search(table, order) {
+		let score;
+		let max_score = Number.NEGATIVE_INFINITY;
+		let min_score = Infinity;
+		let positions = this.get_playable_position(table, order);
+		let eval_pos;
+
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			let p_positions = this.get_playable_position(put_table, this.get_opponent(order));
+
+			if (!p_positions) {
+				score = this.evaluate(put_table, order);
+				if (max_score == score) {
+					if (Math.random() > 0.5) {
+						max_score = score;
+						eval_pos = pos;
+					}
+				} else if (max_score < score) {
+					max_score = score;
+					eval_pos = pos;
+				}
+			}
+
+			for (let p_pos of p_positions) {
+				let e_table = this.put_disk(put_table, this.get_opponent(order), p_pos.x, p_pos.y);
+				score = this.evaluate(e_table, this.get_opponent(order));
+
+				if (min_score > score) {
+					min_score = score;
+					eval_pos = pos;
+				}
+			}
+			// console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+		}
+		return Object.assign({"order": order}, eval_pos);
+	}
+
+	next3_search(table, order) {
+		let score;
+		let max_score = Number.NEGATIVE_INFINITY;
+		let min_score = Infinity;
+
+		let positions = this.get_playable_position(table, order);
+		let eval_pos;
+
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			let p_positions = this.get_playable_position(put_table, this.get_opponent(order));
+			for (let p_pos of p_positions) {
+				let e_table = this.put_disk(put_table, this.get_opponent(order), p_pos.x, p_pos.y);
+				let e_positions = this.get_playable_position(e_table, order);
+				for (let e_pos of e_positions) {
+					let ev_table = this.put_disk(e_table, order, e_pos.x, e_pos.y);
+					score = this.evaluate(ev_table, order);
+
+					if (max_score == score) {
+						if (Math.random() > 0.5) {
+							max_score = score;
+							eval_pos = pos;
+						}
+					} else if (max_score < score) {
+						max_score = score;
+						eval_pos = pos;
+					}
+				}
+				if (min_score == max_score) {
+					if (Math.random() > 0.5) {
+						min_score = max_score;
+					}
+				} else if (min_score > max_score) {
+					min_score = max_score;
+				}
+			}
+			if (max_score == min_score) {
+				if (Math.random() > 0.5) {
+					max_score = min_score;
+					eval_pos = pos;
+				}
+			} else if (max_score < min_score) {
+				max_score = min_score;
+				eval_pos = pos;
+			}
+
+
+
+			console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 		}
 		return Object.assign({"order": order}, eval_pos);
 	}
