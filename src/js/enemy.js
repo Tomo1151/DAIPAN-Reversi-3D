@@ -5,6 +5,7 @@ import { Disk } from "./object.js";
 import * as Event from "./event.js";
 
 export default class Enemy extends Player {
+	MAX_DEPTH = 3;
 	#evalueation_map = [
 		[120, -20, 20,  5,  5, 20, -20, 120],
 		[-20, -40, -5, -5, -5, -5, -40, -20],
@@ -28,7 +29,7 @@ export default class Enemy extends Player {
 			let event;
 
 			// this.set_table(board.table);
-			console.log(this.nega_max(this.get_table_from_board(board), this.order, 3));
+			console.log(this.nega_max(this.get_table_from_board(board), this.order, this.MAX_DEPTH));
 
 			// let map = [
 			// 	[2, 2, 2, 2, 2, 2, 2, 2],
@@ -89,12 +90,9 @@ export default class Enemy extends Player {
 	}
 
 	nega_max(table, order, depth) {
-		// this.view(table)
-
 		if (depth == 0) {
-			// console.log(this.get_playable_position(table, order).length)
-			console.log(`eval: ${this.evaluate(table, order)}`)
-			return this.evaluate(table, order);
+			console.log(`eval: ${this.evaluate(table, this.order)}`)
+			return this.evaluate(table, this.order);
 		}
 
 		let score;
@@ -106,37 +104,31 @@ export default class Enemy extends Player {
 		console.log(`depth: ${4 - depth}手先`);
 		console.log(positions);
 
-		// console.log(this.view(this.put_disk(this.get_table_from_board(board), this.order, positions[0].x, positions[0].y)));
-
 		for (let i = 0; i < positions.length; i++) {
 			let put_table = this.put_disk(table, order, positions[i].x, positions[i].y);
+			// this.view(put_table)
 
-			// this.view(table)
-			this.view(put_table)
-
-			score = this.nega_max(put_table, this.get_opponent(order), depth-1);
-			// console.log(`score: \n`);
-			// console.log(score);
+			score = -this.nega_max(put_table, this.get_opponent(order), depth-1);
 
 			console.log(`cur_max: ${max_score} score: ${score}`)
 
-			if (order) {
-				if (max_score < score) {
-					max_score = score;
-					best_position = positions[i];
-				};
-			} else {
-				if (max_score < score * -1) {
-					max_score = score * -1;
-					best_position = positions[i];
-				};
+			if (max_score < score) {
+				max_score = score;
+				if (depth == this.MAX_DEPTH) best_position = positions[i];
 			}
 
+			// if (depth%2 == 1) {
+			// 	if (max_score < score) {
+			// 		max_score = score;
+			// 		if (depth == this.MAX_DEPTH) best_position = positions[i];
+			// 	};
+			// } else {
+			// 	if (max_score < -score) {
+			// 		max_score = -score;
+			// 	};
+			// }
 			console.log(`cur_max update: ${max_score}`)
-
 		}
-
-		// console.log(best_position)
 		return max_score;
 	}
 
