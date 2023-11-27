@@ -121,8 +121,9 @@ export default class GameSection extends Section {
 
 		// this.scene.add(new THREE.AxesHelper(500));
 
-		this.object_load();
-		// await this.object_load();
+		// this.object_load();
+		await this.object_load();
+		console.log("Loaded")
 	}
 
 	async object_load() {
