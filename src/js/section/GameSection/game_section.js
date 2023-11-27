@@ -13,7 +13,7 @@ export default class GameSection extends Section {
 
 	#selected_hitbox;
 	#hitboxes = [];
-	#disk_meshes = [];
+	#disk_models = [];
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
@@ -152,16 +152,16 @@ export default class GameSection extends Section {
 		});
 
 		await model_load('model_data/Disk.glb', (obj) => {
-			let disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
-					disk = obj.scene.clone();
-					disk.scale.set(4, 4, 4);
-					disk.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					disk.visible = false;
+					let model = Object.assign({}, obj);
+					model.scene = obj.scene.clone();
+					model.scene.scale.set(4, 4, 4);
+					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+					model.scene.visible = false;
 
-					this.#disk_meshes.push(disk);
-					this.scene.add(disk);
+					this.#disk_models.push(model);
+					this.scene.add(model.scene);
 				}
 			}
 		});
@@ -170,16 +170,16 @@ export default class GameSection extends Section {
 	}
 
 
-	disk_mesh_update(table) {
+	disk_mesh_update(table, put_pos, rev_pos) {
 		for (let i = 0; i < table.length; i++) {
 			switch (table[i].state) {
 				case Disk.WHITE:
-					this.#disk_meshes[i].rotation.z = 0;
-					this.#disk_meshes[i].visible = true;
+					this.#disk_models[i].scene.rotation.z = 0;
+					this.#disk_models[i].scene.visible = true;
 					break;
 				case Disk.BLACK:
-					this.#disk_meshes[i].rotation.z = Math.PI;
-					this.#disk_meshes[i].visible = true;
+					this.#disk_models[i].scene.rotation.z = Math.PI;
+					this.#disk_models[i].scene.visible = true;
 					break;
 			}
 		}
