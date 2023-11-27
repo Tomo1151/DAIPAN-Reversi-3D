@@ -29,8 +29,8 @@ export default class Enemy extends Player {
 			let event;
 
 			// this.set_table(board.table);
-			console.log(this.nega_max(this.get_table_from_board(board), this.order, this.MAX_DEPTH));
-
+			// console.log(this.nega_max(this.get_table_from_board(board), this.order, this.MAX_DEPTH));
+			// console.log(this.next_search(this.get_table_from_board(board), this.order));
 			// let map = [
 			// 	[2, 2, 2, 2, 2, 2, 2, 2],
 			// 	[2, 2, 2, 2, 2, 2, 2, 2],
@@ -46,7 +46,8 @@ export default class Enemy extends Player {
 
 			if (e.can_put) {
 				// console.log(`put ${e.can_put}`)
-				const data = this.searchFirst(board);
+				// const data = this.searchFirst(board);
+				const data = this.next_search(this.get_table_from_board(board), this.order);
 				event = new Event.PutNoticeEvent(data);
 			} else {
 				// console.log(`pass ${e.can_put}`)
@@ -75,13 +76,13 @@ export default class Enemy extends Player {
 				// console.log(disk_state)
 				switch (disk_state) {
 					case Disk.WHITE:
-						row += '〇　';
+						row += 'W　';
 						break;
 					case Disk.BLACK:
-						row += '◉　';
+						row += 'B　';
 						break;
 					default:
-						row += '・　';
+						row += '.　';
 						break;
 				}
 			}
@@ -89,10 +90,33 @@ export default class Enemy extends Player {
 		}
 	}
 
+	next_search(table, order) {
+		this.view(table);
+		let score;
+		let max_score = Number.NEGATIVE_INFINITY;
+		let positions = this.get_playable_position(table, order);
+		let eval_pos;
+
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			this.view(put_table);
+			score = this.evaluate(put_table, order);
+			console.log(`score: ${score}\n`);
+
+			if (max_score < score) {
+				max_score = score;
+				eval_pos = pos;
+			}
+		}
+
+		return Object.assign({"order": order}, eval_pos);
+	}
+
 	nega_max(table, order, depth) {
 		if (depth == 0) {
-			console.log(`eval: ${this.evaluate(table, this.order)}`)
-			return this.evaluate(table, this.order);
+			this.view(table)
+			console.log(`eval: ${this.evaluate(table, order)}`);
+			return this.evaluate(table, order);
 		}
 
 		let score;
@@ -110,10 +134,11 @@ export default class Enemy extends Player {
 
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1);
 
-			console.log(`cur_max: ${max_score} score: ${score}`)
+			console.log(`cur_max: ${max_score} <=> score: ${score}`)
 
 			if (max_score < score) {
 				max_score = score;
+				console.log(`cur_max update: ${max_score}`)
 				if (depth == this.MAX_DEPTH) best_position = positions[i];
 			}
 
@@ -127,7 +152,6 @@ export default class Enemy extends Player {
 			// 		max_score = -score;
 			// 	};
 			// }
-			console.log(`cur_max update: ${max_score}`)
 		}
 		return max_score;
 	}
