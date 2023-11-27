@@ -151,7 +151,7 @@ export default class GameSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		await model_load('model_data/Disk_low.gltf', (obj) => {
+		await model_load('model_data/Disk.glb', (obj) => {
 			let disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
