@@ -14,10 +14,12 @@ export default class GameSection extends Section {
 	#selected_hitbox;
 	#hitboxes = [];
 	#disk_models = [];
+	#animation_mixers = [];
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
 	#mode;
+	#clock;
 
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
@@ -101,6 +103,13 @@ export default class GameSection extends Section {
 	}
 
 	run() {
+		// Animation Mixer の時間を進める
+		let d = this.#clock.getDelta();
+		for (let mixer of this.#animation_mixers) {
+			if(mixer){
+				mixer.update(d);
+			}
+		}
 	}
 
 	async init() {
@@ -118,6 +127,7 @@ export default class GameSection extends Section {
 			light.intensity = 0.75;
 			this.scene.add(light);
 		}
+		this.#clock = new THREE.Clock();
 
 		// this.scene.add(new THREE.AxesHelper(500));
 
@@ -151,26 +161,95 @@ export default class GameSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		await model_load('model_data/Disk.glb', (obj) => {
-			for (let i = 0; i < 8; i++) {
-				for (let j = 0; j < 8; j++) {
-					let model = Object.assign({}, obj);
-					model.scene = obj.scene.clone();
-					model.scene.scale.set(4, 4, 4);
-					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					model.scene.visible = false;
+		for (let i = 0; i < 8; i++) {
+			for (let j = 0; j < 8; j++){
+				await model_load('model_data/Disk.glb', (obj) => {
+					let animations = obj.animations;
+					obj.scene.scale.set(4, 4, 4);
+					obj.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+					obj.scene.visible = false;
+					this.#disk_models.push(obj);
+					this.scene.add(obj.scene);
 
-					this.#disk_models.push(model);
-					this.scene.add(model.scene);
-				}
+					if(animations && animations.length) {
+
+						//Animation Mixerインスタンスを生成
+						let mixer = new THREE.AnimationMixer(obj.scene);
+						console.log(animations);
+
+						//全てのAnimation Clipに対して
+						for (let i = 0; i < animations.length; i++) {
+							let animation = animations[i];
+
+							//Animation Actionを生成
+							let action = mixer.clipAction(animation) ;
+
+							//ループ設定（1回のみ）
+							action.setLoop(THREE.LoopOnce);
+
+							//アニメーションの最後のフレームでアニメーションが終了
+							action.clampWhenFinished = true;
+
+							//アニメーションを再生
+							action.play();
+						}
+						this.#animation_mixers.push(mixer);
+					}
+
+					// console.log(obj)
+					// for (let i = 0; i < 8; i++) {
+					// 	for (let j = 0; j < 8; j++) {
+					// 		// let a = obj.clone()
+					// 		let model = Object.assign({}, obj);
+					// 		model.scene = obj.scene.clone();
+					// 		// model.animations = obj.animations.clone();
+					// 		model.scene.scale.set(4, 4, 4);
+					// 		model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+					// 		model.scene.visible = false;
+					// 		this.#disk_models.push(model);
+					// 		this.#disk_animations.push(model.animations);
+					// 		this.scene.add(model.scene);
+					// 	}
+					// }
+				});
 			}
-		});
+		}
 
 		this.disk_mesh_update(this.game_manager.board.table);
 	}
 
 
 	disk_mesh_update(table, put_pos, rev_pos) {
+		let mixer;
+		let animation;
+		if (this.disk_models) {
+			console.log(this.disk_models)
+			for (let i = 0; i < this.disk_models.length; i++) {
+				animations = this.disk_models[i].animations;
+
+				//Animation Mixerインスタンスを生成
+				mixer = new THREE.AnimationMixer(this.disk_models[i]);
+				console.log(animations);
+
+				//全てのAnimation Clipに対して
+				for (let i = 0; i < animations.length; i++) {
+					let animation = animations[i];
+
+					//Animation Actionを生成
+					let action = mixer.clipAction(animation) ;
+
+					//ループ設定（1回のみ）
+					action.setLoop(THREE.LoopOnce);
+
+					//アニメーションの最後のフレームでアニメーションが終了
+					action.clampWhenFinished = true;
+
+					//アニメーションを再生
+					action.play();
+				}
+			}
+		}
+
 		for (let i = 0; i < table.length; i++) {
 			switch (table[i].state) {
 				case Disk.WHITE:
