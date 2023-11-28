@@ -99,8 +99,8 @@ export default class Enemy extends Player {
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
 			score = this.evaluate(put_table, order);
-			console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
-
+			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			if (this.jam_check(put_table, Disk.WHITE)) return Object.assign({"order": order}, eval_pos);
 			if (max_score == score) {
 				if (Math.random() > 0.5) {
 					max_score = score;
@@ -111,7 +111,16 @@ export default class Enemy extends Player {
 				eval_pos = pos;
 			}
 		}
+		console.log(`\t > max: ${JSON.stringify(eval_pos)}`);
 		return Object.assign({"order": order}, eval_pos);
+	}
+
+	jam_check(table, target) {
+		let is_jammed = true;
+		for (let i = 0; i < table.length; i++) {
+			if (table[i].includes(target)) is_jammed = false;
+		}
+		return is_jammed;
 	}
 
 	next2_search(table, order) {
