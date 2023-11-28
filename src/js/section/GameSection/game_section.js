@@ -218,8 +218,8 @@ export default class GameSection extends Section {
 	disk_mesh_update(table, put_pos, rev_pos) {
 		for (let i = 0; i < 8*8; i++) {
 			if (this.#current_table[i] != table[i].state) {
-				console.log(`Disk[${i}] has changed`);
-				console.log(`${this.#current_table[i]} → ${table[i].state}`)
+				// console.log(`Disk[${i}] has changed`);
+				// console.log(`${this.#current_table[i]} → ${table[i].state}`)
 				if (this.#current_table[i] == Disk.EMPTY) {
 					switch (table[i].state) {
 						case Disk.WHITE:
@@ -229,28 +229,13 @@ export default class GameSection extends Section {
 							this.animation_put(i, Disk.BLACK);
 					}
 				} else if (this.#current_table[i] == Disk.WHITE) {
-					// to BLACK
 					this.animation_flip(i, Disk.BLACK);
 				} else {
 					this.animation_flip(i, Disk.WHITE);
 				}
 			}
 		}
-		// for (let i = 0; i < table.length; i++) {
-		// 	switch (table[i].state) {
-		// 		case Disk.WHITE:
-		// 			this.#disk_models[i].scene.rotation.z = 0;
-		// 			this.#disk_models[i].scene.visible = true;
-		// 			break;
-		// 		case Disk.BLACK:
-		// 			this.#disk_models[i].scene.rotation.z = Math.PI;
-		// 			this.#disk_models[i].scene.visible = true;
-		// 			break;
-		// 	}
-		// }
-
 		for (let i = 0; i < 8*8; i++) this.#current_table[i] = table[i].state;
-		// console.log(this.#current_table)
 	}
 
 	get mode() {return this.#mode;}
