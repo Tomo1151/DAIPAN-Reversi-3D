@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import GameManager from "../../game_manager.js";
-import { model_load } from "../../utils.js";
+import { model_load, sleep } from "../../utils.js";
 import { Disk, Board } from "../../object.js";
 import Section from "../section.js";
 import * as Event from "../../event.js";
@@ -11,9 +11,12 @@ export default class GameSection extends Section {
 	static MODE_PUT = 0;
 	static MODE_BANG = 1;
 
+	#current_table = new Array(8*8);
+
 	#selected_hitbox;
 	#hitboxes = [];
 	#disk_models = [];
+	#disk_animations = [];
 	#animation_mixers = [];
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
@@ -26,6 +29,8 @@ export default class GameSection extends Section {
 		this.renderer_manager.controls.enabled = true;
 		const click_controller = new AbortController();
 		const mousemove_controller = new AbortController();
+
+		for (let i = 0; i < 8*8; i++) this.#current_table[i] = Disk.EMPTY;
 
 		console.log("-- GAME SECTION --");
 		window.addEventListener('mousemove', (e) => {
@@ -103,7 +108,6 @@ export default class GameSection extends Section {
 	}
 
 	run() {
-		// Animation Mixer の時間を進める
 		let d = this.#clock.getDelta();
 		for (let mixer of this.#animation_mixers) {
 			if(mixer){
@@ -127,12 +131,36 @@ export default class GameSection extends Section {
 			light.intensity = 0.75;
 			this.scene.add(light);
 		}
-		this.#clock = new THREE.Clock();
 
+		this.#clock = new THREE.Clock();
 		// this.scene.add(new THREE.AxesHelper(500));
 
 		this.object_load();
 		// await this.object_load();
+	}
+
+	async animation_flip(disk_num, order) {
+		let disk = this.#disk_models[disk_num];
+		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[order]);
+		let duration = disk.animations[order].duration;
+		action.setLoop(THREE.LoopOnce);
+		action.play();
+		await sleep(duration*1000);
+		action.stop();
+		disk.scene.rotation.z += Math.PI;
+		disk.scene.rotation.z %= 2 * Math.PI;
+	}
+
+	async animation_put(disk_num, order) {
+		let disk = this.#disk_models[disk_num];
+		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[(1-order + 1)%3]);
+		let duration = disk.animations[1-order].duration;
+		disk.scene.visible = true;
+		disk.scene.rotation.z = order * Math.PI;
+		action.setLoop(THREE.LoopOnce);
+		action.play();
+		await sleep(duration*1000);
+		action.stop();
 	}
 
 	async object_load() {
@@ -161,107 +189,68 @@ export default class GameSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		for (let i = 0; i < 8; i++) {
-			for (let j = 0; j < 8; j++){
-				await model_load('model_data/Disk.glb', (obj) => {
-					let animations = obj.animations;
-					obj.scene.scale.set(4, 4, 4);
-					obj.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					obj.scene.visible = false;
-					this.#disk_models.push(obj);
-					this.scene.add(obj.scene);
+		await model_load('model_data/Disk.glb', (obj) => {
+			let mixer, animations;
+			for (let i = 0; i < 8; i++) {
+				for (let j = 0; j < 8; j++) {
+					let model = Object.assign({}, obj);
+					let animations = model.animations;
+					model.scene = obj.scene.clone();
 
-					if(animations && animations.length) {
+					//Animation Mixerインスタンスを生成
+					mixer = new THREE.AnimationMixer(model.scene);
 
-						//Animation Mixerインスタンスを生成
-						let mixer = new THREE.AnimationMixer(obj.scene);
-						console.log(animations);
-
-						//全てのAnimation Clipに対して
-						for (let i = 0; i < animations.length; i++) {
-							let animation = animations[i];
-
-							//Animation Actionを生成
-							let action = mixer.clipAction(animation) ;
-
-							//ループ設定（1回のみ）
-							action.setLoop(THREE.LoopOnce);
-
-							//アニメーションの最後のフレームでアニメーションが終了
-							action.clampWhenFinished = true;
-
-							//アニメーションを再生
-							action.play();
-						}
-						this.#animation_mixers.push(mixer);
-					}
-
-					// console.log(obj)
-					// for (let i = 0; i < 8; i++) {
-					// 	for (let j = 0; j < 8; j++) {
-					// 		// let a = obj.clone()
-					// 		let model = Object.assign({}, obj);
-					// 		model.scene = obj.scene.clone();
-					// 		// model.animations = obj.animations.clone();
-					// 		model.scene.scale.set(4, 4, 4);
-					// 		model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					// 		model.scene.visible = false;
-					// 		this.#disk_models.push(model);
-					// 		this.#disk_animations.push(model.animations);
-					// 		this.scene.add(model.scene);
-					// 	}
-					// }
-				});
+					model.scene.scale.set(4, 4, 4);
+					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+					model.scene.visible = false;
+					this.#disk_models.push(model);
+					this.#disk_animations.push(model.animations);
+					this.#animation_mixers.push(mixer);
+					this.scene.add(model.scene);
+				}
 			}
-		}
+		});
 
 		this.disk_mesh_update(this.game_manager.board.table);
 	}
 
 
 	disk_mesh_update(table, put_pos, rev_pos) {
-		let mixer;
-		let animation;
-		if (this.disk_models) {
-			console.log(this.disk_models)
-			for (let i = 0; i < this.disk_models.length; i++) {
-				animations = this.disk_models[i].animations;
-
-				//Animation Mixerインスタンスを生成
-				mixer = new THREE.AnimationMixer(this.disk_models[i]);
-				console.log(animations);
-
-				//全てのAnimation Clipに対して
-				for (let i = 0; i < animations.length; i++) {
-					let animation = animations[i];
-
-					//Animation Actionを生成
-					let action = mixer.clipAction(animation) ;
-
-					//ループ設定（1回のみ）
-					action.setLoop(THREE.LoopOnce);
-
-					//アニメーションの最後のフレームでアニメーションが終了
-					action.clampWhenFinished = true;
-
-					//アニメーションを再生
-					action.play();
+		for (let i = 0; i < 8*8; i++) {
+			if (this.#current_table[i] != table[i].state) {
+				console.log(`Disk[${i}] has changed`);
+				console.log(`${this.#current_table[i]} → ${table[i].state}`)
+				if (this.#current_table[i] == Disk.EMPTY) {
+					switch (table[i].state) {
+						case Disk.WHITE:
+							this.animation_put(i, Disk.WHITE);
+							break;
+						case Disk.BLACK:
+							this.animation_put(i, Disk.BLACK);
+					}
+				} else if (this.#current_table[i] == Disk.WHITE) {
+					// to BLACK
+					this.animation_flip(i, Disk.BLACK);
+				} else {
+					this.animation_flip(i, Disk.WHITE);
 				}
 			}
 		}
+		// for (let i = 0; i < table.length; i++) {
+		// 	switch (table[i].state) {
+		// 		case Disk.WHITE:
+		// 			this.#disk_models[i].scene.rotation.z = 0;
+		// 			this.#disk_models[i].scene.visible = true;
+		// 			break;
+		// 		case Disk.BLACK:
+		// 			this.#disk_models[i].scene.rotation.z = Math.PI;
+		// 			this.#disk_models[i].scene.visible = true;
+		// 			break;
+		// 	}
+		// }
 
-		for (let i = 0; i < table.length; i++) {
-			switch (table[i].state) {
-				case Disk.WHITE:
-					this.#disk_models[i].scene.rotation.z = 0;
-					this.#disk_models[i].scene.visible = true;
-					break;
-				case Disk.BLACK:
-					this.#disk_models[i].scene.rotation.z = Math.PI;
-					this.#disk_models[i].scene.visible = true;
-					break;
-			}
-		}
+		for (let i = 0; i < 8*8; i++) this.#current_table[i] = table[i].state;
+		// console.log(this.#current_table)
 	}
 
 	get mode() {return this.#mode;}
