@@ -142,6 +142,7 @@ export default class GameSection extends Section {
 	async animation_flip(disk_num, order) {
 		let disk = this.#disk_models[disk_num];
 		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[order]);
+		// console.log(action)
 		let duration = disk.animations[order].duration;
 		action.setLoop(THREE.LoopOnce);
 		action.play();
@@ -154,7 +155,9 @@ export default class GameSection extends Section {
 	async animation_put(disk_num, order) {
 		let disk = this.#disk_models[disk_num];
 		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[(1-order + 1)%3]);
-		let duration = disk.animations[1-order].duration;
+		// console.log(action)
+		action.timeScale = 10;
+		let duration = disk.animations[(1-order + 1)%3].duration;
 		disk.scene.visible = true;
 		disk.scene.rotation.z = order * Math.PI;
 		action.setLoop(THREE.LoopOnce);

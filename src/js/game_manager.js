@@ -122,7 +122,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('put_pass', (e) => {
 			if (e.order !== this.#current_turn) return;
-			console.log(e);
+			// console.log(e);
 
 			console.log("game_manager received: put_pass");
 			this.dispatchEvent(new Event.TurnChangeEvent());

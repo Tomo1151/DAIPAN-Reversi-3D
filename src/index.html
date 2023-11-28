@@ -175,6 +175,7 @@
 		.button:hover {
 			filter: brightness(0.8);
 			transform: scale(1.1);
+			cursor: pointer;
 		}
 
 		.button:active {
@@ -276,11 +277,13 @@
 
 		.disabled {
 			filter: opacity(0.25);
+			cursor: not-allowed;
 		}
 
 		.disabled:hover, .disabled:active {
 			filter: opacity(0.2);
 			transform: scale(1.0);
+			cursor: not-allowed;
 		}
 
 		.active, .active:hover, .active:active{
@@ -359,7 +362,7 @@
 		<h1 style="margin-bottom: 1rem;">オセロ</h1>
 		<div>
 			<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
-			<p>※ Player名はランキングに使用します</p>
+			<p>※ Player 名はランキング <small>[未実装]</small> に使用します</p>
 		</div>
 		<div class="button" id="start_button">
 			<p>はじめる</p>
