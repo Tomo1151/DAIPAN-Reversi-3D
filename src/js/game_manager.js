@@ -134,13 +134,12 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
 
-			console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
-
 			if (this.checkGameOver()) {
 				const res = this.get_result();
 				this.#result = res;
 				this.dispatchEvent(new Event.GameOverEvent(res));
 			} else {
+				console.log(`[${this.#current_turn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
 				this.dispatchEvent(new Event.TurnNoticeEvent(this.#current_turn, this.#board, this.checkTable(this.#current_turn)));
 			}
 		});
