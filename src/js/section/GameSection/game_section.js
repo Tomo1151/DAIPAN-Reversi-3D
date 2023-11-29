@@ -135,8 +135,9 @@ export default class GameSection extends Section {
 		this.#clock = new THREE.Clock();
 		// this.scene.add(new THREE.AxesHelper(500));
 
-		this.object_load();
-		// await this.object_load();
+		// this.object_load();
+		await this.object_load();
+		console.log("Loaded")
 	}
 
 	async animation_flip(disk_num, order) {
