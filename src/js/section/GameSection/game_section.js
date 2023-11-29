@@ -151,6 +151,8 @@ export default class GameSection extends Section {
 		action.stop();
 		disk.scene.rotation.z += Math.PI;
 		disk.scene.rotation.z %= 2 * Math.PI;
+
+		// @TODO 2回目のアニメーション再生時の不具合
 	}
 
 	async animation_put(disk_num, order) {
