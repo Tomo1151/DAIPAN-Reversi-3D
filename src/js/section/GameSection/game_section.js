@@ -151,38 +151,38 @@ export default class GameSection extends Section {
 
 	async animation_flip(disk_num, order) {
 		let disk = this.#disk_models[disk_num];
-		this.#animation_mixers[disk_num].stopAllAction();
 		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[order]);
-		action.timeScale = 1;
-		// console.log(action)
 		let duration = disk.animations[order].duration;
+
+		action.timeScale = 1;
 		action.setLoop(THREE.LoopOnce);
 		action.clampWhenFinished = true;
+
 		console.log(` |... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
 		await sleep(duration*1000);
 		console.log(" |... animation end");
 		action.stop();
+
 		disk.scene.rotation.z += Math.PI;
 		disk.scene.rotation.z %= 2 * Math.PI;
-
-		// @TODO 2回目のアニメーション再生時の不具合
 	}
 
 	async animation_put(disk_num, order) {
 		let disk = this.#disk_models[disk_num];
-		this.#animation_mixers[disk_num].stopAllAction();
-		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[order + 1]);
-		// console.log(action)
-		action.timeScale = 10;
-		let duration = disk.animations[order + 1].duration;
+		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[1-order + 2]);
+		let duration = disk.animations[1-order + 2].duration;
+
 		disk.scene.visible = true;
 		disk.scene.rotation.z = order * Math.PI;
+
+		action.timeScale = 5;
 		action.setLoop(THREE.LoopOnce);
 		action.clampWhenFinished = true;
+
 		console.log(` |... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
-		await sleep(duration*100);
+		await sleep(duration*200);
 		console.log(" |... animation end");
 		action.stop();
 	}
