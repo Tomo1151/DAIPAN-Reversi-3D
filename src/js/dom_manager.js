@@ -37,6 +37,7 @@ export default class DOMManager {
 
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#game_manager.player.order) return;
+
 			if (e.can_put) {
 				this.#put_button.classList.remove('disabled');
 				this.#pass_button.classList.add('disabled');
@@ -45,6 +46,13 @@ export default class DOMManager {
 				this.#pass_button.classList.remove('disabled');
 			}
 		});
+
+		this.#game_manager.addEventListener('put_success', (e) => {
+			if (e.order == this.#game_manager.player.order) {
+				this.#put_button.classList.add('disabled');
+				this.#pass_button.classList.add('disabled');
+			}
+		})
 
 		this.#game_manager.addEventListener('game_over', async (e) => {
 			console.log(e)

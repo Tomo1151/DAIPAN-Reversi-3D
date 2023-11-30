@@ -27,6 +27,8 @@ export default class GameSection extends Section {
 	constructor(game_manager, renderer_manager, scene) {
 		super(game_manager, renderer_manager, scene);
 		this.renderer_manager.controls.enabled = true;
+		this.#clock = new THREE.Clock();
+
 		const click_controller = new AbortController();
 		const mousemove_controller = new AbortController();
 
@@ -86,6 +88,8 @@ export default class GameSection extends Section {
 			}, {signal: click_controller.signal});
 		}, {signal: click_controller.signal});
 
+		this.init();
+
 		this.game_manager.addEventListener('turn_notice', (e) => {
 			if (this.game_manager.player.order != e.order) {
 				for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
@@ -93,8 +97,9 @@ export default class GameSection extends Section {
 			}
 		});
 
-		this.game_manager.addEventListener('confirmed', () => {
-			this.disk_mesh_update(this.game_manager.board.table);
+		this.game_manager.addEventListener('confirmed', async () => {
+			await this.disk_mesh_update(this.game_manager.board.table);
+			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent());
 		});
 
 		// Listener delete
@@ -132,12 +137,13 @@ export default class GameSection extends Section {
 			this.scene.add(light);
 		}
 
-		this.#clock = new THREE.Clock();
 		// this.scene.add(new THREE.AxesHelper(500));
 
 		// this.object_load();
-		await this.object_load();
-		console.log("Loaded")
+		this.object_load().then(() => {
+			console.log("Loaded")
+			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent())
+		});
 	}
 
 	async animation_flip(disk_num, order) {
@@ -146,8 +152,10 @@ export default class GameSection extends Section {
 		// console.log(action)
 		let duration = disk.animations[order].duration;
 		action.setLoop(THREE.LoopOnce);
-		action.play();
+		console.log("|... animation start");
+		action.reset().play();
 		await sleep(duration*1000);
+		console.log("|... animation end");
 		action.stop();
 		disk.scene.rotation.z += Math.PI;
 		disk.scene.rotation.z %= 2 * Math.PI;
@@ -164,84 +172,93 @@ export default class GameSection extends Section {
 		disk.scene.visible = true;
 		disk.scene.rotation.z = order * Math.PI;
 		action.setLoop(THREE.LoopOnce);
-		action.play();
-		await sleep(duration*1000);
+		console.log("|... animation start");
+		action.reset().play();
+		await sleep(duration*100);
+		console.log("|... animation end");
 		action.stop();
 	}
 
 	async object_load() {
-		await model_load('model_data/Board_low.gltf', (obj) => {
-			obj.scene.scale.set(5.05, 5.05, 5.05);
-			obj.scene.position.set(0, 0.5, 0);
-			for (let i = 0; i < 8; i++) {
-				for (let j = 0; j < 8; j++) {
-					const g = new THREE.BoxGeometry(10, 1.15, 10);
-					const m = new THREE.MeshStandardMaterial({
-						color:0xff0000,
-						opacity: 0.0,
-						transparent: true
-					});
+		return new Promise(async (res) => {
+			await model_load('model_data/Board_low.gltf', (obj) => {
+				obj.scene.scale.set(5.05, 5.05, 5.05);
+				obj.scene.position.set(0, 0.5, 0);
+				for (let i = 0; i < 8; i++) {
+					for (let j = 0; j < 8; j++) {
+						const g = new THREE.BoxGeometry(10, 1.15, 10);
+						const m = new THREE.MeshStandardMaterial({
+							color:0xff0000,
+							opacity: 0.0,
+							transparent: true
+						});
 
-					const box = new THREE.Mesh(g, m);
-					box.position.set(10*j - (10*3+5), -0.02, 10*i - (10*3+5));
-					box.cell_x = j;
-					box.cell_y = i;
-					box.is_mousedown = false;
+						const box = new THREE.Mesh(g, m);
+						box.position.set(10*j - (10*3+5), -0.02, 10*i - (10*3+5));
+						box.cell_x = j;
+						box.cell_y = i;
+						box.is_mousedown = false;
 
-					this.#hitboxes.push(box);
-					this.scene.add(box);
+						this.#hitboxes.push(box);
+						this.scene.add(box);
+					}
 				}
-			}
-			this.scene.add(obj.scene);
-		});
+				this.scene.add(obj.scene);
+			});
 
-		await model_load('model_data/Disk.glb', (obj) => {
-			let mixer, animations;
-			for (let i = 0; i < 8; i++) {
-				for (let j = 0; j < 8; j++) {
-					let model = Object.assign({}, obj);
-					let animations = model.animations;
-					model.scene = obj.scene.clone();
+			await model_load('model_data/Disk.gltf', (obj) => {
+				let mixer, animations;
+				for (let i = 0; i < 8; i++) {
+					for (let j = 0; j < 8; j++) {
+						let model = Object.assign({}, obj);
+						let animations = model.animations;
+						model.scene = obj.scene.clone();
 
-					//Animation Mixerインスタンスを生成
-					mixer = new THREE.AnimationMixer(model.scene);
+						//Animation Mixerインスタンスを生成
+						mixer = new THREE.AnimationMixer(model.scene);
 
-					model.scene.scale.set(4, 4, 4);
-					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					model.scene.visible = false;
-					this.#disk_models.push(model);
-					this.#disk_animations.push(model.animations);
-					this.#animation_mixers.push(mixer);
-					this.scene.add(model.scene);
+						model.scene.scale.set(4, 4, 4);
+						model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+						model.scene.visible = false;
+						this.#disk_models.push(model);
+						this.#disk_animations.push(model.animations);
+						this.#animation_mixers.push(mixer);
+						this.scene.add(model.scene);
+					}
 				}
-			}
-		});
+			});
 
-		this.disk_mesh_update(this.game_manager.board.table);
+			await this.disk_mesh_update(this.game_manager.board.table);
+			res();
+		});
 	}
 
 
-	disk_mesh_update(table, put_pos, rev_pos) {
+	async disk_mesh_update(table, put_pos, rev_pos) {
 		for (let i = 0; i < 8*8; i++) {
 			if (this.#current_table[i] != table[i].state) {
-				// console.log(`Disk[${i}] has changed`);
-				// console.log(`${this.#current_table[i]} → ${table[i].state}`)
 				if (this.#current_table[i] == Disk.EMPTY) {
+					this.#current_table[i] = table[i].state;
 					switch (table[i].state) {
 						case Disk.WHITE:
-							this.animation_put(i, Disk.WHITE);
+							await this.animation_put(i, Disk.WHITE);
 							break;
 						case Disk.BLACK:
-							this.animation_put(i, Disk.BLACK);
+							await this.animation_put(i, Disk.BLACK);
 					}
-				} else if (this.#current_table[i] == Disk.WHITE) {
-					this.animation_flip(i, Disk.BLACK);
-				} else {
-					this.animation_flip(i, Disk.WHITE);
 				}
 			}
 		}
-		for (let i = 0; i < 8*8; i++) this.#current_table[i] = table[i].state;
+		for (let i = 0; i < 8*8; i++) {
+			if (this.#current_table[i] != table[i].state) {
+				if (this.#current_table[i] == Disk.WHITE) {
+					await this.animation_flip(i, Disk.BLACK);
+				} else {
+					await this.animation_flip(i, Disk.WHITE);
+				}
+			}
+			this.#current_table[i] = table[i].state;
+		}
 	}
 
 	get mode() {return this.#mode;}

@@ -81,14 +81,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#section_manager.change_section(this.#current_section);
 
 			console.log("[Event]: game_start");
-			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 			this.#player.name = this.#dom_manager.get_player_name();
-
-			await sleep(1000);
-			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 		});
 
 		this.addEventListener('put_notice', (data) => {
@@ -117,7 +113,18 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
 
-			this.dispatchEvent(new Event.TurnChangeEvent());
+		});
+
+		this.addEventListener('updated', async () => {
+			console.log("game_manager received: updated")
+			if (this.GAME_STATE == GameManager.BEFORE_START) {
+				this.GAME_STATE = GameManager.IN_GAME;
+				await sleep(1000);
+				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
+			} else if (this.GAME_STATE == GameManager.IN_GAME) {
+				await sleep(1000);
+				this.dispatchEvent(new Event.TurnChangeEvent());
+			}
 		});
 
 		this.addEventListener('put_pass', (e) => {
