@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.0.44",
+		"generator":"Khronos glTF Blender I/O v3.5.30",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -91,12 +91,31 @@
 					}
 				}
 			],
-			"name":"set_W",
+			"name":"set_B",
 			"samplers":[
 				{
 					"input":13,
 					"interpolation":"LINEAR",
 					"output":14
+				}
+			]
+		},
+		{
+			"channels":[
+				{
+					"sampler":0,
+					"target":{
+						"node":0,
+						"path":"translation"
+					}
+				}
+			],
+			"name":"set_W",
+			"samplers":[
+				{
+					"input":13,
+					"interpolation":"LINEAR",
+					"output":15
 				}
 			]
 		}
@@ -138,8 +157,8 @@
 				{
 					"attributes":{
 						"POSITION":0,
-						"NORMAL":1,
-						"TEXCOORD_0":2
+						"TEXCOORD_0":1,
+						"NORMAL":2
 					},
 					"indices":3,
 					"material":0
@@ -147,8 +166,8 @@
 				{
 					"attributes":{
 						"POSITION":4,
-						"NORMAL":5,
-						"TEXCOORD_0":6
+						"TEXCOORD_0":5,
+						"NORMAL":6
 					},
 					"indices":7,
 					"material":1
@@ -177,13 +196,13 @@
 			"bufferView":1,
 			"componentType":5126,
 			"count":98,
-			"type":"VEC3"
+			"type":"VEC2"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
 			"count":98,
-			"type":"VEC2"
+			"type":"VEC3"
 		},
 		{
 			"bufferView":3,
@@ -211,13 +230,13 @@
 			"bufferView":5,
 			"componentType":5126,
 			"count":98,
-			"type":"VEC3"
+			"type":"VEC2"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
 			"count":98,
-			"type":"VEC2"
+			"type":"VEC3"
 		},
 		{
 			"bufferView":7,
@@ -278,6 +297,12 @@
 			"componentType":5126,
 			"count":30,
 			"type":"VEC3"
+		},
+		{
+			"bufferView":15,
+			"componentType":5126,
+			"count":30,
+			"type":"VEC3"
 		}
 	],
 	"bufferViews":[
@@ -289,14 +314,14 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":1176,
+			"byteLength":784,
 			"byteOffset":1176,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":784,
-			"byteOffset":2352,
+			"byteLength":1176,
+			"byteOffset":1960,
 			"target":34962
 		},
 		{
@@ -313,14 +338,14 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":1176,
+			"byteLength":784,
 			"byteOffset":4876,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":784,
-			"byteOffset":6052,
+			"byteLength":1176,
+			"byteOffset":5660,
 			"target":34962
 		},
 		{
@@ -363,11 +388,16 @@
 			"buffer":0,
 			"byteLength":360,
 			"byteOffset":7940
+		},
+		{
+			"buffer":0,
+			"byteLength":360,
+			"byteOffset":8300
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":8300,
+			"byteLength":8660,
 			"uri":"Disk.bin"
 		}
 	]

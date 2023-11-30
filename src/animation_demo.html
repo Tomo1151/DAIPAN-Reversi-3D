@@ -82,7 +82,7 @@
 			const disks = [];
 
 			// モデルのロード
-			await model_load('model_data/Disk.glb', (data) => {
+			await model_load('model_data/Disk.gltf', (data) => {
 				const gltf = data;
 				const obj = data.scene;
 				const animations = gltf.animations;
@@ -125,8 +125,8 @@
 			let frame = 0;
 			let cnt = 0
 			async function flip(disk, cnt) {
-				let action = mixer.clipAction(disk.animations[cnt%2]);
-				let duration = disk.animations[cnt%2].duration;
+				let action = mixer.clipAction(disk.animations[2+(cnt%2)]);
+				let duration = disk.animations[2+(cnt%2)].duration;
 				action.setLoop(THREE.LoopOnce);
 				action.play();
 				await sleep(duration*1000);
