@@ -13,6 +13,7 @@ export default class GameSection extends Section {
 
 	#current_table = new Array(8*8);
 
+	#is_selectable = false;
 	#selected_hitbox;
 	#hitboxes = [];
 	#disk_models = [];
@@ -37,7 +38,7 @@ export default class GameSection extends Section {
 		console.log("-- GAME SECTION --");
 		window.addEventListener('mousemove', (e) => {
 			// console.log("mousemove");
-			if (this.game_manager.player.order != this.game_manager.current_turn) return;
+			if (this.game_manager.player.order != this.game_manager.current_turn || !this.#is_selectable) return;
 			this.renderer_manager.setCursorPoint(e);
 			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
 
@@ -91,9 +92,13 @@ export default class GameSection extends Section {
 		this.init();
 
 		this.game_manager.addEventListener('turn_notice', (e) => {
-			if (this.game_manager.player.order != e.order) {
+			if (this.game_manager.player.order == e.order) this.#is_selectable = true;
+		})
+
+		this.game_manager.addEventListener('put_success', (e) => {
+			if (this.game_manager.player.order == e.order) {
 				for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
-				return;
+				this.#is_selectable = false;
 			}
 		});
 
