@@ -18,7 +18,7 @@ export default class SectionManager {
 
 	change_section(section) {
 		this.reset_scene();
-		// section.init()
+		section.init()
 	}
 
 	set scene(scene) {this.#scene = scene;}

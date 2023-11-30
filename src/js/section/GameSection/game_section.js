@@ -89,8 +89,6 @@ export default class GameSection extends Section {
 			}, {signal: click_controller.signal});
 		}, {signal: click_controller.signal});
 
-		this.init();
-
 		this.game_manager.addEventListener('turn_notice', (e) => {
 			if (this.game_manager.player.order == e.order) this.#is_selectable = true;
 		})

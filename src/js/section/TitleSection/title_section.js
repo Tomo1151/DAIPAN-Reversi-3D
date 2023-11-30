@@ -10,7 +10,6 @@ export default class TitleSection extends Section {
 		this.renderer_manager.controls.enabled = false;
 		// this.scene.add(new THREE.AxesHelper(500))
 		console.log("-- TITLE SECTION --");console.log();
-		this.init();
 	}
 
 	run() {

@@ -87,6 +87,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#player.name = this.#dom_manager.get_player_name();
 		});
 
+		this.addEventListener('turn_notice', () => {
+			console.log(` @gm > waiting ${this.#current_turn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
+		});
+
 		this.addEventListener('put_notice', (data) => {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
