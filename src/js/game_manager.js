@@ -81,14 +81,14 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#section_manager.change_section(this.#current_section);
 
 			console.log("[Event]: game_start");
-			this.GAME_STATE = GameManager.IN_GAME;
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 			this.#player.name = this.#dom_manager.get_player_name();
+		});
 
-			await sleep(1000);
-			this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
+		this.addEventListener('turn_notice', () => {
+			console.log(`@gm > waiting ${this.#current_turn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
 		});
 
 		this.addEventListener('put_notice', (data) => {
@@ -117,7 +117,18 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
 
-			this.dispatchEvent(new Event.TurnChangeEvent());
+		});
+
+		this.addEventListener('updated', async () => {
+			console.log("game_manager received: updated")
+			if (this.GAME_STATE == GameManager.BEFORE_START) {
+				this.GAME_STATE = GameManager.IN_GAME;
+				await sleep(1000);
+				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
+			} else if (this.GAME_STATE == GameManager.IN_GAME) {
+				await sleep(1000);
+				this.dispatchEvent(new Event.TurnChangeEvent());
+			}
 		});
 
 		this.addEventListener('put_pass', (e) => {
@@ -148,6 +159,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#end_time = e.time;
+			this.#enemy.point = e.result.black;
+			this.#player.point = e.result.white;
 			await sleep(1000);
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
@@ -215,4 +228,6 @@ export default class GameManager extends THREE.EventDispatcher {
 	get current_turn() {return this.#current_turn;}
 	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
+	get start_time() {return this.#start_time;}
+	get end_time() {return this.#end_time;}
 }

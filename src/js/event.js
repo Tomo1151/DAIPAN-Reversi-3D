@@ -114,6 +114,11 @@ export class PutPassEvent extends CustomEvent {
 	}
 }
 
+export class UpdateCompleteEvent extends CustomEvent {
+	static EVENT_NAME = "updated";
+	constructor () {super(UpdateCompleteEvent.EVENT_NAME);}
+}
+
 // export class EventManager {
 // 	#listeners = [];
 

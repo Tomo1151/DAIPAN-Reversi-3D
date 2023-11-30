@@ -10,7 +10,6 @@ export default class TitleSection extends Section {
 		this.renderer_manager.controls.enabled = false;
 		// this.scene.add(new THREE.AxesHelper(500))
 		console.log("-- TITLE SECTION --");console.log();
-
 	}
 
 	run() {
@@ -43,7 +42,7 @@ export default class TitleSection extends Section {
 			this.scene.add(obj.scene);
 		});
 
-		model_load('model_data/Disk_low.gltf', (obj) => {
+		model_load('model_data/Disk.gltf', (obj) => {
 			let disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {

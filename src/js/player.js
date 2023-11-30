@@ -48,4 +48,6 @@ export default class Player {
 	get order() {return this.#order;}
 	get name() {return this.#name;}
 	set name(name) {this.#name = name;}
+	get point() {return this.#point;}
+	set point(point) {this.#point = point;}
 }
