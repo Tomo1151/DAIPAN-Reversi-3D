@@ -144,7 +144,7 @@ export default class GameSection extends Section {
 
 		// this.object_load();
 		this.object_load().then(() => {
-			console.log("Loaded")
+			console.log(" * Object load completed")
 			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent())
 		});
 	}
