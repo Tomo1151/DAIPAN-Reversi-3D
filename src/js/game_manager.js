@@ -148,6 +148,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#end_time = e.time;
+			this.#enemy.point = e.result.black;
+			this.#player.point = e.result.white;
 			await sleep(1000);
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
@@ -215,4 +217,6 @@ export default class GameManager extends THREE.EventDispatcher {
 	get current_turn() {return this.#current_turn;}
 	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
+	get start_time() {return this.#start_time;}
+	get end_time() {return this.#end_time;}
 }

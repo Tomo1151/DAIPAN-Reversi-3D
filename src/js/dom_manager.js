@@ -146,6 +146,12 @@ export default class DOMManager {
 		let dom_result_score = document.getElementById('score');
 		let dom_result_black = document.getElementById('order_black');
 		let dom_result_white = document.getElementById('order_white');
+		let dom_result_time = document.getElementById('time');
+
+		let dt = this.#game_manager.end_time.getTime() - this.#game_manager.start_time.getTime();
+		let dh = dt / (1000*60*60);
+		let dm = (dh - Math.floor(dh)) * 60;
+		let ds = (dm - Math.floor(dm)) * 60;
 
 		let result_str = '';
 
@@ -160,9 +166,10 @@ export default class DOMManager {
 		}
 
 		dom_result_winner.innerText = result_str;
+		dom_result_score.innerText = this.#game_manager.player.point;
 		dom_result_white.innerText = `${this.get_player_name()} : ${result.white}`;
 		dom_result_black.innerText = `${this.#game_manager.enemy.name} : ${result.black}`;
-		dom_result_score.innerText = -1;
+		dom_result_time.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
 
 	show(dom, is_flex = false) {
