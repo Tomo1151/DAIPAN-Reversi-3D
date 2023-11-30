@@ -88,7 +88,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('turn_notice', () => {
-			console.log(` @gm > waiting ${this.#current_turn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
+			console.log(`@gm > waiting ${this.#current_turn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
 		});
 
 		this.addEventListener('put_notice', (data) => {
