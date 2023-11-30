@@ -155,10 +155,10 @@ export default class GameSection extends Section {
 		// console.log(action)
 		let duration = disk.animations[order].duration;
 		action.setLoop(THREE.LoopOnce);
-		console.log(`|... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
+		console.log(` |... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
 		await sleep(duration*1000);
-		console.log("|... animation end");
+		console.log(" |... animation end");
 		action.stop();
 		disk.scene.rotation.z += Math.PI;
 		disk.scene.rotation.z %= 2 * Math.PI;
@@ -175,10 +175,10 @@ export default class GameSection extends Section {
 		disk.scene.visible = true;
 		disk.scene.rotation.z = order * Math.PI;
 		action.setLoop(THREE.LoopOnce);
-		console.log(`|... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
+		console.log(` |... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
 		await sleep(duration*100);
-		console.log("|... animation end");
+		console.log(" |... animation end");
 		action.stop();
 	}
 
