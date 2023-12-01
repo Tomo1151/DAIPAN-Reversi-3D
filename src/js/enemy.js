@@ -30,7 +30,7 @@ export default class Enemy extends Player {
 
 			if (e.can_put) {
 				// const data = this.searchFirst(board);
-				const data = this.search_negamax(this.get_table_from_board(board), this.order, 4);
+				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
 				event = new Event.PutNoticeEvent(data);
 			} else {
 				event = new Event.PutPassEvent(this.order);
@@ -128,14 +128,9 @@ export default class Enemy extends Player {
 		let max_score = Number.NEGATIVE_INFINITY;
 		let positions = this.get_playable_position(table, order);
 
-		// console.log(`depth: ${depth}`)
-
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			// this.view(put_table)
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
-			// console.log(`score: ${score}\n`)
-			// console.log(`${max_score} <=> ${score}`);
 			max_score = Math.max(max_score, score);
 		}
 
@@ -144,7 +139,50 @@ export default class Enemy extends Player {
 			return -this.nega_max(table, order, depth, true);
 		}
 
-		// console.log(`max: ${max_score}`);
+		return max_score;
+	}
+
+	search_negaalpha(table, order, depth) {
+		let score;
+		let alpha = Number.NEGATIVE_INFINITY;
+		let beta = Infinity;
+		let positions = this.get_playable_position(table, order);
+		let eval_pos = positions[0];
+
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, -beta, -alpha, false);
+			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			if (alpha < score) {
+				alpha = score;
+				eval_pos = pos;
+			}
+		}
+		console.log(`\t > max: ${JSON.stringify(eval_pos)}`);
+		return Object.assign({"order": order}, eval_pos);
+	}
+
+	nega_alpha(table, order, depth, alpha, beta, is_passed) {
+		if (depth == 0) return this.evaluate(table, order);
+
+		let score;
+		let max_score = Number.NEGATIVE_INFINITY;
+		let positions = this.get_playable_position(table, order);
+
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
+			if (score >= beta) return score;
+
+			alpha = Math.max(alpha, score);
+			max_score = Math.max(max_score, score);
+		}
+
+		if (max_score == Number.NEGATIVE_INFINITY) {
+			if (is_passed) return this.evaluate(table, order);
+			return -this.nega_alpha(table, order, depth, -beta, -alpha, true);
+		}
+
 		return max_score;
 	}
 
