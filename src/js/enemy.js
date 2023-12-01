@@ -5,7 +5,6 @@ import { Disk } from "./object.js";
 import * as Event from "./event.js";
 
 export default class Enemy extends Player {
-	MAX_DEPTH = 3;
 	#evalueation_map = [
 		[120, -20, 20,  5,  5, 20, -20, 120],
 		[-20, -40, -5, -5, -5, -5, -40, -20],
@@ -17,20 +16,24 @@ export default class Enemy extends Player {
 		[120, -20, 20,  5,  5, 20, -20, 120]
 	];
 
+	#count;
 	#current_table;
 
 	constructor (game_manager, order) {
 		super(game_manager, order);
 		this.name = 'COM';
-
+		this.#count = 0;
 		this.game_manager.addEventListener('turn_notice', async (e) => {
 			if (e.order != this.order) return;
 			let board = e.board;
 			let event;
-
+			this.#count++;
 			if (e.can_put) {
 				// const data = this.searchFirst(board);
-				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
+				// const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
+				let depth = (this.#count > 25) ? (32 - this.#count)*2 : 5;
+				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, depth);
+				console.log(`count: ${this.#count} | search depth: ${depth}`);
 				event = new Event.PutNoticeEvent(data);
 			} else {
 				event = new Event.PutPassEvent(this.order);
@@ -77,9 +80,9 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			if (this.jam_check(put_table, Disk.WHITE)) return {"order": order, "x": pos.x, "y": pos.y};
 			score = this.evaluate(put_table, order);
 			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
-			if (this.jam_check(put_table, Disk.WHITE)) return Object.assign({"order": order}, eval_pos);
 			if (max_score == score) {
 				if (Math.random() > 0.5) {
 					max_score = score;
@@ -110,6 +113,7 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
 			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 			if (score > max_score) {
@@ -130,6 +134,7 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
 			max_score = Math.max(max_score, score);
 		}
@@ -151,9 +156,15 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, -beta, -alpha, false);
 			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
-			if (alpha < score) {
+			if (alpha == score) {
+				if (Math.random() > 0.5) {
+					alpha = score;
+					eval_pos = pos;
+				}
+			} else if (alpha < score) {
 				alpha = score;
 				eval_pos = pos;
 			}
@@ -171,6 +182,7 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
+			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
 			if (score >= beta) return score;
 
