@@ -102,7 +102,7 @@ export default class DOMManager {
 				await sleep(200);
 				on_orientation_change();
 				caution_screen.classList.add('fadeOut');
-				// this.hide(caution_screen);
+				this.hide(caution_screen);
 			}
 		});
 
