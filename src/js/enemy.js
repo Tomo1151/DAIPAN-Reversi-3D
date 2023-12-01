@@ -28,36 +28,15 @@ export default class Enemy extends Player {
 			let board = e.board;
 			let event;
 
-			// this.set_table(board.table);
-			// console.log(this.nega_max(this.get_table_from_board(board), this.order, this.MAX_DEPTH));
-			// console.log(this.next_search(this.get_table_from_board(board), this.order));
-			// let map = [
-			// 	[2, 2, 2, 2, 2, 2, 2, 2],
-			// 	[2, 2, 2, 2, 2, 2, 2, 2],
-			// 	[2, 2, 2, 1, 2, 2, 2, 2],
-			// 	[2, 2, 2, 1, 1, 2, 2, 2],
-			// 	[2, 2, 0, 0, 1, 2, 2, 2],
-			// 	[2, 2, 2, 2, 1, 2, 2, 2],
-			// 	[2, 2, 2, 2, 2, 2, 2, 2],
-			// 	[2, 2, 2, 2, 2, 2, 2, 2]
-			// ];
-
-			// console.log(`e: ${this.evaluate(map, this.order)}`)
-
 			if (e.can_put) {
-				// console.log(`put ${e.can_put}`)
 				// const data = this.searchFirst(board);
-				const data = this.next_search(this.get_table_from_board(board), this.order);
+				const data = this.search_negamax(this.get_table_from_board(board), this.order, 4);
 				event = new Event.PutNoticeEvent(data);
 			} else {
-				// console.log(`pass ${e.can_put}`)
-				// ここで探索
-				// おける全ての場所を取得し，その各状況を再現 -> その状況で置ける全ての場所を取得し /以下ループ
-
 				event = new Event.PutPassEvent(this.order);
 			}
 
-			await sleep(1000);
+			// await sleep(1000);
 			console.log(`enemy send: ${event.type}`);
 			this.game_manager.dispatchEvent(event);
 		});
@@ -123,150 +102,51 @@ export default class Enemy extends Player {
 		return is_jammed;
 	}
 
-	next2_search(table, order) {
+	search_negamax(table, order, depth) {
 		let score;
 		let max_score = Number.NEGATIVE_INFINITY;
-		let min_score = Infinity;
 		let positions = this.get_playable_position(table, order);
-		let eval_pos;
+		let eval_pos = positions[0];
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			let p_positions = this.get_playable_position(put_table, this.get_opponent(order));
-
-			if (!p_positions) {
-				score = this.evaluate(put_table, order);
-				if (max_score == score) {
-					if (Math.random() > 0.5) {
-						max_score = score;
-						eval_pos = pos;
-					}
-				} else if (max_score < score) {
-					max_score = score;
-					eval_pos = pos;
-				}
-			}
-
-			for (let p_pos of p_positions) {
-				let e_table = this.put_disk(put_table, this.get_opponent(order), p_pos.x, p_pos.y);
-				score = this.evaluate(e_table, this.get_opponent(order));
-
-				if (min_score > score) {
-					min_score = score;
-					eval_pos = pos;
-				}
-			}
-			// console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
-		}
-		return Object.assign({"order": order}, eval_pos);
-	}
-
-	next3_search(table, order) {
-		let score;
-		let max_score = Number.NEGATIVE_INFINITY;
-		let min_score = Infinity;
-
-		let positions = this.get_playable_position(table, order);
-		let eval_pos;
-
-		for (let pos of positions) {
-			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			let p_positions = this.get_playable_position(put_table, this.get_opponent(order));
-			for (let p_pos of p_positions) {
-				let e_table = this.put_disk(put_table, this.get_opponent(order), p_pos.x, p_pos.y);
-				let e_positions = this.get_playable_position(e_table, order);
-				for (let e_pos of e_positions) {
-					let ev_table = this.put_disk(e_table, order, e_pos.x, e_pos.y);
-					score = this.evaluate(ev_table, order);
-
-					if (max_score == score) {
-						if (Math.random() > 0.5) {
-							max_score = score;
-							eval_pos = pos;
-						}
-					} else if (max_score < score) {
-						max_score = score;
-						eval_pos = pos;
-					}
-				}
-				if (min_score == max_score) {
-					if (Math.random() > 0.5) {
-						min_score = max_score;
-					}
-				} else if (min_score > max_score) {
-					min_score = max_score;
-				}
-			}
-			if (max_score == min_score) {
-				if (Math.random() > 0.5) {
-					max_score = min_score;
-					eval_pos = pos;
-				}
-			} else if (max_score < min_score) {
-				max_score = min_score;
+			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
+			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			if (score > max_score) {
+				max_score = score;
 				eval_pos = pos;
 			}
-
-
-
-			console.log(`pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 		}
+		console.log(`\t > max: ${JSON.stringify(eval_pos)}`);
 		return Object.assign({"order": order}, eval_pos);
 	}
 
-	nega_max(table, order, depth) {
-		if (depth == 0) {
-			this.view(table)
-			console.log(`eval: ${this.evaluate(table, order)}`);
-			return this.evaluate(table, order);
-		}
+	nega_max(table, order, depth, is_passed) {
+		if (depth == 0) return this.evaluate(table, order);
 
 		let score;
 		let max_score = Number.NEGATIVE_INFINITY;
 		let positions = this.get_playable_position(table, order);
-		let best_position = positions[0];
 
-		console.log(order == Disk.WHITE ? "WHITE": "BLACK")
-		console.log(`depth: ${4 - depth}手先`);
-		console.log(positions);
+		// console.log(`depth: ${depth}`)
 
-		for (let i = 0; i < positions.length; i++) {
-			let put_table = this.put_disk(table, order, positions[i].x, positions[i].y);
+		for (let pos of positions) {
+			let put_table = this.put_disk(table, order, pos.x, pos.y);
 			// this.view(put_table)
-
-			score = -this.nega_max(put_table, this.get_opponent(order), depth-1);
-
-			console.log(`cur_max: ${max_score} <=> score: ${score}`)
-
-			if (max_score < score) {
-				max_score = score;
-				console.log(`cur_max update: ${max_score}`)
-				if (depth == this.MAX_DEPTH) best_position = positions[i];
-			}
-
-			// if (depth%2 == 1) {
-			// 	if (max_score < score) {
-			// 		max_score = score;
-			// 		if (depth == this.MAX_DEPTH) best_position = positions[i];
-			// 	};
-			// } else {
-			// 	if (max_score < -score) {
-			// 		max_score = -score;
-			// 	};
-			// }
+			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
+			// console.log(`score: ${score}\n`)
+			// console.log(`${max_score} <=> ${score}`);
+			max_score = Math.max(max_score, score);
 		}
+
+		if (max_score == Number.NEGATIVE_INFINITY) {
+			if (is_passed) return this.evaluate(table, order);
+			return -this.nega_max(table, order, depth, true);
+		}
+
+		// console.log(`max: ${max_score}`);
 		return max_score;
 	}
-
-	// search_table(positions) {
-	// 	const queue = [];
-	// 	const depth = [];
-	// 	for (let pos of positions) queue.push(pos);
-
-	// 	while (queue.length > 0) {
-	// 		let pos = queue.shift();
-	// 	}
-	// }
 
 	get_playable_position(table, order) {
 		let positions = []
@@ -378,11 +258,11 @@ export default class Enemy extends Player {
 
 		let white = scores[0];
 		let black = scores[1];
-
-		return black - white;
+		return order == Disk.BLACK? black-white: white-black;
+		// return black - white;
 
 		// console.log{`order: ${order}, pts: ${score}`}
-		return scores[(order+1)%2] - scores[order];
+		// return scores[(order+1)%2] - scores[order];
 	}
 
 	checkCanPut (board) {
