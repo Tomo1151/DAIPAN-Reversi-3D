@@ -134,7 +134,6 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
 			max_score = Math.max(max_score, score);
 		}
@@ -182,7 +181,6 @@ export default class Enemy extends Player {
 
 		for (let pos of positions) {
 			let put_table = this.put_disk(table, order, pos.x, pos.y);
-			if (this.jam_check(put_table, this.get_opponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.nega_max(put_table, this.get_opponent(order), depth-1, false);
 			if (score >= beta) return score;
 
