@@ -30,10 +30,10 @@ export default class Enemy extends Player {
 			this.#count++;
 			if (e.can_put) {
 				// const data = this.searchFirst(board);
-				// const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
-				let depth = (this.#count > 25) ? (32 - this.#count)*2 : 5;
-				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, depth);
-				console.log(`count: ${this.#count} | search depth: ${depth}`);
+				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
+				// let depth = (this.#count > 25) ? (32 - this.#count)*2 : 5;
+				// const data = this.search_negaalpha(this.get_table_from_board(board), this.order, depth);
+				// console.log(`count: ${this.#count} | search depth: ${depth}`);
 				event = new Event.PutNoticeEvent(data);
 			} else {
 				event = new Event.PutPassEvent(this.order);
