@@ -159,8 +159,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#end_time = e.time;
-			this.#enemy.point = e.result.black;
-			this.#player.point = e.result.white;
+			this.#player.point += (e.result.white - e.result.black) * 10;
+			this.#player.point += (e.result.result == 'white') ? 1250 : 600;
+			this.#player.point = Math.floor(this.#player.point);
 			await sleep(1000);
 			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
