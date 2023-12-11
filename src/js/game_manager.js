@@ -23,6 +23,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	#frame;
 	#start_time;
+
 	#end_time;
 	#scene;
 	#current_section;
