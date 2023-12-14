@@ -9,6 +9,7 @@ import GameSection from "./section/GameSection/game_section.js";
 import ResultSection from "./section/ResultSection/result_section.js";
 import Player from "./player.js";
 import Enemy from "./enemy.js";
+import Minimap from "./minimap.js";
 import * as Event from "./event.js";
 import { Disk, Board } from "./object.js";
 import { sleep } from "./utils.js";
@@ -31,6 +32,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	#renderer_manager;
 	#section_manager;
 	#dom_manager;
+	#minimap;
 
 	#board;
 	#player;
@@ -60,6 +62,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
+		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
 
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
 
@@ -85,6 +88,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
+			this.#minimap.update(this.#board.table);
 			this.#player.name = this.#dom_manager.get_player_name();
 		});
 
@@ -108,6 +112,7 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.put(x, y);
 				console.log("game_manager send: put_success");
 				this.dispatchEvent(new Event.PutSuccessEvent(this.#current_turn));
+				this.#minimap.update(this.#board.table);
 			} else {
 				console.log("game_manager send: put_fail");
 				this.dispatchEvent(new Event.PutFailEvent(this.#current_turn));
@@ -117,7 +122,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
-
+			this.#minimap.scaleUp();
 		});
 
 		this.addEventListener('updated', async () => {
@@ -227,6 +232,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	get player() {return this.#player;}
 	get enemy() {return this.#enemy;}
+	get minimap() {return this.#minimap;}
 	get current_turn() {return this.#current_turn;}
 	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
