@@ -35,7 +35,7 @@ export default class DOMManager {
 		this.#bang_button = this.#ingame_buttons.children[2];
 		this.#result_screen_dom = document.getElementById('result_screen');
 		this.#restart_button = document.getElementById('restart_button');
-		this.#minimap = document.getElementById('minimap_table');
+		this.#minimap = this.#game_manager.minimap;
 
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#game_manager.player.order) return;
@@ -117,7 +117,9 @@ export default class DOMManager {
 			this.hide(this.#title_screen_dom);
 			this.show(this.#ingame_buttons);
 			this.show(this.#order_dom, true);
-			this.show(this.#minimap);
+
+			this.#minimap.show();
+
 			this.#game_manager.dispatchEvent(new Event.GameStartEvent());
 		});
 

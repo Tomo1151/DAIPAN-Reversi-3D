@@ -61,8 +61,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#frame = 0;
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
-		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
 		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
+		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
 
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
 
@@ -122,7 +122,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
-			this.#minimap.scaleUp();
+			this.#minimap.activate();
 		});
 
 		this.addEventListener('updated', async () => {
@@ -147,6 +147,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('turn_change', () => {
 			console.log("game_manager received: turn_change");console.log("");
+			// this.#minimap.deactivate();
 
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
