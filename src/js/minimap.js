@@ -49,15 +49,19 @@ export default class Minimap {
 
 		this.#container_dom.style.width = '100%';
 		this.#container_dom.style.height = '100%';
-		this.#container_dom.style.fontSize = '3rem';
+		this.#container_dom.style.fontSize = '.1rem';
 
 		this.#wrapper.style.top = '50%';
 		this.#wrapper.style.left = '50%';
 		this.#wrapper.style.transform = 'translate(-50%, -50%)';
-		this.#wrapper.style.opacity = '1';
+		this.#wrapper.style.opacity = '.95';
 		this.#wrapper.style.pointerEvents = 'all';
 
-		this.#dom.addEventListener('click', (e) => {console.log(`${e.offsetX}, ${e.offsetY}`)})
+		this.#container_dom.addEventListener('click', (e) => {
+			let rect = this.#container_dom.getBoundingClientRect();
+			console.log(`X: ${parseInt(e.clientX - rect.left)}/${this.#container_dom.clientWidth}, Y: ${parseInt(e.clientY - rect.top)}/${this.#container_dom.clientHeight}`)
+			// console.dir(e.target)
+		}, { signal: this.#controller.signal })
 
 		// for (let i = 0; i < 8; i++) {
 		// 	for (let j = 0; j < 8; j++) {
@@ -75,5 +79,7 @@ export default class Minimap {
 		this.#wrapper.style.transform = '';
 		this.#wrapper.style.opacity = '0.8';
 		this.#wrapper.style.pointerEvents = 'none';
+
+		this.#controller.abort();
 	}
 }

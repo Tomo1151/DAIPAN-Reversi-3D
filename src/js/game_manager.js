@@ -122,7 +122,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
 			// this.#current_section.mode = GameSection.MODE_NONE;
-			this.#minimap.activate();
+			// this.#minimap.activate();
 		});
 
 		this.addEventListener('updated', async () => {
