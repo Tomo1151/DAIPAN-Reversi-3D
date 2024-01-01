@@ -331,6 +331,31 @@
 			transform: rotate(10deg);
 		}
 
+		.meter {
+			position: absolute;
+			top: 50%;
+			right: 7.5rem;
+			background-color: grey;
+			width: 3.5rem;
+			height: 50%;
+			opacity: 0.85;
+
+			transform: translateY(-50%);
+			pointer-events: none;
+		}
+
+		#meter_value {
+			position: absolute;
+			bottom: 1%;
+			left: 50%;
+			background-color: red;
+			width: 90%;
+			height: 0%;
+
+			transform: translateX(-50%);
+			transition-duration: 0.25s;
+		}
+
 		@media (max-width: 768px) {
 			html {font-size: 10px;}
 		}
@@ -355,6 +380,10 @@
 		<div class="button disabled" id="bang_button" style="visibility: hidden;">
 			<p>台パン</p>
 		</div>
+	</div>
+
+	<div class="meter" id="meter" style="display: none;">
+		<div id="meter_value"></div>
 	</div>
 
 	<div class="order" id="order_div">
