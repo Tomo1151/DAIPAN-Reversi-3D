@@ -25,6 +25,15 @@ export default class Player {
 			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
 		});
 
+		this.#game_manager.addEventListener('bang_success', (e) => {
+			if (e.order != this.order) return;
+			console.log(this.name + " received: bang_success");
+
+			console.log(`${this.name} send: confirmed`);
+			if (e.order != this.order) return;
+			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
+		});
+
 		this.#game_manager.addEventListener('put_fail', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: put_fail");

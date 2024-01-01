@@ -64,7 +64,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
 
-		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListener();
+		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListeners();
 
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
@@ -117,6 +117,19 @@ export default class GameManager extends THREE.EventDispatcher {
 				console.log("game_manager send: put_fail");
 				this.dispatchEvent(new Event.PutFailEvent(this.#current_turn));
 			}
+		});
+
+		this.addEventListener('bang_notice', (data) => {
+			console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
+			this.board.raffle(data.order, data.x, data.y, data.anger);
+			this.dispatchEvent(new Event.BangSuccessEvent(this.#current_turn))
+			this.#minimap.deactivate();
+			this.#dom_manager.mode_reset();
+		});
+
+		this.addEventListener('bang_succes', (e) => {
+			console.log("game_manager received: bang_success");
+			this.#minimap.update(this.#board.table);
 		});
 
 		this.addEventListener('confirmed', (e) => {

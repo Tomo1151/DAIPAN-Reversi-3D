@@ -22,7 +22,7 @@ export default class GameSection extends Section {
 	#intersects = [];
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
-	#mode;
+	#mode = GameSection.MODE_NONE;
 	#clock;
 
 	constructor(game_manager, renderer_manager, scene) {
@@ -267,6 +267,15 @@ export default class GameSection extends Section {
 			}
 			this.#current_table[i] = table[i].state;
 		}
+	}
+
+	toggle_mode(mode, target = null) {
+		if (mode == this.mode) {
+			this.mode = GameSection.MODE_NONE;
+		} else {
+			this.mode = mode;
+		}
+		console.log(`MODE UPDATE: ${this.mode}`)
 	}
 
 	get mode() {return this.#mode;}
