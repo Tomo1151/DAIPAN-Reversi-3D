@@ -24,6 +24,9 @@ export default class DOMManager {
 	#result_screen_dom;
 	#restart_button;
 
+	#player_anger;
+	#player_anger_dom;
+
 	constructor(game_manager, renderer_manager) {
 		this.#game_manager = game_manager;
 		this.#renderer_manager = renderer_manager;
@@ -39,6 +42,7 @@ export default class DOMManager {
 		this.#minimap_button = this.#ingame_buttons.children[3];
 		this.#result_screen_dom = document.getElementById('result_screen');
 		this.#restart_button = document.getElementById('restart_button');
+		this.#player_anger_dom = document.getElementById('meter_value');
 		this.#minimap = this.#game_manager.minimap;
 
 		this.#game_manager.addEventListener('turn_notice', (e) => {
@@ -240,6 +244,11 @@ export default class DOMManager {
 			p.classList.remove('order-black');
 			p.classList.add('order-white');
 		}
+	}
+
+	anger_update() {
+		let anger_value = this.#game_manager.player.anger;
+		this.#player_anger_dom.style.height = `${anger_value % 100}%`;
 	}
 
 	hide(dom) {

@@ -353,6 +353,29 @@
 			transform: rotate(10deg);
 		}
 
+		.meter {
+			position: absolute;
+			top: 50%;
+			right: 7.5rem;
+			background-color: grey;
+			width: 3.5rem;
+			height: 50%;
+			opacity: 0.85;
+
+			transform: translateY(-50%);
+			pointer-events: none;
+		}
+
+		#meter_value {
+			position: absolute;
+			bottom: 1%;
+			left: 50%;
+			background-color: red;
+			width: 90%;
+			height: 0%;
+
+			transform: translateX(-50%);
+			transition-duration: 0.25s;
 		.minimap-wrapper {
 			position: absolute;
 			bottom: 3rem;
@@ -394,6 +417,7 @@
 			</div>
 		</div>
 
+
 		<div id="ingame_ui">
 			<div class="buttons-wrapper" id="action_button">
 				<div class="button disabled" id="put_button">
@@ -413,6 +437,9 @@
 				<p id="order" class="order-black"><span>黒</span></p>
 				<p>の手番です</p>
 			</div>
+      <div class="meter" id="meter" style="display: none;">
+        <div id="meter_value"></div>
+      </div>
 			<div class="minimap-wrapper">
 				<table id="minimap_table" style="display: none;">
 					<tbody id="minimap_body">

@@ -6,6 +6,7 @@ export default class Player {
 	#order;
 	#name = 'player';
 	#point = 0;
+	#anger = 0;
 
 	constructor (game_manager, order) {
 		this.#game_manager = game_manager;
@@ -59,4 +60,6 @@ export default class Player {
 	set name(name) {this.#name = name;}
 	get point() {return this.#point;}
 	set point(point) {this.#point = point;}
+	get anger() {return this.#anger;}
+	set anger(anger) {this.#anger = anger;}
 }

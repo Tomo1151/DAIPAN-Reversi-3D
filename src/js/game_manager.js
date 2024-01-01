@@ -160,10 +160,13 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('turn_change', () => {
 			console.log("game_manager received: turn_change");console.log("");
-			// this.#minimap.deactivate();
+			this.player.anger += 10;
 
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
+			this.#dom_manager.anger_update();
+
+			console.log(this.player.anger)
 
 			if (this.checkGameOver()) {
 				const res = this.get_result();
