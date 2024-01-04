@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Event from "./event.js";
 import { Disk } from "./object.js"
 export default class Player {
+	static PATIENCE = 80;
 	#game_manager;
 	#order;
 	#name = 'player';
@@ -32,6 +33,7 @@ export default class Player {
 
 			console.log(`${this.name} send: confirmed`);
 			if (e.order != this.order) return;
+			this.calmdown();
 			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
 		});
 
@@ -44,6 +46,22 @@ export default class Player {
 			console.log(`${this.name} received: game_over`)
 			console.log(e);
 		});
+	}
+
+	retching(d) {
+		this.#anger += d;
+		this.#anger = Math.min(this.#anger, 100);
+		this.#game_manager.anger_update();
+	}
+
+	calmdown(d) {
+		if (d) {
+			this.#anger -= d;
+			this.#anger = Math.max(this.#anger, 0);
+		} else {
+			this.#anger = 0;
+		}
+		this.#game_manager.anger_update();
 	}
 
 	// addEventListener(event_name, callback) {

@@ -419,7 +419,6 @@
 			</div>
 		</div>
 
-
 		<div id="ingame_ui">
 			<div class="buttons-wrapper" id="action_button">
 				<div class="button disabled" id="put_button">
@@ -428,10 +427,10 @@
 				<div class="button disabled" id="pass_button">
 					<p>パス</p>
 				</div>
-				<div class="button disabled" id="bang_button" style="visibility: hidden;">
+				<div class="button disabled" id="bang_button" style="display: none;">
 					<p>台パン</p>
 				</div>
-				<div class="button" id="minimap_button" style="font-size: .9em;">
+				<div class="button" id="minimap_button" style="display: none; font-size: .9em;">
 					<p>ミニマップ</p>
 				</div>
 			</div>
@@ -439,9 +438,9 @@
 				<p id="order" class="order-black"><span>黒</span></p>
 				<p>の手番です</p>
 			</div>
-      <div class="meter" id="meter" style="display: none;">
-        <div id="meter_value"></div>
-      </div>
+			<div class="meter" id="meter">
+			<div id="meter_value"></div>
+			</div>
 			<div class="minimap-wrapper">
 				<table id="minimap_table" style="display: none;">
 					<tbody id="minimap_body">

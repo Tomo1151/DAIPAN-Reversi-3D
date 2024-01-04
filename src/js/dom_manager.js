@@ -3,6 +3,7 @@ import { Disk } from "./object.js";
 import { sleep } from "./utils.js";
 import GameManager from "./game_manager.js";
 import GameSection from "./section/GameSection/game_section.js";
+import Player from "./player.js";
 
 export default class DOMManager {
 	#game_manager;
@@ -44,14 +45,19 @@ export default class DOMManager {
 		this.#restart_button = document.getElementById('restart_button');
 		this.#player_anger_dom = document.getElementById('meter_value');
 		this.#minimap = this.#game_manager.minimap;
+		this.#player_anger_dom.style.height = `0%`;
+		this.hide(this.#bang_button);
 
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#game_manager.player.order) return;
+
+			console.log(`ANGER: ${this.#game_manager.player.anger}`)
 
 			if (e.can_put) {
 				this.#put_button.classList.remove('disabled');
 				this.#pass_button.classList.add('disabled');
 				this.#bang_button.classList.remove('disabled');
+				if(this.#game_manager.player.anger >= Player.PATIENCE) this.show(this.#bang_button);
 			} else {
 				this.#put_button.classList.add('disabled');
 				this.#pass_button.classList.remove('disabled');
@@ -72,11 +78,12 @@ export default class DOMManager {
 				this.#put_button.classList.add('disabled');
 				this.#pass_button.classList.add('disabled');
 				this.#bang_button.classList.add('disabled');
+				this.hide(this.#bang_button);
 			}
 		});
 
 		this.#game_manager.addEventListener('game_over', async (e) => {
-			console.log(e)
+			// console.log(e)
 			await sleep(1500);
 			this.#put_button.classList.remove('active');
 			this.#put_button.classList.add('disabled');
@@ -140,7 +147,7 @@ export default class DOMManager {
 			// this.show(this.#order_dom, true);
 			// this.#minimap.show();
 			this.show(this.#ingame_ui_container);
-			this.#bang_button.style.visibility = "visible";
+			// this.#bang_button.style.visibility = "visible";
 
 			this.#game_manager.dispatchEvent(new Event.GameStartEvent());
 		});
@@ -248,7 +255,7 @@ export default class DOMManager {
 
 	anger_update() {
 		let anger_value = this.#game_manager.player.anger;
-		this.#player_anger_dom.style.height = `${anger_value % 100}%`;
+		this.#player_anger_dom.style.height = `${anger_value}%`;
 	}
 
 	hide(dom) {

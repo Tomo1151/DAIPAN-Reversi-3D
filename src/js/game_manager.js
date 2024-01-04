@@ -160,11 +160,11 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('turn_change', () => {
 			console.log("game_manager received: turn_change");console.log("");
-			this.player.anger += 10;
+			this.player.retching(10);
 
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
-			this.#dom_manager.anger_update();
+			this.anger_update();
 
 			console.log(this.player.anger)
 
@@ -195,6 +195,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.GAME_PLAY_COUNT++;
 			this.restart();
 		});
+	}
+
+	anger_update() {
+		this.#dom_manager.anger_update();
 	}
 
 	restart() {
