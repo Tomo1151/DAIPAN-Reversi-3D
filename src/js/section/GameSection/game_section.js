@@ -16,6 +16,9 @@ export default class GameSection extends Section {
 	#is_selectable = false;
 	#selected_hitbox;
 	#hitboxes = [];
+	#base;
+	#on_base;
+	#select_area;
 	#disk_models = [];
 	#disk_animations = [];
 	#animation_mixers = [];
@@ -23,6 +26,8 @@ export default class GameSection extends Section {
 	#selected_color = new THREE.Color(0xff0000);
 	#hitboxe_color = new THREE.Color(0xffffff);
 	#mode = GameSection.MODE_NONE;
+	#player_act;
+	#pos_diff;
 	#clock;
 
 	constructor(game_manager, renderer_manager, camera_manager, scene) {
@@ -37,7 +42,6 @@ export default class GameSection extends Section {
 
 		console.log("-- GAME SECTION --");
 		window.addEventListener('mousemove', (e) => {
-			// console.log("mousemove");
 			if (this.game_manager.player.order != this.game_manager.current_turn || !this.#is_selectable) return;
 			this.renderer_manager.setCursorPoint(e);
 			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
@@ -60,7 +64,20 @@ export default class GameSection extends Section {
 
 					break;
 				case GameSection.MODE_BANG:
-					for (let hitbox of this.#hitboxes) hitbox.opacity = 0;
+					for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
+
+					let intersect = this.renderer_manager.raycaster.intersectObject(this.#base)[0]
+					if (intersect) {
+						this.#on_base = true;
+						this.#select_area.material.opacity = 0.5;
+						this.#select_area.position.x = intersect.point.x
+						this.#select_area.position.z = intersect.point.z
+						// console.log(`pos: ${this.#select_area.position.x*10+400}, ${this.#select_area.position.z*10+400}`)
+					} else {
+						this.#on_base = false;
+						this.#select_area.material.opacity = 0;
+					}
+
 					break;
 				default:
 					break;
@@ -68,25 +85,32 @@ export default class GameSection extends Section {
 		}, {signal: mousemove_controller.signal});
 
 		this.canvas.addEventListener('mousedown', () => {
-			let box = this.#selected_hitbox;
-			this.canvas.addEventListener('mouseup', (e) => {
-				if (this.#selected_hitbox == box && box != undefined) {
-					let order = Disk.WHITE;
-					let x = this.#selected_hitbox.cell_x
-					let y = this.#selected_hitbox.cell_y
-					// console.log(`x: ${x}, y: ${y}`);
-					let data = {
-						"order": order,
-						"x": x,
-						"y": y
-					};
+			switch(this.#mode) {
+				case GameSection.MODE_PUT:
+					let box = this.#selected_hitbox;
+					this.canvas.addEventListener('mouseup', (e) => {
+						if (this.#selected_hitbox == box && box != undefined) {
+							let x = this.#selected_hitbox.cell_x
+							let y = this.#selected_hitbox.cell_y
+							this.#selected_hitbox = undefined;
+							this.game_manager.dispatchEvent(new Event.PutNoticeEvent({"order": Disk.WHITE, "x": x, "y": y}));
+						}
+					}, {signal: click_controller.signal});
 
-					// console.log(data)
-					this.#selected_hitbox = undefined;
+					break;
+				case GameSection.MODE_BANG:
+					let pos = this.#select_area.position;
+					if (this.#on_base) {
+						this.#select_area.material.opacity = 0;
+						// console.log(`pos: ${pos.x*10+400}, ${pos.z*10+400}`)
+						this.game_manager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
+						this.camera_manager.restore();
+					}
 
-					this.game_manager.dispatchEvent(new Event.PutNoticeEvent(data));
-				}
-			}, {signal: click_controller.signal});
+					break;
+				default:
+					break;
+			}
 		}, {signal: click_controller.signal});
 
 		this.game_manager.addEventListener('turn_notice', (e) => {
@@ -98,10 +122,21 @@ export default class GameSection extends Section {
 				for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
 				this.#is_selectable = false;
 			}
+
+			this.#player_act = 'put'
+		});
+
+		this.game_manager.addEventListener('bang_success', (e) => {
+			this.#player_act = 'bang';
+			this.#pos_diff = e.pos;
 		});
 
 		this.game_manager.addEventListener('confirmed', async () => {
-			await this.disk_mesh_update(this.game_manager.board.table);
+			if (this.#player_act == 'bang') {
+				this.disk_mesh_flip(this.game_manager.board.table, this.#pos_diff);
+			} else {
+				await this.disk_mesh_update(this.game_manager.board.table);
+			}
 			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent());
 		});
 
@@ -140,7 +175,24 @@ export default class GameSection extends Section {
 			this.scene.add(light);
 		}
 
-		// this.scene.add(new THREE.AxesHelper(500));
+		this.scene.add(new THREE.AxesHelper(500));
+		const cylinder = new THREE.Mesh(
+			new THREE.CylinderGeometry(10, 10, 1, 30),
+			new THREE.MeshPhongMaterial({color: 0xff0000, opacity: 0, transparent: true})
+		);
+		cylinder.position.set(50, 1.9, 40)
+		this.#select_area = cylinder;
+
+		const base = new THREE.Mesh(
+			new THREE.PlaneGeometry(80, 80, 1, 1),
+			new THREE.MeshPhongMaterial({color: 0x7f00ff, opacity: 0.5, side: THREE.DoubleSide, transparent: true})
+		);
+
+		base.position.y = 0.6
+		base.rotation.x = - Math.PI / 2
+		this.#base = base;
+		this.scene.add(cylinder);
+		this.scene.add(base);
 
 		// this.object_load();
 		this.object_load().then(() => {
@@ -202,7 +254,7 @@ export default class GameSection extends Section {
 						});
 
 						const box = new THREE.Mesh(g, m);
-						box.position.set(10*j - (10*3+5), -0.02, 10*i - (10*3+5));
+						box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
 						box.cell_x = j;
 						box.cell_y = i;
 						box.is_mousedown = false;
@@ -241,6 +293,14 @@ export default class GameSection extends Section {
 		});
 	}
 
+	disk_mesh_flip(table, put_pos) {
+		for (let pos of put_pos) {
+			let num = pos.y*8+pos.x;
+			let order = table[num].state == Disk.WHITE ? Disk.WHITE : Disk.BLACK;
+			this.#current_table[num] = table[num].state;
+			this.animation_flip(num, order);
+		}
+	}
 
 	async disk_mesh_update(table, put_pos, rev_pos) {
 		for (let i = 0; i < 8*8; i++) {
@@ -272,6 +332,7 @@ export default class GameSection extends Section {
 	toggle_mode(mode, target = null) {
 		if (mode == this.mode) {
 			this.mode = GameSection.MODE_NONE;
+			this.camera_manager.controlable = true;
 		} else {
 			this.mode = mode;
 		}

@@ -73,22 +73,26 @@ export class Board {
 
 	raffle(order, x, y, anger) {
 		// let str = '';
+		let pos = [];
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				// str += `(${j}, ${i})`;
 				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
 				if (dist < this.#shock_threshold) {
 					// console.log(`prob: ${1-(dist/this.#shock_threshold)}`)
-					if (Math.random() < 1-(dist/this.#shock_threshold)) {
+					if (Math.random() < 1-(dist/this.#shock_threshold/2)) {
 						console.log(`(${j}, ${i}): ${dist}`);
 						this.getDisk(j, i).reverse();
-						this.view();
+						pos.push({"x": j, "y": i});
 					}
 				}
 			}
 			// console.log(str);
 			// str = '';
 		}
+
+		this.view();
+		return pos;
 	}
 
 	getOpponent(order) {

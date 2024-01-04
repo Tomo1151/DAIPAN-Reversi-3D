@@ -62,15 +62,16 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	init() {
 		this.#frame = 0;
+		this.#scene = new THREE.Scene();
+
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
-		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
-		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
 		this.#camera_manager = new CameraManager(this, this.#renderer_manager, this.#scene);
+		this.#dom_manager = new DOMManager(this, this.#renderer_manager, this.#camera_manager);
+		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
 
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListeners();
 
-		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
 		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#camera_manager, this.#scene);
@@ -126,15 +127,15 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('bang_notice', (data) => {
 			console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
-			this.board.raffle(data.order, data.x, data.y, data.anger);
-			this.dispatchEvent(new Event.BangSuccessEvent(this.#current_turn))
-			this.#minimap.deactivate();
+			let pos = this.board.raffle(data.order, data.x, data.y, data.anger);
+			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#current_turn, "pos": pos}))
+			// this.#minimap.deactivate();
 			this.#dom_manager.mode_reset();
 		});
 
 		this.addEventListener('bang_succes', (e) => {
 			console.log("game_manager received: bang_success");
-			this.#minimap.update(this.#board.table);
+			// this.#minimap.update(this.#board.table);
 		});
 
 		this.addEventListener('confirmed', (e) => {
@@ -147,10 +148,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			console.log("game_manager received: updated")
 			if (this.GAME_STATE == GameManager.BEFORE_START) {
 				this.GAME_STATE = GameManager.IN_GAME;
-				await sleep(1000);
+				// await sleep(1000);
 				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 			} else if (this.GAME_STATE == GameManager.IN_GAME) {
-				await sleep(1000);
+				// await sleep(1000);
 				this.dispatchEvent(new Event.TurnChangeEvent());
 			}
 		});
@@ -171,7 +172,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#dom_manager.order_update();
 			this.anger_update();
 
-			console.log(this.player.anger)
+			// console.log(this.player.anger)
 
 			if (this.checkGameOver()) {
 				const res = this.get_result();

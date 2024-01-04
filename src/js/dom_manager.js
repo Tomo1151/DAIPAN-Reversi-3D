@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import * as Event from "./event.js"
 import { Disk } from "./object.js";
 import { sleep } from "./utils.js";
@@ -8,6 +9,7 @@ import Player from "./player.js";
 export default class DOMManager {
 	#game_manager;
 	#renderer_manager;
+	#camera_manager;
 
 	#title_screen_dom;
 	#start_button;
@@ -28,9 +30,10 @@ export default class DOMManager {
 	#player_anger;
 	#player_anger_dom;
 
-	constructor(game_manager, renderer_manager) {
+	constructor(game_manager, renderer_manager, camera_manager) {
 		this.#game_manager = game_manager;
 		this.#renderer_manager = renderer_manager;
+		this.#camera_manager = camera_manager;
 
 		this.#title_screen_dom = document.getElementById('title_screen');
 		this.#start_button = document.getElementById('start_button');
@@ -50,8 +53,6 @@ export default class DOMManager {
 
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#game_manager.player.order) return;
-
-			console.log(`ANGER: ${this.#game_manager.player.anger}`)
 
 			if (e.can_put) {
 				this.#put_button.classList.remove('disabled');
@@ -159,7 +160,7 @@ export default class DOMManager {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 			this.#bang_button.classList.remove('active');
 			this.#put_button.classList.toggle('active');
-			this.#game_manager.minimap.deactivate();
+			// this.#game_manager.minimap.deactivate();
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_PUT);
 			// console.log(`MODE: ${this.mode}`);
 		});
@@ -172,14 +173,12 @@ export default class DOMManager {
 
 		this.#bang_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
-			// this.#game_manager.current_section.mode = GameSection.MODE_BANG;
 			this.#put_button.classList.remove('active');
 			this.#bang_button.classList.toggle('active');
-			this.#game_manager.minimap.toggle_activate();
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_BANG);
-
-			// console.log(`MODE: ${this.mode}`);
+			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");})
 		});
+
 		this.#minimap_button.addEventListener('click', () => {
 			if (this.#game_manager.current_section.mode == GameSection.MODE_BANG) return;
 			this.#game_manager.minimap.toggle();
