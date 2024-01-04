@@ -25,8 +25,8 @@ export default class GameSection extends Section {
 	#mode = GameSection.MODE_NONE;
 	#clock;
 
-	constructor(game_manager, renderer_manager, scene) {
-		super(game_manager, renderer_manager, scene);
+	constructor(game_manager, renderer_manager, camera_manager, scene) {
+		super(game_manager, renderer_manager, camera_manager, scene);
 		this.renderer_manager.controls.enabled = true;
 		this.#clock = new THREE.Clock();
 

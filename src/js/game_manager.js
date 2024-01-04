@@ -3,6 +3,7 @@ import * as THREE from "three";
 import RendererManager from "./renderer_manager.js";
 import SectionManager from "./section_manager.js";
 import DOMManager from "./dom_manager.js";
+import CameraManager from "./camera_manager.js";
 import Section from "./section/section.js";
 import TitleSection from "./section/TitleSection/title_section.js";
 import GameSection from "./section/GameSection/game_section.js";
@@ -32,6 +33,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	#renderer_manager;
 	#section_manager;
 	#dom_manager;
+	#camera_manager;
 	#minimap;
 
 	#board;
@@ -50,6 +52,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		const tick = () => {
 			this.#frame += 1;
 			this.#current_section.run();
+			this.#camera_manager.update();
 			this.#renderer_manager.render(this.#scene);
 			requestAnimationFrame(tick)
 		}
@@ -63,13 +66,14 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#section_manager = new SectionManager();
 		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager);
+		this.#camera_manager = new CameraManager(this, this.#renderer_manager, this.#scene);
 
 		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListeners();
 
 		this.#scene = new THREE.Scene();
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
-		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#scene);
+		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#camera_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
 		this.GAME_STATE = GameManager.BEFORE_START;
 		this.#current_turn = Disk.BLACK;
@@ -81,10 +85,11 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
 			this.#start_time = e.time;
-			this.#current_section = new GameSection(this, this.#renderer_manager, this.#scene);
+			this.#current_section = new GameSection(this, this.#renderer_manager, this.#camera_manager, this.#scene);
 			this.#section_manager.change_section(this.#current_section);
 
 			console.log("[Event]: game_start");
+			// this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");})
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
@@ -186,7 +191,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#player.point += (e.result.result == 'white') ? 1250 : 600;
 			this.#player.point = Math.floor(this.#player.point);
 			await sleep(1000);
-			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#scene, this.#result);
+			this.#current_section = new ResultSection(this, this.#renderer_manager, this.#camera_manager, this.#scene, this.#result);
 			this.#section_manager.change_section(this.#current_section);
 		});
 
