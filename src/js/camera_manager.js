@@ -16,6 +16,8 @@ export default class CameraManager extends THREE.EventDispatcher {
 		this.#renderer_manager = renderer_manager;
 		this.#scene = scene;
 		this.#camera = renderer_manager.camera;
+		this.#target = undefined
+		this.#original_position = undefined;
 	}
 
 	update() {
@@ -23,7 +25,7 @@ export default class CameraManager extends THREE.EventDispatcher {
 		// console.log(this.#original_position)
 	}
 
-	moveTo(x, y, z, lookAt, controlable, callback) {
+	moveTo(x, y, z, lookAt, controlable, callback, step) {
 		if (!this.#original_position) {
 			this.#original_position = JSON.parse(JSON.stringify(this.#camera.position));
 			// this.#original_rotation = this.#camera.rotation;
@@ -37,7 +39,8 @@ export default class CameraManager extends THREE.EventDispatcher {
 			"z": z,
 			"lookAt": lookAt,
 			"controlable": controlable,
-			"callback": callback
+			"callback": callback,
+			"step": step,
 		};
 	}
 
@@ -48,10 +51,11 @@ export default class CameraManager extends THREE.EventDispatcher {
 		let dx = this.#target.x - this.#camera.position.x;
 		let dy = this.#target.y - this.#camera.position.y;
 		let dz = this.#target.z - this.#camera.position.z;
+		let step = this.#target.step ? this.#target.step : 50
 
-		this.#camera.position.x += dx / 50;
-		this.#camera.position.y += dy / 50;
-		this.#camera.position.z += dz / 50;
+		this.#camera.position.x += dx / step;
+		this.#camera.position.y += dy / step;
+		this.#camera.position.z += dz / step;
 		this.#camera.lookAt(this.#target.lookAt.x, this.#target.lookAt.y, this.#target.lookAt.z);
 
 		if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05 && Math.abs(dz) < 0.05) {
@@ -65,7 +69,7 @@ export default class CameraManager extends THREE.EventDispatcher {
 	restore() {
 		let pos = this.#original_position;
 		// let rot = this.#original_rotation;
-		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true);
+		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), false, () => {this.controlable = true;}, 10);
 		this.#original_position = undefined;
 		// this.#original_rotation = undefined;
 	}
