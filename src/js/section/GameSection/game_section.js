@@ -52,10 +52,10 @@ export default class GameSection extends Section {
 					if (intersects.length > 0) {
 						for (let hitbox of this.#hitboxes) {
 							if (hitbox == intersects[0].object) {
-								hitbox.material.opacity = 0.75;
+								hitbox.visible = true;
 								this.#selected_hitbox = hitbox;
 							} else {
-								hitbox.material.opacity = 0;
+								hitbox.visible = false;
 							}
 						}
 					} else {
@@ -64,18 +64,17 @@ export default class GameSection extends Section {
 
 					break;
 				case GameSection.MODE_BANG:
-					for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
+					for (let hitbox of this.#hitboxes) hitbox.visible = false;
 
 					let intersect = this.renderer_manager.raycaster.intersectObject(this.#base)[0]
 					if (intersect) {
 						this.#on_base = true;
-						this.#select_area.material.opacity = 0.5;
+						this.#select_area.visible = true;
 						this.#select_area.position.x = intersect.point.x
 						this.#select_area.position.z = intersect.point.z
-						// console.log(`pos: ${this.#select_area.position.x*10+400}, ${this.#select_area.position.z*10+400}`)
 					} else {
 						this.#on_base = false;
-						this.#select_area.material.opacity = 0;
+						this.#select_area.visible = false;
 					}
 
 					break;
@@ -101,7 +100,7 @@ export default class GameSection extends Section {
 				case GameSection.MODE_BANG:
 					let pos = this.#select_area.position;
 					if (this.#on_base) {
-						this.#select_area.material.opacity = 0;
+						this.#select_area.visible = false;
 						// console.log(`pos: ${pos.x*10+400}, ${pos.z*10+400}`)
 						this.game_manager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
 						this.camera_manager.restore();
@@ -115,11 +114,18 @@ export default class GameSection extends Section {
 
 		this.game_manager.addEventListener('turn_notice', (e) => {
 			if (this.game_manager.player.order == e.order) this.#is_selectable = true;
-		})
+		});
+
+		this.game_manager.addEventListener('put_pass', (e) => {
+			if (this.game_manager.player.order != e.order) return;
+			for (let hitbox of this.#hitboxes) hitbox.visible = false;
+			this.#is_selectable = false;
+			this.#player_act = 'pass';
+		});
 
 		this.game_manager.addEventListener('put_success', (e) => {
 			if (this.game_manager.player.order == e.order) {
-				for (let hitbox of this.#hitboxes) hitbox.material.opacity = 0;
+				for (let hitbox of this.#hitboxes) hitbox.visible = false;
 				this.#is_selectable = false;
 			}
 
@@ -178,9 +184,10 @@ export default class GameSection extends Section {
 		this.scene.add(new THREE.AxesHelper(500));
 		const cylinder = new THREE.Mesh(
 			new THREE.CylinderGeometry(10, 10, 1, 30),
-			new THREE.MeshPhongMaterial({color: 0xff0000, opacity: 0, transparent: true})
+			new THREE.MeshPhongMaterial({color: 0xff0000, opacity: 0.5, transparent: true})
 		);
-		cylinder.position.set(50, 1.9, 40)
+		cylinder.visible = false;
+		cylinder.position.set(0, 1.9, 0);
 		this.#select_area = cylinder;
 
 		const base = new THREE.Mesh(
@@ -249,7 +256,7 @@ export default class GameSection extends Section {
 						const g = new THREE.BoxGeometry(10, 1.15, 10);
 						const m = new THREE.MeshStandardMaterial({
 							color:0xff0000,
-							opacity: 0.0,
+							opacity: 0.75,
 							transparent: true
 						});
 
@@ -257,8 +264,7 @@ export default class GameSection extends Section {
 						box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
 						box.cell_x = j;
 						box.cell_y = i;
-						box.is_mousedown = false;
-
+						box.visible = false
 						this.#hitboxes.push(box);
 						this.scene.add(box);
 					}
