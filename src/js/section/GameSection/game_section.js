@@ -133,7 +133,7 @@ export default class GameSection extends Section {
 
 		this.game_manager.addEventListener('confirmed', async () => {
 			if (this.#player_act == 'bang') {
-				this.disk_mesh_flip(this.game_manager.board.table, this.#pos_diff);
+				await this.disk_mesh_flip(this.game_manager.board.table, this.#pos_diff);
 			} else {
 				await this.disk_mesh_update(this.game_manager.board.table);
 			}
@@ -185,7 +185,7 @@ export default class GameSection extends Section {
 
 		const base = new THREE.Mesh(
 			new THREE.PlaneGeometry(80, 80, 1, 1),
-			new THREE.MeshPhongMaterial({color: 0x7f00ff, opacity: 0, side: THREE.DoubleSide, transparent: true})
+			new THREE.MeshPhongMaterial({color: 0x7f00ff, opacity: 0, transparent: true})
 		);
 
 		base.position.y = 0.6
@@ -293,13 +293,15 @@ export default class GameSection extends Section {
 		});
 	}
 
-	disk_mesh_flip(table, put_pos) {
+	async disk_mesh_flip(table, put_pos) {
+		let duration = this.#disk_models[0].animations[2].duration;
 		for (let pos of put_pos) {
 			let num = pos.y*8+pos.x;
 			let order = table[num].state == Disk.WHITE ? Disk.WHITE : Disk.BLACK;
 			this.#current_table[num] = table[num].state;
 			this.animation_flip(num, order);
 		}
+		await sleep(duration*400);
 	}
 
 	async disk_mesh_update(table, put_pos, rev_pos) {
