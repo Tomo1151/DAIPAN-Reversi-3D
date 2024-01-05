@@ -185,7 +185,7 @@ export default class GameSection extends Section {
 
 		const base = new THREE.Mesh(
 			new THREE.PlaneGeometry(80, 80, 1, 1),
-			new THREE.MeshPhongMaterial({color: 0x7f00ff, opacity: 0.5, side: THREE.DoubleSide, transparent: true})
+			new THREE.MeshPhongMaterial({color: 0x7f00ff, opacity: 0, side: THREE.DoubleSide, transparent: true})
 		);
 
 		base.position.y = 0.6
