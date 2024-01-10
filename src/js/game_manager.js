@@ -96,6 +96,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#player = new Player(this, Disk.WHITE);
 			this.#minimap.update(this.#board.table);
 			this.#player.name = this.#dom_manager.get_player_name();
+
+			console.log(this)
 		});
 
 		this.addEventListener('turn_notice', () => {

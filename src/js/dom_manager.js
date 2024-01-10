@@ -176,7 +176,9 @@ export default class DOMManager {
 			this.#put_button.classList.remove('active');
 			this.#bang_button.classList.toggle('active');
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_BANG);
-			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");})
+			console.log(this.#camera_manager)
+
+			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");}, 20)
 		});
 
 		this.#minimap_button.addEventListener('click', () => {

@@ -26,6 +26,6 @@ export default class ResultSection extends Section {
 		this.renderer_manager.camera.lookAt(0, 0, 0);
 	}
 	init() {
-		this.camera_manager.moveTo(0, 50, 100, new THREE.Vector3(0, 0, 0), false, () => {this.#hasMoveCompleted = true;})
+		// this.camera_manager.moveTo(0, 50, 100, new THREE.Vector3(0, 0, 0), false, () => {this.#hasMoveCompleted = true;})
 	}
 }

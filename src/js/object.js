@@ -91,7 +91,7 @@ export class Board {
 			// str = '';
 		}
 
-		this.view();
+		// this.view();
 		return pos;
 	}
 
