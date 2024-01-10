@@ -184,9 +184,6 @@ export default class DOMManager {
 			this.#put_button.classList.remove('active');
 			this.#bang_button.classList.toggle('active');
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_BANG);
-			console.log(this.#camera_manager)
-
-			console.log(`uuid: ${this.#camera_manager.uuid}`)
 			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");}, 20)
 		}, { signal: this.#dom_event_controller.signal });
 
