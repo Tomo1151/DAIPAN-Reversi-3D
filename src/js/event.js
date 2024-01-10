@@ -132,10 +132,12 @@ export class BangFailEvent extends CustomEvent {
 export class BangSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "bang_success";
 	order;
+	pos;
 
-	constructor (order) {
+	constructor (data) {
 		super (BangSuccessEvent.EVENT_NAME);
-		this.order = order;
+		this.order = data.order;
+		this.pos = data.pos;
 	}
 }
 
@@ -153,6 +155,7 @@ export class UpdateCompleteEvent extends CustomEvent {
 	static EVENT_NAME = "updated";
 	constructor () {super(UpdateCompleteEvent.EVENT_NAME);}
 }
+
 
 // export class EventManager {
 // 	#listeners = [];

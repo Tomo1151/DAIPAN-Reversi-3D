@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import * as Event from "./event.js"
 import { Disk } from "./object.js";
 import { sleep } from "./utils.js";
@@ -8,6 +9,7 @@ import Player from "./player.js";
 export default class DOMManager {
 	#game_manager;
 	#renderer_manager;
+	#camera_manager;
 
 	#title_screen_dom;
 	#start_button;
@@ -28,9 +30,12 @@ export default class DOMManager {
 	#player_anger;
 	#player_anger_dom;
 
-	constructor(game_manager, renderer_manager) {
+	#dom_event_controller;
+
+	constructor(game_manager, renderer_manager, camera_manager) {
 		this.#game_manager = game_manager;
 		this.#renderer_manager = renderer_manager;
+		this.#camera_manager = camera_manager;
 
 		this.#title_screen_dom = document.getElementById('title_screen');
 		this.#start_button = document.getElementById('start_button');
@@ -48,10 +53,10 @@ export default class DOMManager {
 		this.#player_anger_dom.style.height = `0%`;
 		this.hide(this.#bang_button);
 
+		this.#dom_event_controller = new AbortController();
+
 		this.#game_manager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#game_manager.player.order) return;
-
-			console.log(`ANGER: ${this.#game_manager.player.anger}`)
 
 			if (e.can_put) {
 				this.#put_button.classList.remove('disabled');
@@ -99,6 +104,8 @@ export default class DOMManager {
 			this.hide(this.#result_screen_dom);
 			this.hide(this.#ingame_ui_container);
 			this.show(this.#title_screen_dom);
+
+			this.#dom_event_controller.abort();
 		});
 	}
 
@@ -121,7 +128,7 @@ export default class DOMManager {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
 				this.show(caution_screen, true);
 			}
-		});
+		}, { signal: this.#dom_event_controller.signal });
 
 		screen.orientation.addEventListener('change', async () => {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
@@ -134,7 +141,7 @@ export default class DOMManager {
 				await sleep(1000);
 				this.hide(caution_screen);
 			}
-		});
+		}, { signal: this.#dom_event_controller.signal });
 
 		// def Game Events
 		document.getElementById('start_button').addEventListener('click', () => {
@@ -150,41 +157,41 @@ export default class DOMManager {
 			// this.#bang_button.style.visibility = "visible";
 
 			this.#game_manager.dispatchEvent(new Event.GameStartEvent());
-		});
+		}, { signal: this.#dom_event_controller.signal });
+
 
 		/*
 		 * GameSection
 		 */
+
 		this.#put_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
 			this.#bang_button.classList.remove('active');
 			this.#put_button.classList.toggle('active');
-			this.#game_manager.minimap.deactivate();
+			// this.#game_manager.minimap.deactivate();
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_PUT);
 			// console.log(`MODE: ${this.mode}`);
-		});
+		}, { signal: this.#dom_event_controller.signal });
 
 		this.#pass_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order || this.#game_manager.checkTable(this.#game_manager.player.order)) return;
 			this.#game_manager.dispatchEvent(new Event.PutPassEvent(this.#game_manager.player.order));
 			document.getElementById('pass_button').classList.add('disabled');
-		});
+		}, { signal: this.#dom_event_controller.signal });
 
 		this.#bang_button.addEventListener('click', () => {
 			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
-			// this.#game_manager.current_section.mode = GameSection.MODE_BANG;
 			this.#put_button.classList.remove('active');
 			this.#bang_button.classList.toggle('active');
-			this.#game_manager.minimap.toggle_activate();
 			this.#game_manager.current_section.toggle_mode(GameSection.MODE_BANG);
+			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");}, 20)
+		}, { signal: this.#dom_event_controller.signal });
 
-			// console.log(`MODE: ${this.mode}`);
-		});
 		this.#minimap_button.addEventListener('click', () => {
 			if (this.#game_manager.current_section.mode == GameSection.MODE_BANG) return;
-			this.#game_manager.minimap.toggle();
+			// this.#game_manager.minimap.toggle();
 			this.#minimap_button.classList.toggle('active');
-		})
+		}, { signal: this.#dom_event_controller.signal });
 
 		/*
 		 * ResultSection
@@ -192,7 +199,7 @@ export default class DOMManager {
 		this.#restart_button.addEventListener('click', (e) => {
 			// console.log(e);
 			this.#game_manager.dispatchEvent(new Event.GameRestartEvent());
-		});
+		}, { signal: this.#dom_event_controller.signal });
 	}
 
 	draw_result_screen(result) {

@@ -5,8 +5,8 @@ import { sleep, model_load } from "../../utils.js";
 export default class TitleSection extends Section {
 	#rot = 0;
 
-	constructor(game_manager, renderer_manager, scene) {
-		super(game_manager, renderer_manager, scene);
+	constructor(game_manager, renderer_manager, camera_manager, scene) {
+		super(game_manager, renderer_manager, camera_manager, scene);
 		this.renderer_manager.controls.enabled = false;
 		// this.scene.add(new THREE.AxesHelper(500))
 		console.log("-- TITLE SECTION --");console.log();
