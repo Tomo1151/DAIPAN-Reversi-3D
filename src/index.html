@@ -1,93 +1,489 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
 
-	<!-- CSS Load -->
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-
-	<!-- JS Load -->
-	<script type="importmap">
-		{
-			"imports": {
-				"three": "./lib/three.js/build/three.module.js",
-				"three/addons/": "./lib/three.js/jsm/"
+	<head>
+		<meta charset="utf-8">
+		<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>3Dオセロ</title>
+		<!-- CSS Load -->
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<!-- JS Load -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./lib/three.js/build/three.module.js",
+					"three/addons/": "./lib/three.js/jsm/"
+				}
 			}
+		</script>
+		<script>
+			document.addEventListener('touchmove', function (event) {
+				if (event.scale !== 1) {
+					event.preventDefault();
+				}
+			}, { passive: false });
+		</script>
+		<script defer type="module" src="js/main.js"></script>
+		<style type="text/css">
+		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Sans+Mono:wght@400;600&display=swap');
+
+		:root {
+			--font-main-black: #333;
+			--color-border-black: #444;
+			--font-main-white: #FAFAFA;
+			--color-bg-board: #00e62e;
 		}
-	</script>
-	<script defer type="module" src="js/main.js"></script>
 
+		* {
+			margin: 0;
+			box-sizing: border-box;
+		}
 
-
-	<style type="text/css">
 		body {
 			margin: 0;
+			font-family: 'Noto Sans JP', sans-serif;
+			font-weight: 600;
 			overflow: hidden;
+
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			outline: none;
+			-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+			/* mobile webkit */
+		}
+
+		.fadeIn {
+			animation-name: fadeInAnimation;
+			animation-duration: 1s;
+			animation-fill-mode: forwards;
+			opacity: 0;
+		}
+
+		.fadeOut {
+			animation-name: fadeOutAnimation;
+			animation-duration: 1s;
+			animation-fill-mode: forwards;
+			opacity: 1;
+		}
+
+		@keyframes fadeInAnimation {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 0.85;
+			}
+		}
+
+		@keyframes fadeOutAnimation {
+			from {
+				opacity: 1;
+			}
+
+			to {
+				opacity: 0;
+				display: none;
+			}
+		}
+
+		@keyframes shake {
+			50% {
+				transform: rotate(-10deg);
+			}
+
+			100% {
+				transform: rotate(10deg);
+			}
+		}
+
+		#ingame_ui {
+			display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+
+			pointer-events: none;
 		}
 
 		.order {
+			display: flex;
+			background: var(--color-bg-board);
+			font-size: 1.25rem;
+			font-weight: bold;
+			justify-content: center;
+			align-items: center;
 			position: absolute;
-			top: 5rem;
-			left: 1rem;
-			border: 1px solid #444;
-			border-radius: 5px;
+			top: -3px;
+			left: 50%;
+			border: 3px solid #444;
+			border-radius: 0 0 10px 10px;
 			padding: 0.5rem 1rem;
+			opacity: 0.85;
 			user-select: none;
 
+			width: 20rem;
+			max-width: 32.5%;
+			height: 4.5rem;
+			transform: translateX(-50%);
+			pointer-events: none;
+		}
+
+		#order {
+			display: flex;
+			position: relative;
+			font-size: 2rem;
+			justify-content: center;
+			align-items: center;
+			border-radius: 50%;
+			width: 3.5rem;
+			height: 3.5rem;
+			margin-right: 1rem;
+		}
+
+		#order span {
+			position: relative;
+			top: -3px;
+			left: 0.5px;
 		}
 
 		.order-black {
-			color: white;
-			background: black;
-			font-weight: bold;
+			color: var(--font-main-white);
+			background: #000;
+			/*			border: 2px solid var(--font-main-white);*/
 		}
 
 		.order-white {
-			color: black;
-			background: white;
-			font-weight: bold;
+			color: var(--font-main-black);
+			background: var(--font-main-white);
+			border: 2px solid var(--font-main-black);
 		}
 
+
 		.button {
-			position: absolute;
+			/*			position: absolute;
 			top: 1rem;
-			left: 1rem;
-			border: 1px solid #444;
+			left: 1rem;*/
+			background: var(--font-main-white);
+			border: 2px solid var(--color-border-black);
 			border-radius: 5px;
 			padding: 0.5rem 1rem;
+			margin: 1rem 0;
+			width: fit-content;
 			user-select: none;
 			transition-duration: 0.25s;
+			opacity: 0.85;
+			font-family: 'Noto Sans JP', sans-serif;
+
+			text-align-last: justify;
+			text-justify: inter-ideograph;
+			pointer-events: all;
 		}
 
 		.button:hover {
 			filter: brightness(0.8);
 			transform: scale(1.1);
+			cursor: pointer;
 		}
 
 		.button:active {
 			transform: scale(0.95);
 		}
 
-		.pass {
-			display: none;
-			top: 9rem;
+		.buttons-wrapper {
+/*			display: none;*/
+			position: absolute;
+			top: 1rem;
+			left: 1rem;
+
+			padding: 2rem;
 		}
 
-		canvas {margin: 0; width: 100%; height: 100%;}
-	</style>
-</head>
-<body>
-	<div class="button" id="start_button">
-		<p>Start</p>
-	</div>
-	<div class="button pass" id="pass_button">
-		<p>Pass</p>
-	</div>
-	<div class="order" id="order_div">
-		<p id="order">NONE</p>
-	</div>
-	<canvas id="main-canvas"></canvas>
-</body>
+		.buttons-wrapper .button {
+			font-size: 2rem;
+			font-weight: normal;
+			padding: 0.5rem 1.75rem;
+			width: 10rem;
+		}
+
+		.button:hover {
+			filter: brightness(0.8);
+			transform: scale(1.05);
+		}
+
+		.button:active {
+			transform: scale(0.975);
+		}
+
+		canvas {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		#title_screen {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: var(--font-main-white);
+
+			border: 3px solid #AAA;
+			border-radius: 5px;
+
+			width: 720px;
+			max-width: 50%;
+			/*			height: 470px;
+			max-height: 50%;*/
+
+			opacity: 0.75;
+
+			padding: 2rem;
+		}
+
+		#result_screen {
+			display: none;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			font-family: 'Noto Sans Mono', monospace;
+			transform: translate(-50%, -50%);
+
+			background: var(--font-main-white);
+
+			border: 3px solid #AAA;
+			border-radius: 5px;
+
+			opacity: 0.75;
+
+			width: 720px;
+			max-width: 50%;
+			/*			height: 480px;
+			max-height: 50%;*/
+
+			padding: 2rem;
+		}
+
+		#result_screen h2 {
+			font-size: 1.5rem;
+			font-weight: normal;
+			text-align: center;
+		}
+
+		#result_screen h3 {
+			font-size: 2.5rem;
+			font-weight: normal;
+			text-align: center;
+		}
+
+		#score::before {
+			content: 'Score : ';
+		}
+
+		#order_black::before {
+			content: '[ Black ] ';
+		}
+
+		#order_white::before {
+			content: '[ White ] ';
+		}
+
+		.disabled {
+			filter: opacity(0.25);
+			cursor: not-allowed;
+		}
+
+		.disabled:hover,
+		.disabled:active {
+			filter: opacity(0.2);
+			transform: scale(1.0);
+			cursor: not-allowed;
+		}
+
+		.active,
+		.active:hover,
+		.active:active {
+			background: #AAA;
+			transform: scale(1.0);
+		}
+
+		#player_name {
+			font-size: 1rem;
+			padding: 1rem;
+			border: 2px solid var(--color-border-black);
+			border-radius: 5px;
+			width: 17.25rem;
+			margin: 1rem 0;
+			opacity: 0.85;
+		}
+
+		.caution {
+			display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background: white;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			font-size: 2.5rem;
+			color: var(--font-main-black);
+			width: 100vw;
+			height: 100vh;
+			z-index: 999;
+			pointer-events: none;
+		}
+
+		.phone_image {
+			margin-top: 5rem;
+			width: 30%;
+			opacity: 0.85;
+		}
+
+		.phone_image img {
+			width: 100%;
+			animation: shake 2s infinite;
+			transform: rotate(10deg);
+		}
+
+		.meter {
+			position: absolute;
+			top: 50%;
+			right: 7.5rem;
+			background-color: grey;
+			width: 3.5rem;
+			height: 50%;
+			opacity: 0.85;
+
+			transform: translateY(-50%);
+			pointer-events: none;
+		}
+
+		#meter_value {
+			position: absolute;
+			bottom: 1%;
+			left: 50%;
+			background-color: red;
+			width: 90%;
+			height: 0%;
+
+			transform: translateX(-50%);
+			transition-duration: 0.25s;
+		}
+
+		.minimap-wrapper {
+			position: absolute;
+			bottom: 3rem;
+			right: 3rem;
+			opacity: 0.8;
+			pointer-events: all;
+		}
+
+		#minimap_table {
+			display: none;
+			border-collapse: collapse;
+			box-shadow: 0 0 30px 0px var(--color-border-black);
+			font-family: monospace;
+		}
+
+		#minimap_table td {
+			background-color: var(--color-bg-board);
+			border: 2px solid var(--color-border-black);
+			width: 2.5rem;
+			height: 2.5rem;
+			text-align: center;
+			vertical-align: middle;
+			font-size: 1.5rem;
+		}
+
+		@media (max-width: 768px) {
+			html {
+				font-size: 10px;
+			}
+		}
+		</style>
+	</head>
+
+	<body>
+		<div class="caution">
+			<p>スマホを横向きにしてください</p>
+			<div class="phone_image">
+				<img src="img/phone_rotation.png" alt="">
+			</div>
+		</div>
+
+		<div id="ingame_ui">
+			<div class="buttons-wrapper" id="action_button">
+				<div class="button disabled" id="put_button">
+					<p>おく</p>
+				</div>
+				<div class="button disabled" id="pass_button">
+					<p>パス</p>
+				</div>
+				<div class="button disabled" id="bang_button" style="display: none;">
+					<p>台パン</p>
+				</div>
+				<div class="button" id="minimap_button" style="display: none; font-size: .9em;">
+					<p>ミニマップ</p>
+				</div>
+			</div>
+			<div class="order" id="order_div">
+				<p id="order" class="order-black"><span>黒</span></p>
+				<p>の手番です</p>
+			</div>
+			<div class="meter" id="meter">
+			<div id="meter_value"></div>
+			</div>
+			<div class="minimap-wrapper">
+				<table id="minimap_table" style="display: none;">
+					<tbody id="minimap_body">
+						<script type="text/javascript">
+							for (let i = 0; i < 8; i++) {
+								document.write(`<tr id="minimap_tr_${i}">`);
+								for (let j = 0; j < 8; j++) {
+									document.write(`<td id="minimap_${i}_${j}">${j+1}, ${i+1}</td>`);
+								}
+								document.write('</tr>');
+							}
+						</script>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="fadeIn" id="title_screen">
+			<h1 style="margin-bottom: 1rem;">オセロ</h1>
+			<div>
+				<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
+				<p>※ Player 名はランキング <small>[未実装]</small> に使用します</p>
+			</div>
+			<div class="button" id="start_button">
+				<p>はじめる</p>
+			</div>
+		</div>
+
+		<div class="fadeIn" id="result_screen">
+			<h2>Result</h2>
+			<h3 id="winner">Player の勝ち！</h3>
+			<div id="result">
+				<p id="score"></p>
+				<p id="order_black"></p>
+				<p id="order_white"></p>
+				<p id="time"></p>
+			</div>
+			<div class="button" id="restart_button">
+				<p>タイトルに戻る</p>
+			</div>
+		</div>
+
+		<canvas id="main-canvas"></canvas>
+	</body>
+
 </html>

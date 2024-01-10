@@ -30,29 +30,31 @@ export default class RendererManager {
 		this.#renderer.setSize(window.innerWidth, window.innerHeight);
 
 		// def camera
-		this.#camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight);
+		this.#camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 10000);
 		this.#camera.position.set(50, 50, 50);
 
 		// def controls
 		this.#controls = new OrbitControls(this.#camera, this.#renderer.domElement);
-		this.#controls.maxDistance = 125;
+		this.#controls.maxDistance = 135;
 		this.#controls.minDistance = 30;
 		this.#controls.maxZoom = 2;
 		this.#controls.minZoom = 1.25;
+		// this.#controls.enableDamping = true;
+		// this.#controls.dampingFactor = 0.2;
 
 
 		// def mouse vec
 		this.#mouse = new THREE.Vector2({x: 0, y: 0});
 
 		// def raycaster
-		this.#raycaster = new THREE.Raycaster()
+		this.#raycaster = new THREE.Raycaster();
 
 		window.addEventListener('resize', () => {
 			this.#renderer.setSize(window.innerWidth, window.innerHeight);
 			this.#renderer.setPixelRatio(window.devicePixelRatio);
 			this.#camera.aspect = window.innerWidth / window.innerHeight;
 			this.#camera.updateProjectionMatrix();
-		})
+		});
 	}
 
 	getIntersectObject(objects) {
@@ -67,11 +69,12 @@ export default class RendererManager {
 	}
 
 	render(scene) {
-		// console.log(this.#camera)
 		this.#renderer.render(scene, this.#camera);
 	}
 
+	get renderer() {return this.#renderer;}
 	get raycaster() {return this.#raycaster;}
 	get mouse() {return this.#mouse;}
 	get camera() {return this.#camera;}
+	get controls() {return this.#controls;}
 }

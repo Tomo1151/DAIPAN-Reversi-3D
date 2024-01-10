@@ -32,6 +32,7 @@ export class Disk {
 }
 
 export class Board {
+	#shock_threshold = 200;
 	#width;
 	#height;
 	#table = new Array();
@@ -53,12 +54,45 @@ export class Board {
 	get table() {return this.#table}
 	get width() {return this.#width}
 	get height() {return this.#height}
+	get shock_threshold() {return this.#shock_threshold}
 
 	init() {
 		this.getDisk(3, 3).put(Disk.WHITE);
 		this.getDisk(4, 3).put(Disk.BLACK);
 		this.getDisk(3, 4).put(Disk.BLACK);
 		this.getDisk(4, 4).put(Disk.WHITE);
+	}
+
+	count(order) {
+		if (order == Disk.WHITE || order == Disk.BLACK) {
+			return this.#table.filter(e => e.state == order).length;
+		} else {
+			return false;
+		}
+	}
+
+	raffle(order, x, y, anger) {
+		// let str = '';
+		let pos = [];
+		for (let i = 0; i < 8; i++) {
+			for (let j = 0; j < 8; j++) {
+				// str += `(${j}, ${i})`;
+				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
+				if (dist < this.#shock_threshold) {
+					// console.log(`prob: ${1-(dist/this.#shock_threshold)}`)
+					if (Math.random() < 1-(dist/this.#shock_threshold/2)) {
+						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
+						this.getDisk(j, i).reverse();
+						pos.push({"x": j, "y": i});
+					}
+				}
+			}
+			// console.log(str);
+			// str = '';
+		}
+
+		// this.view();
+		return pos;
 	}
 
 	getOpponent(order) {

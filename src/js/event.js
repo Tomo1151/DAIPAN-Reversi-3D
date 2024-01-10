@@ -18,9 +18,19 @@ export class GameStartEvent extends CustomEvent {
 
 export class GameOverEvent extends CustomEvent {
 	static EVENT_NAME = "game_over";
+	result;
+
+	constructor (result) {
+		super (GameOverEvent.EVENT_NAME);
+		this.result = result;
+	}
+}
+
+export class GameRestartEvent extends CustomEvent {
+	static EVENT_NAME = "game_restart";
 
 	constructor () {
-		super (GameOverEvent.EVENT_NAME);
+		super (GameRestartEvent.EVENT_NAME);
 	}
 }
 
@@ -94,13 +104,58 @@ export class PutSuccessEvent extends CustomEvent {
 	}
 }
 
-export class PutPassEvent extends CustomEvent {
-	static EVENT_NAME = "put_pass";
+export class BangNoticeEvent extends CustomEvent {
+	static EVENT_NAME = "bang_notice";
+	order;
+	x;
+	y;
+	anger = 100;
 
-	constructor () {
-		super (PutPassEvent.EVENT_NAME);
+	constructor (data) {
+		super (BangNoticeEvent.EVENT_NAME);
+		this.order = data.order;
+		this.x = data.x;
+		this.y = data.y;
 	}
 }
+
+export class BangFailEvent extends CustomEvent {
+	static EVENT_NAME = "bang_fail";
+	order;
+
+	constructor (order) {
+		super (BangFailEvent.EVENT_NAME);
+		this.order = order;
+	}
+}
+
+export class BangSuccessEvent extends CustomEvent {
+	static EVENT_NAME = "bang_success";
+	order;
+	pos;
+
+	constructor (data) {
+		super (BangSuccessEvent.EVENT_NAME);
+		this.order = data.order;
+		this.pos = data.pos;
+	}
+}
+
+export class PutPassEvent extends CustomEvent {
+	static EVENT_NAME = "put_pass";
+	order;
+
+	constructor (order) {
+		super (PutPassEvent.EVENT_NAME);
+		this.order = order;
+	}
+}
+
+export class UpdateCompleteEvent extends CustomEvent {
+	static EVENT_NAME = "updated";
+	constructor () {super(UpdateCompleteEvent.EVENT_NAME);}
+}
+
 
 // export class EventManager {
 // 	#listeners = [];
