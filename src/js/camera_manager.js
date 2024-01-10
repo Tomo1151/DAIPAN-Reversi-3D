@@ -51,7 +51,7 @@ export default class CameraManager extends THREE.EventDispatcher {
 		if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05 && Math.abs(dz) < 0.05) {
 			this.#camera.position.set(this.#target.x, this.#target.y, this.#target.z);
 			this.#hasMoveCompleted = true;
-			if(!is_empty(this.#target.callback)) this.#target.callback();
+			if (this.#target.callback) this.#target.callback();
 			console.log(` |~ camera: moved to (${this.#target.x}, ${this.#target.y}, ${this.#target.z})`);
 			this.#target = undefined;
 		}
