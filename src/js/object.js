@@ -81,7 +81,7 @@ export class Board {
 				if (dist < this.#shock_threshold) {
 					// console.log(`prob: ${1-(dist/this.#shock_threshold)}`)
 					if (Math.random() < 1-(dist/this.#shock_threshold/2)) {
-						console.log(`(${j}, ${i}): ${dist}`);
+						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});
 					}

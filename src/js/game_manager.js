@@ -67,10 +67,12 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#camera_manager = new CameraManager(this, this.#renderer_manager, this.#scene);
+		console.log(this.#camera_manager.uuid)
+
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager, this.#camera_manager);
 		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
 
-		if (this.GAME_PLAY_COUNT == 0) this.#dom_manager.addDOMEventListeners();
+		this.#dom_manager.addDOMEventListeners();
 
 		this.#section_manager.scene = this.#scene;
 		this.#section_manager.renderer_manager = this.#renderer_manager;
@@ -97,7 +99,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#minimap.update(this.#board.table);
 			this.#player.name = this.#dom_manager.get_player_name();
 
-			console.log(this)
+			// console.log(this)
+			// this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");}, 20)
 		});
 
 		this.addEventListener('turn_notice', () => {
