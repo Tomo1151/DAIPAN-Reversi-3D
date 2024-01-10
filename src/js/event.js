@@ -104,6 +104,43 @@ export class PutSuccessEvent extends CustomEvent {
 	}
 }
 
+export class BangNoticeEvent extends CustomEvent {
+	static EVENT_NAME = "bang_notice";
+	order;
+	x;
+	y;
+	anger = 100;
+
+	constructor (data) {
+		super (BangNoticeEvent.EVENT_NAME);
+		this.order = data.order;
+		this.x = data.x;
+		this.y = data.y;
+	}
+}
+
+export class BangFailEvent extends CustomEvent {
+	static EVENT_NAME = "bang_fail";
+	order;
+
+	constructor (order) {
+		super (BangFailEvent.EVENT_NAME);
+		this.order = order;
+	}
+}
+
+export class BangSuccessEvent extends CustomEvent {
+	static EVENT_NAME = "bang_success";
+	order;
+	pos;
+
+	constructor (data) {
+		super (BangSuccessEvent.EVENT_NAME);
+		this.order = data.order;
+		this.pos = data.pos;
+	}
+}
+
 export class PutPassEvent extends CustomEvent {
 	static EVENT_NAME = "put_pass";
 	order;
@@ -118,6 +155,7 @@ export class UpdateCompleteEvent extends CustomEvent {
 	static EVENT_NAME = "updated";
 	constructor () {super(UpdateCompleteEvent.EVENT_NAME);}
 }
+
 
 // export class EventManager {
 // 	#listeners = [];

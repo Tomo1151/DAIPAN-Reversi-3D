@@ -1,5 +1,15 @@
-* {
+/** {
 	margin: 0;
 	box-sizing: border-box;
 }
 
+body {margin: 2rem}
+h2 {margin: 2rem 0}
+table td {
+	font-size: 2rem;
+	border: 1px solid #444;
+	 width: 4rem;
+	 height: 4rem;
+	 padding: 0.5rem;
+	text-align: center;
+}*/
