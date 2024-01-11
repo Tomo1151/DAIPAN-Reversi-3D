@@ -10,7 +10,6 @@ import GameSection from "./section/GameSection/game_section.js";
 import ResultSection from "./section/ResultSection/result_section.js";
 import Player from "./player.js";
 import Enemy from "./enemy.js";
-import Minimap from "./minimap.js";
 import * as Event from "./event.js";
 import { Disk, Board } from "./object.js";
 import { sleep } from "./utils.js";
@@ -34,7 +33,6 @@ export default class GameManager extends THREE.EventDispatcher {
 	#section_manager;
 	#dom_manager;
 	#camera_manager;
-	#minimap;
 
 	#board;
 	#player;
@@ -67,10 +65,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#renderer_manager = new RendererManager(this);
 		this.#section_manager = new SectionManager();
 		this.#camera_manager = new CameraManager(this, this.#renderer_manager, this.#scene);
-
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager, this.#camera_manager);
-		this.#minimap = new Minimap(this, this.#renderer_manager, this.#dom_manager);
-
 		this.#dom_manager.addDOMEventListeners();
 
 		this.#section_manager.scene = this.#scene;
@@ -91,15 +86,12 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#section_manager.change_section(this.#current_section);
 
 			console.log("[Event]: game_start");
-			// this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");})
+
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
-			this.#minimap.update(this.#board.table);
 			this.#player.name = this.#dom_manager.get_player_name();
 
-			// console.log(this)
-			// this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {console.log("****************** MOVED ******************");}, 20)
 		});
 
 		this.addEventListener('turn_notice', () => {
@@ -122,7 +114,6 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.put(x, y);
 				console.log("game_manager send: put_success");
 				this.dispatchEvent(new Event.PutSuccessEvent(this.#current_turn));
-				this.#minimap.update(this.#board.table);
 			} else {
 				console.log("game_manager send: put_fail");
 				this.dispatchEvent(new Event.PutFailEvent(this.#current_turn));
@@ -132,20 +123,16 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('bang_notice', (data) => {
 			console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
 			let pos = this.board.raffle(data.order, data.x, data.y, data.anger);
-			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#current_turn, "pos": pos}))
-			// this.#minimap.deactivate();
+			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#current_turn, "pos": pos}));
 			this.#dom_manager.mode_reset();
 		});
 
 		this.addEventListener('bang_succes', (e) => {
 			console.log("game_manager received: bang_success");
-			// this.#minimap.update(this.#board.table);
 		});
 
 		this.addEventListener('confirmed', (e) => {
 			console.log("game_manager received: confirmed");
-			// this.#current_section.mode = GameSection.MODE_NONE;
-			// this.#minimap.activate();
 		});
 
 		this.addEventListener('updated', async () => {
@@ -162,7 +149,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		this.addEventListener('put_pass', (e) => {
 			if (e.order !== this.#current_turn) return;
-			// console.log(e);
 
 			console.log("game_manager received: put_pass");
 			this.dispatchEvent(new Event.TurnChangeEvent());
@@ -175,8 +161,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#current_turn == Disk.BLACK ? this.#current_turn = Disk.WHITE : this.#current_turn = Disk.BLACK;
 			this.#dom_manager.order_update();
 			this.anger_update();
-
-			// console.log(this.player.anger)
 
 			if (this.checkGameOver()) {
 				const res = this.get_result();
@@ -263,7 +247,6 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	get player() {return this.#player;}
 	get enemy() {return this.#enemy;}
-	get minimap() {return this.#minimap;}
 	get current_turn() {return this.#current_turn;}
 	get current_section() {return this.#current_section;}
 	get board() {return this.#board;}
