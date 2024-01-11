@@ -35,26 +35,10 @@ export default class TitleSection extends Section {
 			this.scene.add(light);
 		}
 
-		model_load('model_data/Board_low.gltf', (obj) => {
-			obj.scene.scale.set(5.05, 5.05, 5.05);
-			obj.scene.position.set(0, 0.5, 0);
-
-			this.scene.add(obj.scene);
-		});
-
-		model_load('model_data/Disk.gltf', (obj) => {
-			let disk;
-			for (let i = 0; i < 8; i++) {
-				for (let j = 0; j < 8; j++) {
-					disk = obj.scene.clone();
-					disk.scale.set(4, 4, 4);
-					disk.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-					disk.visible = false;
-
-					this.scene.add(disk);
-				}
-			}
-		});
+		const board_model = this.game_manager.objects.board.scene.clone();
+		board_model.scale.set(5.05, 5.05, 5.05);
+		board_model.position.set(0, 0.5, 0);
+		this.scene.add(board_model);
 	}
 
 	get rot() {return this.#rot;}

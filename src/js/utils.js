@@ -1,11 +1,15 @@
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-async function model_load(fbx_path, on_load_func) {
+async function model_load(gltf_path, on_load_func, on_progress_func, on_error_func) {
 	const loader = new GLTFLoader();
 	return new Promise(res => {
-		loader.load(fbx_path, (obj) => {
+		loader.load(gltf_path, (obj) => {
 			on_load_func(obj);
 			res();
+		}, (xhr) => {
+			if (on_progress_func) on_progress_func(xhr);
+		}, (error) => {
+			if (on_error_func) on_error_func(error);
 		});
 	});
 }

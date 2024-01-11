@@ -377,6 +377,17 @@
 			transition-duration: 0.25s;
 		}
 
+		#loading {
+			display: none;
+			position: absolute;
+			inset: 0;
+			background-color: white;
+			opacity: 0.8;
+			width: 100%;
+			height: 100%;
+			z-index: 1000;
+		}
+
 		@media (max-width: 768px) {
 			html {
 				font-size: 10px;
@@ -391,6 +402,10 @@
 			<div class="phone_image">
 				<img src="img/phone_rotation.png" alt="">
 			</div>
+		</div>
+
+		<div id="loading">
+			<p>ロード中</p>
 		</div>
 
 		<div id="ingame_ui">

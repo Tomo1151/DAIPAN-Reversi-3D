@@ -200,8 +200,8 @@ export default class GameSection extends Section {
 		this.scene.add(cylinder);
 		this.scene.add(base);
 
-		this.object_load().then(() => {
-			console.log(" * Object load completed")
+		this.object_set().then(async () => {
+			await this.disk_mesh_update(this.game_manager.board.table);
 			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent())
 		});
 	}
@@ -244,55 +244,44 @@ export default class GameSection extends Section {
 		action.stop();
 	}
 
-	async object_load() {
+	async object_set() {
 		return new Promise(async (res) => {
-			await model_load('model_data/Board_low.gltf', (obj) => {
-				obj.scene.scale.set(5.05, 5.05, 5.05);
-				obj.scene.position.set(0, 0.5, 0);
-				for (let i = 0; i < 8; i++) {
-					for (let j = 0; j < 8; j++) {
-						const g = new THREE.BoxGeometry(10, 1.15, 10);
-						const m = new THREE.MeshStandardMaterial({
-							color:0xff0000,
-							opacity: 0.75,
-							transparent: true
-						});
+			for (let i = 0; i < 8; i++) {
+				for (let j = 0; j < 8; j++) {
+					const g = new THREE.BoxGeometry(10, 1.15, 10);
+					const m = new THREE.MeshStandardMaterial({
+						color:0xff0000,
+						opacity: 0.75,
+						transparent: true
+					});
 
-						const box = new THREE.Mesh(g, m);
-						box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
-						box.cell_x = j;
-						box.cell_y = i;
-						box.visible = false
-						this.#hitboxes.push(box);
-						this.scene.add(box);
-					}
+					const box = new THREE.Mesh(g, m);
+					box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
+					box.cell_x = j;
+					box.cell_y = i;
+					box.visible = false
+					this.#hitboxes.push(box);
+					this.scene.add(box);
 				}
-				this.scene.add(obj.scene);
-			});
+			}
 
-			await model_load('model_data/Disk.gltf', (obj) => {
-				let mixer, animations;
-				for (let i = 0; i < 8; i++) {
-					for (let j = 0; j < 8; j++) {
-						let model = Object.assign({}, obj);
-						let animations = model.animations;
-						model.scene = obj.scene.clone();
-
-						//Animation Mixerインスタンスを生成
-						mixer = new THREE.AnimationMixer(model.scene);
-
-						model.scene.scale.set(4, 4, 4);
-						model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
-						model.scene.visible = false;
-						this.#disk_models.push(model);
-						this.#disk_animations.push(model.animations);
-						this.#animation_mixers.push(mixer);
-						this.scene.add(model.scene);
-					}
+			let mixer, animations;
+			let obj = this.game_manager.objects.disk;
+			for (let i = 0; i < 8; i++) {
+				for (let j = 0; j < 8; j++) {
+					let model = Object.assign({}, obj);
+					let animations = model.animations;
+					model.scene = obj.scene.clone();
+					mixer = new THREE.AnimationMixer(model.scene);
+					model.scene.scale.set(4, 4, 4);
+					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
+					model.scene.visible = false;
+					this.#disk_models.push(model);
+					this.#disk_animations.push(model.animations);
+					this.#animation_mixers.push(mixer);
+					this.scene.add(model.scene);
 				}
-			});
-
-			await this.disk_mesh_update(this.game_manager.board.table);
+			}
 			res();
 		});
 	}
