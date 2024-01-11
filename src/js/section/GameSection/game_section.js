@@ -101,7 +101,6 @@ export default class GameSection extends Section {
 					let pos = this.#select_area.position;
 					if (this.#on_base) {
 						this.#select_area.visible = false;
-						// console.log(`pos: ${pos.x*10+400}, ${pos.z*10+400}`)
 						this.game_manager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
 						this.camera_manager.restore();
 					}
@@ -201,7 +200,6 @@ export default class GameSection extends Section {
 		this.scene.add(cylinder);
 		this.scene.add(base);
 
-		// this.object_load();
 		this.object_load().then(() => {
 			console.log(" * Object load completed")
 			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent())

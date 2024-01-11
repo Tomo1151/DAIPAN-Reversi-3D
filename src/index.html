@@ -166,7 +166,6 @@
 			border: 2px solid var(--font-main-black);
 		}
 
-
 		.button {
 			/*			position: absolute;
 			top: 1rem;
@@ -378,31 +377,6 @@
 			transition-duration: 0.25s;
 		}
 
-		.minimap-wrapper {
-			position: absolute;
-			bottom: 3rem;
-			right: 3rem;
-			opacity: 0.8;
-			pointer-events: all;
-		}
-
-		#minimap_table {
-			display: none;
-			border-collapse: collapse;
-			box-shadow: 0 0 30px 0px var(--color-border-black);
-			font-family: monospace;
-		}
-
-		#minimap_table td {
-			background-color: var(--color-bg-board);
-			border: 2px solid var(--color-border-black);
-			width: 2.5rem;
-			height: 2.5rem;
-			text-align: center;
-			vertical-align: middle;
-			font-size: 1.5rem;
-		}
-
 		@media (max-width: 768px) {
 			html {
 				font-size: 10px;
@@ -430,31 +404,13 @@
 				<div class="button disabled" id="bang_button" style="display: none;">
 					<p>台パン</p>
 				</div>
-				<div class="button" id="minimap_button" style="display: none; font-size: .9em;">
-					<p>ミニマップ</p>
-				</div>
 			</div>
 			<div class="order" id="order_div">
 				<p id="order" class="order-black"><span>黒</span></p>
 				<p>の手番です</p>
 			</div>
 			<div class="meter" id="meter">
-			<div id="meter_value"></div>
-			</div>
-			<div class="minimap-wrapper">
-				<table id="minimap_table" style="display: none;">
-					<tbody id="minimap_body">
-						<script type="text/javascript">
-							for (let i = 0; i < 8; i++) {
-								document.write(`<tr id="minimap_tr_${i}">`);
-								for (let j = 0; j < 8; j++) {
-									document.write(`<td id="minimap_${i}_${j}">${j+1}, ${i+1}</td>`);
-								}
-								document.write('</tr>');
-							}
-						</script>
-					</tbody>
-				</table>
+				<div id="meter_value"></div>
 			</div>
 		</div>
 
