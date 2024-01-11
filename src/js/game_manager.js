@@ -51,6 +51,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		super();
 		this.model_load().then(() => {
 			this.init();
+			this.disable_loading_screen();
 		});
 	}
 
@@ -78,6 +79,11 @@ export default class GameManager extends THREE.EventDispatcher {
 				console.log(`[Model loading: Disk] ${xhr.loaded / xhr.total * 100}% loaded` );
 			});
 		});
+	}
+
+	disable_loading_screen() {
+		const loading_screen = document.getElementById('loading');
+		loading_screen.style.display = 'none';
 	}
 
 	run() {
