@@ -1,26 +1,20 @@
 import * as THREE from "three";
 import { is_empty } from "./utils.js";
 
-export default class CameraManager extends THREE.EventDispatcher {
+export default class CameraManager {
 	#game_manager;
 	#renderer_manager;
 	#scene;
 	#camera;
-	#hasMoveCompleted;
+	#hasMoveCompleted = true;
 	#target;
 	#original_position;
-	#uuid;
 
 	constructor(game_manager, renderer_manager, scene) {
-		super();
 		this.#game_manager = game_manager;
 		this.#renderer_manager = renderer_manager;
 		this.#scene = scene;
 		this.#camera = renderer_manager.camera;
-		this.#hasMoveCompleted = true;
-		this.#target = undefined
-		this.#original_position = undefined;
-		this.#uuid = crypto.randomUUID();
 	}
 
 	update() {
@@ -63,5 +57,4 @@ export default class CameraManager extends THREE.EventDispatcher {
 	}
 
 	set controlable(bool) {this.#renderer_manager.controls.enabled = bool;}
-	get uuid() {return this.#uuid;}
 }

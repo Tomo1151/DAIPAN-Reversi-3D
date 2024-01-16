@@ -377,6 +377,30 @@
 			transition-duration: 0.25s;
 		}
 
+		#loading {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			font-size: 5rem;
+			position: absolute;
+			inset: 0;
+			background-color: white;
+			opacity: 0.9;
+			width: 100%;
+			height: 100%;
+			z-index: 1000;
+		}
+
+		.loading-image {
+			width: 30%;
+			max-width: 200px;
+		}
+
+		.loading-image img {
+			width: 100%;
+		}
+
 		@media (max-width: 768px) {
 			html {
 				font-size: 10px;
@@ -390,6 +414,13 @@
 			<p>スマホを横向きにしてください</p>
 			<div class="phone_image">
 				<img src="img/phone_rotation.png" alt="">
+			</div>
+		</div>
+
+		<div id="loading">
+			<p>ロード中</p>
+			<div class="loading-image">
+				<img src="img/loading.gif">
 			</div>
 		</div>
 

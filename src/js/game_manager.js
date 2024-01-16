@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import RendererManager from "./renderer_manager.js";
 import SectionManager from "./section_manager.js";
@@ -41,17 +42,56 @@ export default class GameManager extends THREE.EventDispatcher {
 	#current_turn;
 	#result;
 
+	#object_pool = {
+		"board": undefined,
+		"disk": undefined
+	}
+
 	constructor() {
 		super();
-		this.init();
+		this.model_load().then(() => {
+			this.init();
+			this.disable_loading_screen();
+		});
+	}
+
+	model_load() {
+		let loading_queue = {"board": false, "disk": false}
+		const loader = new GLTFLoader();
+
+		return new Promise((res) => {
+			loader.load('https://reversi.syntck.com/model_data/Board_low.gltf', (obj) => {
+				this.#object_pool.board = obj;
+				loading_queue.board = true;
+				if (Object.values(loading_queue).every(v => {return v})) res();
+			}, (xhr) => {
+				// console.log(xhr)
+				console.log(`[Model loading: Board] ${xhr.loaded / xhr.total * 100}% loaded` );
+			});
+
+			loader.load('https://reversi.syntck.com/model_data/Disk.gltf', (obj) => {
+				this.#object_pool.disk = obj;
+				loading_queue.disk = true;
+
+				if (Object.values(loading_queue).every(v => {return v})) res();
+			}, (xhr) => {
+				// console.log(xhr)
+				console.log(`[Model loading: Disk] ${xhr.loaded / xhr.total * 100}% loaded` );
+			});
+		});
+	}
+
+	disable_loading_screen() {
+		const loading_screen = document.getElementById('loading');
+		loading_screen.style.display = 'none';
 	}
 
 	run() {
 		const tick = () => {
 			this.#frame += 1;
-			this.#current_section.run();
-			this.#camera_manager.update();
-			this.#renderer_manager.render(this.#scene);
+			if(this.#current_section) this.#current_section.run();
+			if(this.#camera_manager) this.#camera_manager.update();
+			if(this.#renderer_manager && this.#scene) this.#renderer_manager.render(this.#scene);
 			requestAnimationFrame(tick)
 		}
 
@@ -63,14 +103,11 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#scene = new THREE.Scene();
 
 		this.#renderer_manager = new RendererManager(this);
-		this.#section_manager = new SectionManager();
+		this.#section_manager = new SectionManager(this, this.#renderer_manager, this.#scene);
 		this.#camera_manager = new CameraManager(this, this.#renderer_manager, this.#scene);
+		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#camera_manager, this.#scene);
 		this.#dom_manager = new DOMManager(this, this.#renderer_manager, this.#camera_manager);
 		this.#dom_manager.addDOMEventListeners();
-
-		this.#section_manager.scene = this.#scene;
-		this.#section_manager.renderer_manager = this.#renderer_manager;
-		this.#current_section = new TitleSection(this, this.#renderer_manager, this.#camera_manager, this.#scene);
 		this.#section_manager.change_section(this.#current_section);
 		this.GAME_STATE = GameManager.BEFORE_START;
 		this.#current_turn = Disk.BLACK;
@@ -245,6 +282,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		}
 	}
 
+	get objects() {return this.#object_pool;}
 	get player() {return this.#player;}
 	get enemy() {return this.#enemy;}
 	get current_turn() {return this.#current_turn;}
