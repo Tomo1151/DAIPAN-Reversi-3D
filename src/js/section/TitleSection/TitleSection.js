@@ -1,22 +1,22 @@
 import * as THREE from "three";
-import Section from "../section.js";
-import { sleep, model_load } from "../../utils.js";
+import Section from "../Section.js";
+import { sleep, model_load } from "../../Utils.js";
 
 export default class TitleSection extends Section {
 	#rot = 0;
 
-	constructor(game_manager, renderer_manager, camera_manager, scene) {
-		super(game_manager, renderer_manager, camera_manager, scene);
-		this.renderer_manager.controls.enabled = false;
+	constructor(gameManager, rendererManager, cameraManager, scene) {
+		super(gameManager, rendererManager, cameraManager, scene);
+		this.rendererManager.controls.enabled = false;
 		// this.scene.add(new THREE.AxesHelper(500))
 		console.log("-- TITLE SECTION --");console.log();
 	}
 
 	run() {
 		let rad = this.#rot++ * Math.PI / 180 / 20;
-		this.renderer_manager.camera.position.x = 100 * Math.sin(rad);
-		this.renderer_manager.camera.position.z = 100 * Math.cos(rad);
-		this.renderer_manager.camera.lookAt(0, 0, 0);
+		this.rendererManager.camera.position.x = 100 * Math.sin(rad);
+		this.rendererManager.camera.position.z = 100 * Math.cos(rad);
+		this.rendererManager.camera.lookAt(0, 0, 0);
 	}
 
 	init() {
@@ -35,7 +35,7 @@ export default class TitleSection extends Section {
 			this.scene.add(light);
 		}
 
-		const board_model = this.game_manager.objects.board.scene.clone();
+		const board_model = this.gameManager.objects.board.scene.clone();
 		board_model.scale.set(5.05, 5.05, 5.05);
 		board_model.position.set(0, 0.5, 0);
 		this.scene.add(board_model);

@@ -1,5 +1,5 @@
-import GameManager from "./game_manager.js";
+import GameManager from "./GameManager.js";
 console.log("Hello, world!");
 
-const game_manager = new GameManager();
-game_manager.run();
+const gameManager = new GameManager();
+gameManager.run();

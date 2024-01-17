@@ -1,48 +1,49 @@
 import * as THREE from 'three';
-import * as Event from "./event.js";
-import { Disk } from "./object.js"
+import * as Event from "./Event.js";
+import { Disk } from "./Object.js"
+
 export default class Player {
 	static PATIENCE = 80;
-	#game_manager;
+	#gameManager;
 	#order;
 	#name = 'player';
 	#point = 0;
 	#anger = 0;
 
-	constructor (game_manager, order) {
-		this.#game_manager = game_manager;
+	constructor (gameManager, order) {
+		this.#gameManager = gameManager;
 		this.#order = order;
 
-		this.#game_manager.addEventListener('turn_notice', (e) => {
+		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: turn_notice");
 		});
 
-		this.#game_manager.addEventListener('put_success', (e) => {
+		this.#gameManager.addEventListener('put_success', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: put_success");
 
 			console.log(`${this.name} send: confirmed`);
 			if (e.order != this.order) return;
-			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
+			this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
 		});
 
-		this.#game_manager.addEventListener('bang_success', (e) => {
+		this.#gameManager.addEventListener('bang_success', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: bang_success");
 
 			console.log(`${this.name} send: confirmed`);
 			if (e.order != this.order) return;
 			this.calmdown();
-			this.#game_manager.dispatchEvent(new Event.ConfirmationEvent());
+			this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
 		});
 
-		this.#game_manager.addEventListener('put_fail', (e) => {
+		this.#gameManager.addEventListener('put_fail', (e) => {
 			if (e.order != this.order) return;
 			console.log(this.name + " received: put_fail");
 		});
 
-		this.#game_manager.addEventListener('game_over', (e) => {
+		this.#gameManager.addEventListener('game_over', (e) => {
 			console.log(`${this.name} received: game_over`)
 			console.log(e);
 		});
@@ -51,7 +52,7 @@ export default class Player {
 	retching(d) {
 		this.#anger += d;
 		this.#anger = Math.min(this.#anger, 100);
-		this.#game_manager.anger_update();
+		this.#gameManager.angerUpdate();
 	}
 
 	calmdown(d) {
@@ -61,7 +62,7 @@ export default class Player {
 		} else {
 			this.#anger = 0;
 		}
-		this.#game_manager.anger_update();
+		this.#gameManager.angerUpdate();
 	}
 
 	// addEventListener(event_name, callback) {
@@ -72,7 +73,7 @@ export default class Player {
 	// 	this.#event_dispatcher.dispatchEvent(event);
 	// }
 
-	get game_manager() {return this.#game_manager;}
+	get gameManager() {return this.#gameManager;}
 	get order() {return this.#order;}
 	get name() {return this.#name;}
 	set name(name) {this.#name = name;}

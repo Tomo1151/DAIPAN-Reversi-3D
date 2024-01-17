@@ -1,15 +1,15 @@
 import * as THREE from "three";
-import * as Event from "./event.js"
-import { Disk } from "./object.js";
-import { sleep } from "./utils.js";
-import GameManager from "./game_manager.js";
-import GameSection from "./section/GameSection/game_section.js";
-import Player from "./player.js";
+import * as Event from "./Event.js"
+import { Disk } from "./Object.js";
+import { sleep } from "./Utils.js";
+import GameManager from "./GameManager.js";
+import GameSection from "./section/GameSection/GameSection.js";
+import Player from "./Player.js";
 
 export default class DOMManager {
-	#game_manager;
-	#renderer_manager;
-	#camera_manager;
+	#gameManager;
+	#rendererManager;
+	#cameraManager;
 
 	#title_screen_dom;
 	#start_button;
@@ -29,10 +29,10 @@ export default class DOMManager {
 
 	#dom_event_controller;
 
-	constructor(game_manager, renderer_manager, camera_manager) {
-		this.#game_manager = game_manager;
-		this.#renderer_manager = renderer_manager;
-		this.#camera_manager = camera_manager;
+	constructor(gameManager, rendererManager, cameraManager) {
+		this.#gameManager = gameManager;
+		this.#rendererManager = rendererManager;
+		this.#cameraManager = cameraManager;
 
 		this.#title_screen_dom = document.getElementById('title_screen');
 		this.#start_button = document.getElementById('start_button');
@@ -50,14 +50,14 @@ export default class DOMManager {
 
 		this.#dom_event_controller = new AbortController();
 
-		this.#game_manager.addEventListener('turn_notice', (e) => {
-			if (e.order != this.#game_manager.player.order) return;
+		this.#gameManager.addEventListener('turn_notice', (e) => {
+			if (e.order != this.#gameManager.player.order) return;
 
 			if (e.can_put) {
 				this.#put_button.classList.remove('disabled');
 				this.#pass_button.classList.add('disabled');
 				this.#bang_button.classList.remove('disabled');
-				if(this.#game_manager.player.anger >= Player.PATIENCE) this.show(this.#bang_button);
+				if(this.#gameManager.player.anger >= Player.PATIENCE) this.show(this.#bang_button);
 			} else {
 				this.#put_button.classList.add('disabled');
 				this.#pass_button.classList.remove('disabled');
@@ -65,16 +65,16 @@ export default class DOMManager {
 			}
 		});
 
-		this.#game_manager.addEventListener('put_success', (e) => {
-			if (e.order == this.#game_manager.player.order) {
+		this.#gameManager.addEventListener('put_success', (e) => {
+			if (e.order == this.#gameManager.player.order) {
 				this.#put_button.classList.add('disabled');
 				this.#pass_button.classList.add('disabled');
 				this.#bang_button.classList.add('disabled');
 			}
 		});
 
-		this.#game_manager.addEventListener('bang_success', (e) => {
-			if (e.order == this.#game_manager.player.order) {
+		this.#gameManager.addEventListener('bang_success', (e) => {
+			if (e.order == this.#gameManager.player.order) {
 				this.#put_button.classList.add('disabled');
 				this.#pass_button.classList.add('disabled');
 				this.#bang_button.classList.add('disabled');
@@ -82,7 +82,7 @@ export default class DOMManager {
 			}
 		});
 
-		this.#game_manager.addEventListener('game_over', async (e) => {
+		this.#gameManager.addEventListener('game_over', async (e) => {
 			await sleep(1500);
 			this.#put_button.classList.remove('active');
 			this.#put_button.classList.add('disabled');
@@ -91,7 +91,7 @@ export default class DOMManager {
 			this.draw_result_screen(e.result);
 		});
 
-		this.#game_manager.addEventListener('game_restart', () => {
+		this.#gameManager.addEventListener('game_restart', () => {
 			console.log('GAME RESTART');
 			this.hide(this.#result_screen_dom);
 			this.hide(this.#ingame_ui_container);
@@ -110,10 +110,10 @@ export default class DOMManager {
 			document.getElementById('main-canvas').style.width = width;
 			document.getElementById('main-canvas').style.height = height;
 
-			this.#renderer_manager.renderer.setSize(window.innerWidth, window.innerHeight);
-			this.#renderer_manager.renderer.setPixelRatio(window.devicePixelRatio);
-			this.#renderer_manager.camera.aspect = window.innerWidth / window.innerHeight;
-			this.#renderer_manager.camera.updateProjectionMatrix();
+			this.#rendererManager.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.#rendererManager.renderer.setPixelRatio(window.devicePixelRatio);
+			this.#rendererManager.camera.aspect = window.innerWidth / window.innerHeight;
+			this.#rendererManager.camera.updateProjectionMatrix();
 		}
 
 		window.addEventListener('DOMContentLoaded', () => {
@@ -139,12 +139,12 @@ export default class DOMManager {
 		document.getElementById('start_button').addEventListener('click', () => {
 			// Setting DOMs
 			console.log("* send: game_start");console.log("");
-			this.order_update();
+			this.orderUpdate();
 
 			this.hide(this.#title_screen_dom);
 			this.show(this.#ingame_ui_container);
 
-			this.#game_manager.dispatchEvent(new Event.GameStartEvent());
+			this.#gameManager.dispatchEvent(new Event.GameStartEvent());
 		}, { signal: this.#dom_event_controller.signal });
 
 
@@ -153,31 +153,31 @@ export default class DOMManager {
 		 */
 
 		this.#put_button.addEventListener('click', () => {
-			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
+			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
 			this.#bang_button.classList.remove('active');
 			this.#put_button.classList.toggle('active');
-			this.#game_manager.current_section.toggle_mode(GameSection.MODE_PUT);
+			this.#gameManager.currentSection.toggle_mode(GameSection.MODE_PUT);
 		}, { signal: this.#dom_event_controller.signal });
 
 		this.#pass_button.addEventListener('click', () => {
-			if (this.#game_manager.current_turn != this.#game_manager.player.order || this.#game_manager.checkTable(this.#game_manager.player.order)) return;
-			this.#game_manager.dispatchEvent(new Event.PutPassEvent(this.#game_manager.player.order));
+			if (this.#gameManager.currentTurn != this.#gameManager.player.order || this.#gameManager.checkTable(this.#gameManager.player.order)) return;
+			this.#gameManager.dispatchEvent(new Event.PutPassEvent(this.#gameManager.player.order));
 			document.getElementById('pass_button').classList.add('disabled');
 		}, { signal: this.#dom_event_controller.signal });
 
 		this.#bang_button.addEventListener('click', () => {
-			if (this.#game_manager.current_turn != this.#game_manager.player.order) return;
+			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
 			this.#put_button.classList.remove('active');
 			this.#bang_button.classList.toggle('active');
-			this.#game_manager.current_section.toggle_mode(GameSection.MODE_BANG);
-			this.#camera_manager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
+			this.#gameManager.currentSection.toggle_mode(GameSection.MODE_BANG);
+			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
 		}, { signal: this.#dom_event_controller.signal });
 
 		/*
 		 * ResultSection
 		 */
 		this.#restart_button.addEventListener('click', (e) => {
-			this.#game_manager.dispatchEvent(new Event.GameRestartEvent());
+			this.#gameManager.dispatchEvent(new Event.GameRestartEvent());
 		}, { signal: this.#dom_event_controller.signal });
 	}
 
@@ -188,7 +188,7 @@ export default class DOMManager {
 		let dom_result_white = document.getElementById('order_white');
 		let dom_result_time = document.getElementById('time');
 
-		let dt = this.#game_manager.end_time.getTime() - this.#game_manager.start_time.getTime();
+		let dt = this.#gameManager.endTime.getTime() - this.#gameManager.startTime.getTime();
 		let dh = dt / (1000*60*60);
 		let dm = (dh - Math.floor(dh)) * 60;
 		let ds = (dm - Math.floor(dm)) * 60;
@@ -205,9 +205,9 @@ export default class DOMManager {
 		}
 
 		dom_result_winner.innerText = result_str;
-		dom_result_score.innerText = this.#game_manager.player.point;
-		dom_result_white.innerText = `${this.get_player_name()} : ${result.white}`;
-		dom_result_black.innerText = `${this.#game_manager.enemy.name} : ${result.black}`;
+		dom_result_score.innerText = this.#gameManager.player.point;
+		dom_result_white.innerText = `${this.getPlayerName()} : ${result.white}`;
+		dom_result_black.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
 		dom_result_time.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
 
@@ -219,13 +219,13 @@ export default class DOMManager {
 		}
 	}
 
-	get_player_name() {
+	getPlayerName() {
 		return document.getElementById('player_name').value || 'Player';
 	}
 
-	order_update(){
+	orderUpdate(){
 		let p = document.getElementById('order');
-		if (this.#game_manager.current_turn == Disk.BLACK) {
+		if (this.#gameManager.currentTurn == Disk.BLACK) {
 			p.children[0].innerText = '黒';
 			p.classList.remove('order-white');
 			p.classList.add('order-black');
@@ -236,8 +236,8 @@ export default class DOMManager {
 		}
 	}
 
-	anger_update() {
-		let anger_value = this.#game_manager.player.anger;
+	angerUpdate() {
+		let anger_value = this.#gameManager.player.anger;
 		this.#player_anger_dom.style.height = `${anger_value}%`;
 	}
 
@@ -245,9 +245,9 @@ export default class DOMManager {
 		dom.style.display = "none";
 	}
 
-	mode_reset() {
+	modeReset() {
 		this.#put_button.classList.remove('active');
 		this.#bang_button.classList.remove('active');
-		this.#game_manager.current_section.mode = GameSection.MODE_NONE;
+		this.#gameManager.currentSection.mode = GameSection.MODE_NONE;
 	}
 }

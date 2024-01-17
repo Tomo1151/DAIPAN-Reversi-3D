@@ -7,7 +7,7 @@ export default class RendererManager {
 	static SCREEN_WIDTH;
 	static SCREEN_HEIGHT;
 
-	#game_manager;
+	#gameManager;
 	#object_pool;
 
 	#renderer;
@@ -16,9 +16,9 @@ export default class RendererManager {
 	#mouse;
 	#raycaster;
 
-	constructor (game_manager, object_pool) {
+	constructor (gameManager, object_pool) {
 		// set game manager
-		this.#game_manager = game_manager;
+		this.#gameManager = gameManager;
 
 		// def renderer
 		this.#renderer = new THREE.WebGLRenderer({

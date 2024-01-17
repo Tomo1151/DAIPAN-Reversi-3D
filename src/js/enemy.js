@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { sleep } from "./utils.js"
-import Player from "./player.js";
-import { Disk } from "./object.js";
-import * as Event from "./event.js";
+import { sleep } from "./Utils.js"
+import Player from "./Player.js";
+import { Disk } from "./Object.js";
+import * as Event from "./Event.js";
 
 export default class Enemy extends Player {
 	#evalueation_map = [
@@ -19,18 +19,18 @@ export default class Enemy extends Player {
 	#count;
 	#current_table;
 
-	constructor (game_manager, order) {
-		super(game_manager, order);
+	constructor (gameManager, order) {
+		super(gameManager, order);
 		this.name = 'COM';
 		this.#count = 0;
-		this.game_manager.addEventListener('turn_notice', async (e) => {
+		this.gameManager.addEventListener('turn_notice', async (e) => {
 			if (e.order != this.order) return;
 			let board = e.board;
 			let event;
 			this.#count++;
 			if (e.can_put) {
 				// const data = this.searchFirst(board);
-				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 5);
+				const data = this.search_negaalpha(this.get_table_from_board(board), this.order, 7);
 				// let depth = (this.#count > 25) ? (32 - this.#count)*2 : 5;
 				// const data = this.search_negaalpha(this.get_table_from_board(board), this.order, depth);
 				// console.log(`count: ${this.#count} | search depth: ${depth}`);
@@ -41,7 +41,7 @@ export default class Enemy extends Player {
 
 			// await sleep(1000);
 			console.log(`enemy send: ${event.type}`);
-			this.game_manager.dispatchEvent(event);
+			this.gameManager.dispatchEvent(event);
 		});
 	}
 

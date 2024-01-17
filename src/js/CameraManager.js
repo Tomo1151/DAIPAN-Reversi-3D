@@ -1,20 +1,20 @@
 import * as THREE from "three";
-import { is_empty } from "./utils.js";
+import { is_empty } from "./Utils.js";
 
 export default class CameraManager {
-	#game_manager;
-	#renderer_manager;
+	#gameManager;
+	#rendererManager;
 	#scene;
 	#camera;
 	#hasMoveCompleted = true;
 	#target;
 	#original_position;
 
-	constructor(game_manager, renderer_manager, scene) {
-		this.#game_manager = game_manager;
-		this.#renderer_manager = renderer_manager;
+	constructor(gameManager, rendererManager, scene) {
+		this.#gameManager = gameManager;
+		this.#rendererManager = rendererManager;
 		this.#scene = scene;
-		this.#camera = renderer_manager.camera;
+		this.#camera = rendererManager.camera;
 	}
 
 	update() {
@@ -56,5 +56,5 @@ export default class CameraManager {
 		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true, () => {this.controlable = true;}, 10);
 	}
 
-	set controlable(bool) {this.#renderer_manager.controls.enabled = bool;}
+	set controlable(bool) {this.#rendererManager.controls.enabled = bool;}
 }

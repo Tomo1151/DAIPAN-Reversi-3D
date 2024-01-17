@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-import GameManager from "../../game_manager.js";
-import { model_load, sleep } from "../../utils.js";
-import { Disk, Board } from "../../object.js";
-import Section from "../section.js";
-import * as Event from "../../event.js";
+import GameManager from "../../GameManager.js";
+import { model_load, sleep } from "../../Utils.js";
+import { Disk, Board } from "../../Object.js";
+import Section from "../Section.js";
+import * as Event from "../../Event.js";
 
 export default class GameSection extends Section {
 	static MODE_NONE = -1;
@@ -30,9 +30,9 @@ export default class GameSection extends Section {
 	#pos_diff;
 	#clock;
 
-	constructor(game_manager, renderer_manager, camera_manager, scene) {
-		super(game_manager, renderer_manager, camera_manager, scene);
-		this.renderer_manager.controls.enabled = true;
+	constructor(gameManager, rendererManager, cameraManager, scene) {
+		super(gameManager, rendererManager, cameraManager, scene);
+		this.rendererManager.controls.enabled = true;
 		this.#clock = new THREE.Clock();
 
 		const click_controller = new AbortController();
@@ -42,13 +42,13 @@ export default class GameSection extends Section {
 
 		console.log("-- GAME SECTION --");
 		window.addEventListener('mousemove', (e) => {
-			if (this.game_manager.player.order != this.game_manager.current_turn || !this.#is_selectable) return;
-			this.renderer_manager.setCursorPoint(e);
-			this.renderer_manager.raycaster.setFromCamera(this.renderer_manager.mouse, this.renderer_manager.camera);
+			if (this.gameManager.player.order != this.gameManager.currentTurn || !this.#is_selectable) return;
+			this.rendererManager.setCursorPoint(e);
+			this.rendererManager.raycaster.setFromCamera(this.rendererManager.mouse, this.rendererManager.camera);
 
 			switch (this.#mode) {
 				case GameSection.MODE_PUT:
-					let intersects = this.renderer_manager.raycaster.intersectObjects(this.#hitboxes);
+					let intersects = this.rendererManager.raycaster.intersectObjects(this.#hitboxes);
 					if (intersects.length > 0) {
 						for (let hitbox of this.#hitboxes) {
 							if (hitbox == intersects[0].object) {
@@ -66,7 +66,7 @@ export default class GameSection extends Section {
 				case GameSection.MODE_BANG:
 					for (let hitbox of this.#hitboxes) hitbox.visible = false;
 
-					let intersect = this.renderer_manager.raycaster.intersectObject(this.#base)[0]
+					let intersect = this.rendererManager.raycaster.intersectObject(this.#base)[0]
 					if (intersect) {
 						this.#on_base = true;
 						this.#select_area.visible = true;
@@ -92,7 +92,7 @@ export default class GameSection extends Section {
 							let x = this.#selected_hitbox.cell_x
 							let y = this.#selected_hitbox.cell_y
 							this.#selected_hitbox = undefined;
-							this.game_manager.dispatchEvent(new Event.PutNoticeEvent({"order": Disk.WHITE, "x": x, "y": y}));
+							this.gameManager.dispatchEvent(new Event.PutNoticeEvent({"order": Disk.WHITE, "x": x, "y": y}));
 						}
 					}, {signal: click_controller.signal});
 
@@ -101,8 +101,8 @@ export default class GameSection extends Section {
 					let pos = this.#select_area.position;
 					if (this.#on_base) {
 						this.#select_area.visible = false;
-						this.game_manager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
-						this.camera_manager.restore();
+						this.gameManager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
+						this.cameraManager.restore();
 					}
 
 					break;
@@ -111,19 +111,19 @@ export default class GameSection extends Section {
 			}
 		}, {signal: click_controller.signal});
 
-		this.game_manager.addEventListener('turn_notice', (e) => {
-			if (this.game_manager.player.order == e.order) this.#is_selectable = true;
+		this.gameManager.addEventListener('turn_notice', (e) => {
+			if (this.gameManager.player.order == e.order) this.#is_selectable = true;
 		});
 
-		this.game_manager.addEventListener('put_pass', (e) => {
-			if (this.game_manager.player.order != e.order) return;
+		this.gameManager.addEventListener('put_pass', (e) => {
+			if (this.gameManager.player.order != e.order) return;
 			for (let hitbox of this.#hitboxes) hitbox.visible = false;
 			this.#is_selectable = false;
 			this.#player_act = 'pass';
 		});
 
-		this.game_manager.addEventListener('put_success', (e) => {
-			if (this.game_manager.player.order == e.order) {
+		this.gameManager.addEventListener('put_success', (e) => {
+			if (this.gameManager.player.order == e.order) {
 				for (let hitbox of this.#hitboxes) hitbox.visible = false;
 				this.#is_selectable = false;
 			}
@@ -131,22 +131,22 @@ export default class GameSection extends Section {
 			this.#player_act = 'put'
 		});
 
-		this.game_manager.addEventListener('bang_success', (e) => {
+		this.gameManager.addEventListener('bang_success', (e) => {
 			this.#player_act = 'bang';
 			this.#pos_diff = e.pos;
 		});
 
-		this.game_manager.addEventListener('confirmed', async () => {
+		this.gameManager.addEventListener('confirmed', async () => {
 			if (this.#player_act == 'bang') {
-				await this.disk_mesh_flip(this.game_manager.board.table, this.#pos_diff);
+				await this.disk_mesh_flip(this.gameManager.board.table, this.#pos_diff);
 			} else {
-				await this.disk_mesh_update(this.game_manager.board.table);
+				await this.disk_mesh_update(this.gameManager.board.table);
 			}
-			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent());
+			this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
 		});
 
 		// Listener delete
-		this.game_manager.addEventListener('game_over', () => {
+		this.gameManager.addEventListener('game_over', () => {
 				console.log("delete click callback");
 				click_controller.abort();
 				console.log("delete mousemove callback");
@@ -201,8 +201,8 @@ export default class GameSection extends Section {
 		this.scene.add(base);
 
 		this.object_set().then(async () => {
-			await this.disk_mesh_update(this.game_manager.board.table);
-			this.game_manager.dispatchEvent(new Event.UpdateCompleteEvent())
+			await this.disk_mesh_update(this.gameManager.board.table);
+			this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent())
 		});
 	}
 
@@ -266,7 +266,7 @@ export default class GameSection extends Section {
 			}
 
 			let mixer, animations;
-			let obj = this.game_manager.objects.disk;
+			let obj = this.gameManager.objects.disk;
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
 					let model = Object.assign({}, obj);
@@ -327,7 +327,7 @@ export default class GameSection extends Section {
 	toggle_mode(mode, target = null) {
 		if (mode == this.mode) {
 			this.mode = GameSection.MODE_NONE;
-			this.camera_manager.controlable = true;
+			this.cameraManager.controlable = true;
 		} else {
 			this.mode = mode;
 		}
