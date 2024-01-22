@@ -1,20 +1,19 @@
 import * as THREE from "three";
-import { is_empty } from "./utils.js";
 
 export default class CameraManager {
-	#game_manager;
-	#renderer_manager;
+	#gameManager;
+	#rendererManager;
 	#scene;
 	#camera;
 	#hasMoveCompleted = true;
 	#target;
-	#original_position;
+	#originalPosition;
 
-	constructor(game_manager, renderer_manager, scene) {
-		this.#game_manager = game_manager;
-		this.#renderer_manager = renderer_manager;
+	constructor(gameManager, rendererManager, scene) {
+		this.#gameManager = gameManager;
+		this.#rendererManager = rendererManager;
 		this.#scene = scene;
-		this.#camera = renderer_manager.camera;
+		this.#camera = rendererManager.camera;
 	}
 
 	update() {
@@ -23,7 +22,7 @@ export default class CameraManager {
 
 	moveTo(x, y, z, lookAt, controlable, callback, step) {
 		console.log(` |~ camera: move to (${x}, ${y}, ${z})`);
-		this.#original_position = JSON.parse(JSON.stringify(this.#camera.position));
+		this.#originalPosition = JSON.parse(JSON.stringify(this.#camera.position));
 		this.#target = {x, y, z, lookAt, controlable, callback, step};
 		this.#hasMoveCompleted = false;
 	}
@@ -52,9 +51,9 @@ export default class CameraManager {
 	}
 
 	restore() {
-		let pos = this.#original_position;
+		let pos = this.#originalPosition;
 		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true, () => {this.controlable = true;}, 10);
 	}
 
-	set controlable(bool) {this.#renderer_manager.controls.enabled = bool;}
+	set controlable(bool) {this.#rendererManager.controls.enabled = bool;}
 }
