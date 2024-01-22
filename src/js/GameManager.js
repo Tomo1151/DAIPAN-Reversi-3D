@@ -5,10 +5,11 @@ import RendererManager from "./RendererManager.js";
 import SectionManager from "./SectionManager.js";
 import DOMManager from "./DOMManager.js";
 import CameraManager from "./CameraManager.js";
-import Section from "./section/Section.js";
+
 import TitleSection from "./section/TitleSection/TitleSection.js";
 import GameSection from "./section/GameSection/GameSection.js";
 import ResultSection from "./section/ResultSection/ResultSection.js";
+
 import Player from "./Player.js";
 import Enemy from "./Enemy.js";
 import * as Event from "./Event.js";
@@ -140,7 +141,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 
 			let order = data.order;
-			let resultEvent;
 			let x = data.x;
 			let y = data.y;
 
