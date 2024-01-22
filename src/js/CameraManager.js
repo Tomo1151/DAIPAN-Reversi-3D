@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { is_empty } from "./Utils.js";
 
 export default class CameraManager {
 	#gameManager;
@@ -8,7 +7,7 @@ export default class CameraManager {
 	#camera;
 	#hasMoveCompleted = true;
 	#target;
-	#original_position;
+	#originalPosition;
 
 	constructor(gameManager, rendererManager, scene) {
 		this.#gameManager = gameManager;
@@ -23,7 +22,7 @@ export default class CameraManager {
 
 	moveTo(x, y, z, lookAt, controlable, callback, step) {
 		console.log(` |~ camera: move to (${x}, ${y}, ${z})`);
-		this.#original_position = JSON.parse(JSON.stringify(this.#camera.position));
+		this.#originalPosition = JSON.parse(JSON.stringify(this.#camera.position));
 		this.#target = {x, y, z, lookAt, controlable, callback, step};
 		this.#hasMoveCompleted = false;
 	}
@@ -52,7 +51,7 @@ export default class CameraManager {
 	}
 
 	restore() {
-		let pos = this.#original_position;
+		let pos = this.#originalPosition;
 		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true, () => {this.controlable = true;}, 10);
 	}
 

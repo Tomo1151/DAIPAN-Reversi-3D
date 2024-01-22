@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import GameManager from "../../GameManager.js";
-import { model_load, sleep } from "../../Utils.js";
+import { sleep } from "../../Utils.js";
 import { Disk, Board } from "../../Object.js";
 import Section from "../Section.js";
 import * as Event from "../../Event.js";
@@ -11,23 +11,22 @@ export default class GameSection extends Section {
 	static MODE_PUT = 0;
 	static MODE_BANG = 1;
 
-	#current_table = new Array(8*8);
+	#currentTable = new Array(8*8);
 
-	#is_selectable = false;
-	#selected_hitbox;
+	#isSelectable = false;
+	#selectedHitbox;
 	#hitboxes = [];
 	#base;
-	#on_base;
-	#select_area;
-	#disk_models = [];
-	#disk_animations = [];
-	#animation_mixers = [];
+	#onBase;
+	#selectArea;
+	#diskModels = [];
+	#diskAnimations = [];
+	#animationMixers = [];
 	#intersects = [];
-	#selected_color = new THREE.Color(0xff0000);
-	#hitboxe_color = new THREE.Color(0xffffff);
+	#selectedColor = new THREE.Color(0xff0000);
 	#mode = GameSection.MODE_NONE;
-	#player_act;
-	#pos_diff;
+	#playerAct;
+	#posDiff;
 	#clock;
 
 	constructor(gameManager, rendererManager, cameraManager, scene) {
@@ -35,14 +34,14 @@ export default class GameSection extends Section {
 		this.rendererManager.controls.enabled = true;
 		this.#clock = new THREE.Clock();
 
-		const click_controller = new AbortController();
-		const mousemove_controller = new AbortController();
+		const clickController = new AbortController();
+		const mousemoveController = new AbortController();
 
-		for (let i = 0; i < 8*8; i++) this.#current_table[i] = Disk.EMPTY;
+		for (let i = 0; i < 8*8; i++) this.#currentTable[i] = Disk.EMPTY;
 
 		console.log("-- GAME SECTION --");
 		window.addEventListener('mousemove', (e) => {
-			if (this.gameManager.player.order != this.gameManager.currentTurn || !this.#is_selectable) return;
+			if (this.gameManager.player.order != this.gameManager.currentTurn || !this.#isSelectable) return;
 			this.rendererManager.setCursorPoint(e);
 			this.rendererManager.raycaster.setFromCamera(this.rendererManager.mouse, this.rendererManager.camera);
 
@@ -53,13 +52,13 @@ export default class GameSection extends Section {
 						for (let hitbox of this.#hitboxes) {
 							if (hitbox == intersects[0].object) {
 								hitbox.visible = true;
-								this.#selected_hitbox = hitbox;
+								this.#selectedHitbox = hitbox;
 							} else {
 								hitbox.visible = false;
 							}
 						}
 					} else {
-						this.#selected_hitbox = undefined;
+						this.#selectedHitbox = undefined;
 					}
 
 					break;
@@ -68,39 +67,39 @@ export default class GameSection extends Section {
 
 					let intersect = this.rendererManager.raycaster.intersectObject(this.#base)[0]
 					if (intersect) {
-						this.#on_base = true;
-						this.#select_area.visible = true;
-						this.#select_area.position.x = intersect.point.x
-						this.#select_area.position.z = intersect.point.z
+						this.#onBase = true;
+						this.#selectArea.visible = true;
+						this.#selectArea.position.x = intersect.point.x
+						this.#selectArea.position.z = intersect.point.z
 					} else {
-						this.#on_base = false;
-						this.#select_area.visible = false;
+						this.#onBase = false;
+						this.#selectArea.visible = false;
 					}
 
 					break;
 				default:
 					break;
 			}
-		}, {signal: mousemove_controller.signal});
+		}, {signal: mousemoveController.signal});
 
 		this.canvas.addEventListener('mousedown', () => {
 			switch(this.#mode) {
 				case GameSection.MODE_PUT:
-					let box = this.#selected_hitbox;
+					let box = this.#selectedHitbox;
 					this.canvas.addEventListener('mouseup', (e) => {
-						if (this.#selected_hitbox == box && box != undefined) {
-							let x = this.#selected_hitbox.cell_x
-							let y = this.#selected_hitbox.cell_y
-							this.#selected_hitbox = undefined;
+						if (this.#selectedHitbox == box && box != undefined) {
+							let x = this.#selectedHitbox.cellX
+							let y = this.#selectedHitbox.cellY
+							this.#selectedHitbox = undefined;
 							this.gameManager.dispatchEvent(new Event.PutNoticeEvent({"order": Disk.WHITE, "x": x, "y": y}));
 						}
-					}, {signal: click_controller.signal});
+					}, {signal: clickController.signal});
 
 					break;
 				case GameSection.MODE_BANG:
-					let pos = this.#select_area.position;
-					if (this.#on_base) {
-						this.#select_area.visible = false;
+					let pos = this.#selectArea.position;
+					if (this.#onBase) {
+						this.#selectArea.visible = false;
 						this.gameManager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
 						this.cameraManager.restore();
 					}
@@ -109,38 +108,38 @@ export default class GameSection extends Section {
 				default:
 					break;
 			}
-		}, {signal: click_controller.signal});
+		}, {signal: clickController.signal});
 
 		this.gameManager.addEventListener('turn_notice', (e) => {
-			if (this.gameManager.player.order == e.order) this.#is_selectable = true;
+			if (this.gameManager.player.order == e.order) this.#isSelectable = true;
 		});
 
 		this.gameManager.addEventListener('put_pass', (e) => {
 			if (this.gameManager.player.order != e.order) return;
 			for (let hitbox of this.#hitboxes) hitbox.visible = false;
-			this.#is_selectable = false;
-			this.#player_act = 'pass';
+			this.#isSelectable = false;
+			this.#playerAct = 'pass';
 		});
 
 		this.gameManager.addEventListener('put_success', (e) => {
 			if (this.gameManager.player.order == e.order) {
 				for (let hitbox of this.#hitboxes) hitbox.visible = false;
-				this.#is_selectable = false;
+				this.#isSelectable = false;
 			}
 
-			this.#player_act = 'put'
+			this.#playerAct = 'put'
 		});
 
 		this.gameManager.addEventListener('bang_success', (e) => {
-			this.#player_act = 'bang';
-			this.#pos_diff = e.pos;
+			this.#playerAct = 'bang';
+			this.#posDiff = e.pos;
 		});
 
 		this.gameManager.addEventListener('confirmed', async () => {
-			if (this.#player_act == 'bang') {
-				await this.disk_mesh_flip(this.gameManager.board.table, this.#pos_diff);
+			if (this.#playerAct == 'bang') {
+				await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
 			} else {
-				await this.disk_mesh_update(this.gameManager.board.table);
+				await this.diskMeshUpdate(this.gameManager.board.table);
 			}
 			this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
 		});
@@ -148,16 +147,16 @@ export default class GameSection extends Section {
 		// Listener delete
 		this.gameManager.addEventListener('game_over', () => {
 				console.log("delete click callback");
-				click_controller.abort();
+				clickController.abort();
 				console.log("delete mousemove callback");
-				mousemove_controller.abort();
+				mousemoveController.abort();
 		});
 
 	}
 
 	run() {
 		let d = this.#clock.getDelta();
-		for (let mixer of this.#animation_mixers) {
+		for (let mixer of this.#animationMixers) {
 			if(mixer){
 				mixer.update(d);
 			}
@@ -165,16 +164,16 @@ export default class GameSection extends Section {
 	}
 
 	async init() {
-		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
-		const directional_light0 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light1 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light2 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light3 = new THREE.DirectionalLight(0xffffff, 1);
-		const lights = [directional_light0, directional_light1, directional_light2, directional_light3];
-		directional_light0.position.set(25, 25, -25);
-		directional_light1.position.set(-25, 25, -25);
-		directional_light2.position.set(-25, 25, 25);
-		directional_light3.position.set(-25, 25, -25);
+		const ambientLight = new THREE.AmbientLight(0xffffff, 1.75);
+		const directionalLight0 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight3 = new THREE.DirectionalLight(0xffffff, 1);
+		const lights = [directionalLight0, directionalLight1, directionalLight2, directionalLight3];
+		directionalLight0.position.set(25, 25, -25);
+		directionalLight1.position.set(-25, 25, -25);
+		directionalLight2.position.set(-25, 25, 25);
+		directionalLight3.position.set(-25, 25, -25);
 		for (let light of lights) {
 			light.intensity = 0.75;
 			this.scene.add(light);
@@ -187,7 +186,7 @@ export default class GameSection extends Section {
 		);
 		cylinder.visible = false;
 		cylinder.position.set(0, 1.9, 0);
-		this.#select_area = cylinder;
+		this.#selectArea = cylinder;
 
 		const base = new THREE.Mesh(
 			new THREE.PlaneGeometry(80, 80, 1, 1),
@@ -201,14 +200,14 @@ export default class GameSection extends Section {
 		this.scene.add(base);
 
 		this.object_set().then(async () => {
-			await this.disk_mesh_update(this.gameManager.board.table);
+			await this.diskMeshUpdate(this.gameManager.board.table);
 			this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent())
 		});
 	}
 
-	async animation_flip(disk_num, order) {
-		let disk = this.#disk_models[disk_num];
-		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[order]);
+	async animationFlip(disk_num, order) {
+		let disk = this.#diskModels[disk_num];
+		let action = this.#animationMixers[disk_num].clipAction(disk.animations[order]);
 		let duration = disk.animations[order].duration;
 
 		action.timeScale = 1;
@@ -225,9 +224,9 @@ export default class GameSection extends Section {
 		disk.scene.rotation.z %= 2 * Math.PI;
 	}
 
-	async animation_put(disk_num, order) {
-		let disk = this.#disk_models[disk_num];
-		let action = this.#animation_mixers[disk_num].clipAction(disk.animations[1-order + 2]);
+	async animationPut(disk_num, order) {
+		let disk = this.#diskModels[disk_num];
+		let action = this.#animationMixers[disk_num].clipAction(disk.animations[1-order + 2]);
 		let duration = disk.animations[1-order + 2].duration;
 
 		disk.scene.visible = true;
@@ -257,8 +256,8 @@ export default class GameSection extends Section {
 
 					const box = new THREE.Mesh(g, m);
 					box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
-					box.cell_x = j;
-					box.cell_y = i;
+					box.cellX = j;
+					box.cellY = i;
 					box.visible = false
 					this.#hitboxes.push(box);
 					this.scene.add(box);
@@ -276,9 +275,9 @@ export default class GameSection extends Section {
 					model.scene.scale.set(4, 4, 4);
 					model.scene.position.set(10*j - (10*3+5), 1.325, 10*i - (10*3+5));
 					model.scene.visible = false;
-					this.#disk_models.push(model);
-					this.#disk_animations.push(model.animations);
-					this.#animation_mixers.push(mixer);
+					this.#diskModels.push(model);
+					this.#diskAnimations.push(model.animations);
+					this.#animationMixers.push(mixer);
 					this.scene.add(model.scene);
 				}
 			}
@@ -286,45 +285,45 @@ export default class GameSection extends Section {
 		});
 	}
 
-	async disk_mesh_flip(table, put_pos) {
-		let duration = this.#disk_models[0].animations[2].duration;
+	async diskMeshFlip(table, put_pos) {
+		let duration = this.#diskModels[0].animations[2].duration;
 		for (let pos of put_pos) {
 			let num = pos.y*8+pos.x;
 			let order = table[num].state == Disk.WHITE ? Disk.WHITE : Disk.BLACK;
-			this.#current_table[num] = table[num].state;
-			this.animation_flip(num, order);
+			this.#currentTable[num] = table[num].state;
+			this.animationFlip(num, order);
 		}
 		await sleep(duration*400);
 	}
 
-	async disk_mesh_update(table, put_pos, rev_pos) {
+	async diskMeshUpdate(table, put_pos, rev_pos) {
 		for (let i = 0; i < 8*8; i++) {
-			if (this.#current_table[i] != table[i].state) {
-				if (this.#current_table[i] == Disk.EMPTY) {
-					this.#current_table[i] = table[i].state;
+			if (this.#currentTable[i] != table[i].state) {
+				if (this.#currentTable[i] == Disk.EMPTY) {
+					this.#currentTable[i] = table[i].state;
 					switch (table[i].state) {
 						case Disk.WHITE:
-							await this.animation_put(i, Disk.WHITE);
+							await this.animationPut(i, Disk.WHITE);
 							break;
 						case Disk.BLACK:
-							await this.animation_put(i, Disk.BLACK);
+							await this.animationPut(i, Disk.BLACK);
 					}
 				}
 			}
 		}
 		for (let i = 0; i < 8*8; i++) {
-			if (this.#current_table[i] != table[i].state) {
-				if (this.#current_table[i] == Disk.WHITE) {
-					await this.animation_flip(i, Disk.BLACK);
+			if (this.#currentTable[i] != table[i].state) {
+				if (this.#currentTable[i] == Disk.WHITE) {
+					await this.animationFlip(i, Disk.BLACK);
 				} else {
-					await this.animation_flip(i, Disk.WHITE);
+					await this.animationFlip(i, Disk.WHITE);
 				}
 			}
-			this.#current_table[i] = table[i].state;
+			this.#currentTable[i] = table[i].state;
 		}
 	}
 
-	toggle_mode(mode, target = null) {
+	toggleMode(mode, target = null) {
 		if (mode == this.mode) {
 			this.mode = GameSection.MODE_NONE;
 			this.cameraManager.controlable = true;

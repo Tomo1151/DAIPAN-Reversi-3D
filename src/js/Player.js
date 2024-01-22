@@ -65,14 +65,6 @@ export default class Player {
 		this.#gameManager.angerUpdate();
 	}
 
-	// addEventListener(event_name, callback) {
-	// 	this.#event_dispatcher.addEventListener(event_name, callback);
-	// }
-
-	// dispatchEvent(event, dispatch_object) {
-	// 	this.#event_dispatcher.dispatchEvent(event);
-	// }
-
 	get gameManager() {return this.#gameManager;}
 	get order() {return this.#order;}
 	get name() {return this.#name;}

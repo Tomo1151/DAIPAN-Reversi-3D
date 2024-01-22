@@ -8,7 +8,6 @@ export default class RendererManager {
 	static SCREEN_HEIGHT;
 
 	#gameManager;
-	#object_pool;
 
 	#renderer;
 	#camera;
@@ -16,7 +15,7 @@ export default class RendererManager {
 	#mouse;
 	#raycaster;
 
-	constructor (gameManager, object_pool) {
+	constructor (gameManager) {
 		// set game manager
 		this.#gameManager = gameManager;
 

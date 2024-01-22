@@ -1,69 +1,80 @@
 class CustomEvent {
-	type;
-	time;
+	#type;
+	#time;
 
-	constructor (type) {
-		this.type = type;
-		this.time = new Date();
+	constructor(type) {
+		this.#type = type;
+		this.#time = new Date();
 	}
+
+	get type() {return this.#type;}
+	get time() {return this.#time;}
 }
 
 export class GameStartEvent extends CustomEvent {
 	static EVENT_NAME = "game_start";
 
-	constructor () {
+	constructor() {
 		super (GameStartEvent.EVENT_NAME);
 	}
 }
 
 export class GameOverEvent extends CustomEvent {
 	static EVENT_NAME = "game_over";
-	result;
+	#result;
 
-	constructor (result) {
+	constructor(result) {
 		super (GameOverEvent.EVENT_NAME);
-		this.result = result;
+		this.#result = result;
 	}
+
+	get result () {return this.#result}
 }
 
 export class GameRestartEvent extends CustomEvent {
 	static EVENT_NAME = "game_restart";
 
-	constructor () {
+	constructor() {
 		super (GameRestartEvent.EVENT_NAME);
 	}
 }
 
 export class ConfirmationEvent extends CustomEvent {
 	static EVENT_NAME = "confirmed";
-	order;
+	#order;
 
-	constructor (order) {
+	constructor(order) {
 		super (ConfirmationEvent.EVENT_NAME);
-		this.order = order;
+		this.#order = order;
 	}
+
+	get order() {return this.#order}
 }
 
 export class TurnChangeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_change";
 
-	constructor () {
+	constructor() {
 		super (TurnChangeEvent.EVENT_NAME);
 	}
 }
 
 export class TurnNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "turn_notice";
-	board;
-	can_put;
-	order;
+	#board;
+	#canPut;
+	#order;
 
-	constructor (order, board, can_put) {
-		super (TurnNoticeEvent.EVENT_NAME);
-		this.board = board;
-		this.can_put = can_put;
-		this.order = order;
+	constructor(order, board, canPut) {
+		super(TurnNoticeEvent.EVENT_NAME);
+		this.#board = board;
+		this.#canPut = canPut;
+		this.#order = order;
 	}
+
+	get board() {return this.#board;}
+	get canPut() {return this.#canPut;}
+	get order() {return this.#order;}
 }
 
 export class PutNoticeEvent extends CustomEvent {
@@ -72,109 +83,102 @@ export class PutNoticeEvent extends CustomEvent {
 	#x;
 	#y;
 
-	constructor (data) {
+	constructor(data) {
 		super (PutNoticeEvent.EVENT_NAME);
-		this.#order = data["order"];
-		this.#x = data["x"];
-		this.#y = data["y"];
+		this.#order = data.order;
+		this.#x = data.x;
+		this.#y = data.y;
 	}
 
-	get order () {return this.#order;}
-	get x () {return this.#x;}
-	get y () {return this.#y;}
+	get order() {return this.#order;}
+	get x() {return this.#x;}
+	get y() {return this.#y;}
 }
 
 export class PutFailEvent extends CustomEvent {
 	static EVENT_NAME = "put_fail";
-	order;
+	#order;
 
-	constructor (order) {
+	constructor(order) {
 		super (PutFailEvent.EVENT_NAME);
-		this.order = order;
+		this.#order = order;
 	}
+
+	get order() {return this.#order;}
 }
 
 export class PutSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "put_success";
-	order;
+	#order;
 
-	constructor (order) {
+	constructor(order) {
 		super (PutSuccessEvent.EVENT_NAME);
-		this.order = order
+		this.#order = order;
 	}
+
+	get order() {return this.#order;}
 }
 
 export class BangNoticeEvent extends CustomEvent {
 	static EVENT_NAME = "bang_notice";
-	order;
-	x;
-	y;
-	anger = 100;
+	#order;
+	#x;
+	#y;
+	#anger = 100;
 
-	constructor (data) {
+	constructor(data) {
 		super (BangNoticeEvent.EVENT_NAME);
-		this.order = data.order;
-		this.x = data.x;
-		this.y = data.y;
+		this.#order = data.order;
+		this.#x = data.x;
+		this.#y = data.y;
 	}
+
+	get order() {return this.#order;}
+	get x() {return this.#x;}
+	get y() {return this.#y;}
+	get anger() {return this.#anger;}
 }
 
 export class BangFailEvent extends CustomEvent {
 	static EVENT_NAME = "bang_fail";
-	order;
+	#order;
 
-	constructor (order) {
+	constructor(order) {
 		super (BangFailEvent.EVENT_NAME);
-		this.order = order;
+		this.#order = order;
 	}
+
+	get order() {return this.#order;}
 }
 
 export class BangSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "bang_success";
-	order;
-	pos;
+	#order;
+	#pos;
 
-	constructor (data) {
+	constructor(data) {
 		super (BangSuccessEvent.EVENT_NAME);
-		this.order = data.order;
-		this.pos = data.pos;
+		this.#order = data.order;
+		this.#pos = data.pos;
 	}
+
+	get order() {return this.#order;}
+	get pos() {return this.#pos;}
 }
 
 export class PutPassEvent extends CustomEvent {
 	static EVENT_NAME = "put_pass";
-	order;
+	#order;
 
-	constructor (order) {
+	constructor(order) {
 		super (PutPassEvent.EVENT_NAME);
-		this.order = order;
+		this.#order = order;
 	}
+
+	get order() {return this.#order;}
 }
 
 export class UpdateCompleteEvent extends CustomEvent {
 	static EVENT_NAME = "updated";
-	constructor () {super(UpdateCompleteEvent.EVENT_NAME);}
+	constructor() {super(UpdateCompleteEvent.EVENT_NAME);}
 }
-
-
-// export class EventManager {
-// 	#listeners = [];
-
-// 	constructor () {}
-
-// 	addEventListener(event_name, callback) {
-// 		if (event_name in this.#listeners) {
-// 			this.#listeners[event_name].push(callback);
-// 		} else {
-// 			this.#listeners[event_name] = [callback];
-// 		}
-// 	}
-
-// 	dispatchEvent(event, dispatch_object) {
-// 		if (event.name in this.#listeners) {
-// 			this.#listeners[event.name].forEach((func) => {func(event)});
-// 		} else {
-// 			console.log(`this object doen't has listener: ${event.name}`);
-// 		}
-// 	}
-// }

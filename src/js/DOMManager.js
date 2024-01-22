@@ -11,99 +11,94 @@ export default class DOMManager {
 	#rendererManager;
 	#cameraManager;
 
-	#title_screen_dom;
-	#start_button;
+	#titleScreenDOM;
+	#startButton;
 
-	#ingame_ui_container;
-	#order_dom;
-	#ingame_buttons;
-	#put_button;
-	#pass_button;
-	#bang_button;
+	#ingameUIContainer;
+	#ingameButtons;
+	#putButton;
+	#passButton;
+	#bangButton;
 
-	#result_screen_dom;
-	#restart_button;
+	#resultScreenDOM;
+	#restartButton;
 
-	#player_anger;
-	#player_anger_dom;
+	#playerAngerDOM;
 
-	#dom_event_controller;
+	#DOMEventController;
 
 	constructor(gameManager, rendererManager, cameraManager) {
 		this.#gameManager = gameManager;
 		this.#rendererManager = rendererManager;
 		this.#cameraManager = cameraManager;
 
-		this.#title_screen_dom = document.getElementById('title_screen');
-		this.#start_button = document.getElementById('start_button');
-		this.#ingame_ui_container = document.getElementById('ingame_ui');
-		this.#order_dom = document.getElementById('order_div');
-		this.#ingame_buttons = document.getElementById('action_button');
-		this.#put_button = this.#ingame_buttons.children[0];
-		this.#pass_button = this.#ingame_buttons.children[1];
-		this.#bang_button = this.#ingame_buttons.children[2];
-		this.#result_screen_dom = document.getElementById('result_screen');
-		this.#restart_button = document.getElementById('restart_button');
-		this.#player_anger_dom = document.getElementById('meter_value');
-		this.#player_anger_dom.style.height = `0%`;
-		this.hide(this.#bang_button);
+		this.#titleScreenDOM = document.getElementById('title_screen');
+		this.#startButton = document.getElementById('start_button');
+		this.#ingameUIContainer = document.getElementById('ingame_ui');
+		this.#ingameButtons = document.getElementById('action_button');
+		[this.#putButton, this.#passButton, this.#bangButton] = this.#ingameButtons.children;
+		this.#resultScreenDOM = document.getElementById('result_screen');
+		this.#restartButton = document.getElementById('restart_button');
+		this.#playerAngerDOM = document.getElementById('meter_value');
+		this.#playerAngerDOM.style.height = `0%`;
+		this.hide(this.#bangButton);
 
-		this.#dom_event_controller = new AbortController();
+		this.#DOMEventController = new AbortController();
 
 		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#gameManager.player.order) return;
 
-			if (e.can_put) {
-				this.#put_button.classList.remove('disabled');
-				this.#pass_button.classList.add('disabled');
-				this.#bang_button.classList.remove('disabled');
-				if(this.#gameManager.player.anger >= Player.PATIENCE) this.show(this.#bang_button);
+			if (e.canPut) {
+				this.#putButton.classList.remove('disabled');
+				this.#passButton.classList.add('disabled');
+				this.#bangButton.classList.remove('disabled');
+				if(this.#gameManager.player.anger >= Player.PATIENCE) this.show(this.#bangButton);
 			} else {
-				this.#put_button.classList.add('disabled');
-				this.#pass_button.classList.remove('disabled');
-				this.#bang_button.classList.add('disabled');
+				this.#putButton.classList.add('disabled');
+				this.#passButton.classList.remove('disabled');
+				this.#bangButton.classList.add('disabled');
 			}
 		});
 
 		this.#gameManager.addEventListener('put_success', (e) => {
 			if (e.order == this.#gameManager.player.order) {
-				this.#put_button.classList.add('disabled');
-				this.#pass_button.classList.add('disabled');
-				this.#bang_button.classList.add('disabled');
+				this.#putButton.classList.add('disabled');
+				this.#passButton.classList.add('disabled');
+				this.#bangButton.classList.add('disabled');
 			}
 		});
 
 		this.#gameManager.addEventListener('bang_success', (e) => {
 			if (e.order == this.#gameManager.player.order) {
-				this.#put_button.classList.add('disabled');
-				this.#pass_button.classList.add('disabled');
-				this.#bang_button.classList.add('disabled');
-				this.hide(this.#bang_button);
+				this.#putButton.classList.add('disabled');
+				this.#passButton.classList.add('disabled');
+				this.#bangButton.classList.add('disabled');
+				this.hide(this.#bangButton);
 			}
 		});
 
 		this.#gameManager.addEventListener('game_over', async (e) => {
 			await sleep(1500);
-			this.#put_button.classList.remove('active');
-			this.#put_button.classList.add('disabled');
-			this.#bang_button.classList.remove('active');
-			this.#bang_button.classList.add('disabled');
-			this.draw_result_screen(e.result);
+			this.#putButton.classList.remove('active');
+			this.#putButton.classList.add('disabled');
+			this.#bangButton.classList.remove('active');
+			this.#bangButton.classList.add('disabled');
+			this.drawResultScreen(e.result);
 		});
 
 		this.#gameManager.addEventListener('game_restart', () => {
 			console.log('GAME RESTART');
-			this.hide(this.#result_screen_dom);
-			this.hide(this.#ingame_ui_container);
-			this.show(this.#title_screen_dom);
+			this.hide(this.#resultScreenDOM);
+			this.hide(this.#ingameUIContainer);
+			this.show(this.#titleScreenDOM);
 
-			this.#dom_event_controller.abort();
+			this.#DOMEventController.abort();
 		});
 	}
 
 	addDOMEventListeners() {
-		const caution_screen = document.querySelector('.caution');
-		const on_orientation_change = () => {
+		const cautionScreen = document.querySelector('.caution');
+		const onOrientationChange = () => {
 			let width = window.innerWidth;
 			let height = window.innerHeight;
 			if (width < height) [width, height] = [height, width];
@@ -118,75 +113,75 @@ export default class DOMManager {
 
 		window.addEventListener('DOMContentLoaded', () => {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
-				this.show(caution_screen, true);
+				this.show(cautionScreen, true);
 			}
-		}, { signal: this.#dom_event_controller.signal });
+		}, { signal: this.#DOMEventController.signal });
 
 		screen.orientation.addEventListener('change', async () => {
 			if (screen.orientation.type.indexOf('landscape') == -1) {
-				caution_screen.classList.remove('fadeOut');
-				this.show(caution_screen, true);
+				cautionScreen.classList.remove('fadeOut');
+				this.show(cautionScreen, true);
 			} else {
 				await sleep(650);
-				on_orientation_change();
-				caution_screen.classList.add('fadeOut');
+				onOrientationChange();
+				cautionScreen.classList.add('fadeOut');
 				await sleep(1000);
-				this.hide(caution_screen);
+				this.hide(cautionScreen);
 			}
-		}, { signal: this.#dom_event_controller.signal });
+		}, { signal: this.#DOMEventController.signal });
 
 		// def Game Events
-		document.getElementById('start_button').addEventListener('click', () => {
+		this.#startButton.addEventListener('click', () => {
 			// Setting DOMs
 			console.log("* send: game_start");console.log("");
 			this.orderUpdate();
 
-			this.hide(this.#title_screen_dom);
-			this.show(this.#ingame_ui_container);
+			this.hide(this.#titleScreenDOM);
+			this.show(this.#ingameUIContainer);
 
 			this.#gameManager.dispatchEvent(new Event.GameStartEvent());
-		}, { signal: this.#dom_event_controller.signal });
+		}, { signal: this.#DOMEventController.signal });
 
 
 		/*
 		 * GameSection
 		 */
 
-		this.#put_button.addEventListener('click', () => {
+		this.#putButton.addEventListener('click', () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
-			this.#bang_button.classList.remove('active');
-			this.#put_button.classList.toggle('active');
-			this.#gameManager.currentSection.toggle_mode(GameSection.MODE_PUT);
-		}, { signal: this.#dom_event_controller.signal });
+			this.#bangButton.classList.remove('active');
+			this.#putButton.classList.toggle('active');
+			this.#gameManager.currentSection.toggleMode(GameSection.MODE_PUT);
+		}, { signal: this.#DOMEventController.signal });
 
-		this.#pass_button.addEventListener('click', () => {
+		this.#passButton.addEventListener('click', () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order || this.#gameManager.checkTable(this.#gameManager.player.order)) return;
 			this.#gameManager.dispatchEvent(new Event.PutPassEvent(this.#gameManager.player.order));
-			document.getElementById('pass_button').classList.add('disabled');
-		}, { signal: this.#dom_event_controller.signal });
+			this.#passButton.classList.add('disabled');
+		}, { signal: this.#DOMEventController.signal });
 
-		this.#bang_button.addEventListener('click', () => {
+		this.#bangButton.addEventListener('click', () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
-			this.#put_button.classList.remove('active');
-			this.#bang_button.classList.toggle('active');
-			this.#gameManager.currentSection.toggle_mode(GameSection.MODE_BANG);
+			this.#putButton.classList.remove('active');
+			this.#bangButton.classList.toggle('active');
+			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
-		}, { signal: this.#dom_event_controller.signal });
+		}, { signal: this.#DOMEventController.signal });
 
 		/*
 		 * ResultSection
 		 */
-		this.#restart_button.addEventListener('click', (e) => {
+		this.#restartButton.addEventListener('click', (e) => {
 			this.#gameManager.dispatchEvent(new Event.GameRestartEvent());
-		}, { signal: this.#dom_event_controller.signal });
+		}, { signal: this.#DOMEventController.signal });
 	}
 
-	draw_result_screen(result) {
-		let dom_result_winner = document.getElementById('winner');
-		let dom_result_score = document.getElementById('score');
-		let dom_result_black = document.getElementById('order_black');
-		let dom_result_white = document.getElementById('order_white');
-		let dom_result_time = document.getElementById('time');
+	drawResultScreen(result) {
+		let resultWinner = document.getElementById('winner');
+		let resultScore = document.getElementById('score');
+		let resultBlack = document.getElementById('order_black');
+		let resultWhite = document.getElementById('order_white');
+		let resultTime = document.getElementById('time');
 
 		let dt = this.#gameManager.endTime.getTime() - this.#gameManager.startTime.getTime();
 		let dh = dt / (1000*60*60);
@@ -195,8 +190,8 @@ export default class DOMManager {
 
 		let result_str = '';
 
-		this.hide(this.#ingame_ui_container);
-		this.show(this.#result_screen_dom);
+		this.hide(this.#ingameUIContainer);
+		this.show(this.#resultScreenDOM);
 
 		if (result.result == 'draw') {
 			result_str = '引き分け!';
@@ -204,15 +199,15 @@ export default class DOMManager {
 			result_str = `${result.result}の勝ち!`;
 		}
 
-		dom_result_winner.innerText = result_str;
-		dom_result_score.innerText = this.#gameManager.player.point;
-		dom_result_white.innerText = `${this.getPlayerName()} : ${result.white}`;
-		dom_result_black.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
-		dom_result_time.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
+		resultWinner.innerText = result_str;
+		resultScore.innerText = this.#gameManager.player.point;
+		resultWhite.innerText = `${this.getPlayerName()} : ${result.white}`;
+		resultBlack.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
+		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
 
-	show(dom, is_flex = false) {
-		if (is_flex) {
+	show(dom, isFlex = false) {
+		if (isFlex) {
 			dom.style.display = "flex";
 		} else {
 			dom.style.display = "block";
@@ -237,8 +232,8 @@ export default class DOMManager {
 	}
 
 	angerUpdate() {
-		let anger_value = this.#gameManager.player.anger;
-		this.#player_anger_dom.style.height = `${anger_value}%`;
+		let angerValue = this.#gameManager.player.anger;
+		this.#playerAngerDOM.style.height = `${angerValue}%`;
 	}
 
 	hide(dom) {
@@ -246,8 +241,8 @@ export default class DOMManager {
 	}
 
 	modeReset() {
-		this.#put_button.classList.remove('active');
-		this.#bang_button.classList.remove('active');
+		this.#putButton.classList.remove('active');
+		this.#bangButton.classList.remove('active');
 		this.#gameManager.currentSection.mode = GameSection.MODE_NONE;
 	}
 }

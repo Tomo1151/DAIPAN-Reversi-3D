@@ -32,7 +32,7 @@ export class Disk {
 }
 
 export class Board {
-	#shock_threshold = 200;
+	#shockThreshold = 200;
 	#width;
 	#height;
 	#table = new Array();
@@ -54,7 +54,7 @@ export class Board {
 	get table() {return this.#table}
 	get width() {return this.#width}
 	get height() {return this.#height}
-	get shock_threshold() {return this.#shock_threshold}
+	get shockThreshold() {return this.#shockThreshold;}
 
 	init() {
 		this.getDisk(3, 3).put(Disk.WHITE);
@@ -78,9 +78,9 @@ export class Board {
 			for (let j = 0; j < 8; j++) {
 				// str += `(${j}, ${i})`;
 				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
-				if (dist < this.#shock_threshold) {
-					// console.log(`prob: ${1-(dist/this.#shock_threshold)}`)
-					if (Math.random() < 1-(dist/this.#shock_threshold/2)) {
+				if (dist < this.#shockThreshold) {
+					// console.log(`prob: ${1-(dist/this.#shockThreshold)}`)
+					if (Math.random() < 1-(dist/this.#shockThreshold/2)) {
 						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});
@@ -193,8 +193,8 @@ export class Board {
 			// console.log();
 			let row = '';
 			for (let j = 0; j < this.#width; j++) {
-				let disk_state = this.#table[this.#width * i + j].state;
-				switch (disk_state) {
+				let diskState = this.#table[this.#width * i + j].state;
+				switch (diskState) {
 					case Disk.WHITE:
 						row += '〇　';
 						break;

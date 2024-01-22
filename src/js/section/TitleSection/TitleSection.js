@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Section from "../Section.js";
-import { sleep, model_load } from "../../Utils.js";
+import { sleep } from "../../Utils.js";
 
 export default class TitleSection extends Section {
 	#rot = 0;
@@ -20,25 +20,25 @@ export default class TitleSection extends Section {
 	}
 
 	init() {
-		const ambient_light = new THREE.AmbientLight(0xffffff, 1.75);
-		const directional_light0 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light1 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light2 = new THREE.DirectionalLight(0xffffff, 1);
-		const directional_light3 = new THREE.DirectionalLight(0xffffff, 1);
-		const lights = [directional_light0, directional_light1, directional_light2, directional_light3];
-		directional_light0.position.set(25, 25, -25);
-		directional_light1.position.set(-25, 25, -25);
-		directional_light2.position.set(-25, 25, 25);
-		directional_light3.position.set(-25, 25, -25);
+		const ambientLight = new THREE.AmbientLight(0xffffff, 1.75);
+		const directionalLight0 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+		const directionalLight3 = new THREE.DirectionalLight(0xffffff, 1);
+		const lights = [directionalLight0, directionalLight1, directionalLight2, directionalLight3];
+		directionalLight0.position.set(25, 25, -25);
+		directionalLight1.position.set(-25, 25, -25);
+		directionalLight2.position.set(-25, 25, 25);
+		directionalLight3.position.set(-25, 25, -25);
 		for (let light of lights) {
 			light.intensity = 0.75;
 			this.scene.add(light);
 		}
 
-		const board_model = this.gameManager.objects.board.scene.clone();
-		board_model.scale.set(5.05, 5.05, 5.05);
-		board_model.position.set(0, 0.5, 0);
-		this.scene.add(board_model);
+		const boardModel = this.gameManager.objects.board.scene.clone();
+		boardModel.scale.set(5.05, 5.05, 5.05);
+		boardModel.position.set(0, 0.5, 0);
+		this.scene.add(boardModel);
 	}
 
 	get rot() {return this.#rot;}

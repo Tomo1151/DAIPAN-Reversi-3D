@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { model_load } from "../../Utils.js";
 import { Disk, Board } from "../../Object.js";
 import Section from "../Section.js";
 import * as Event from "../../Event.js";
