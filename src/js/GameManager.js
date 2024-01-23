@@ -57,7 +57,9 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	modelLoad() {
-		let loadingQueue = {"board": false, "disk": false}
+		let loadingQueue = {"board": false, "disk": false};
+		const disk_progress = document.getElementById('disk_progress');
+		const board_progress = document.getElementById('board_progress');
 		const loader = new GLTFLoader();
 
 		return new Promise((res) => {
@@ -69,6 +71,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			}, (xhr) => {
 				// console.log(xhr)
 				console.log(`[Model loading: Board] ${xhr.loaded / xhr.total * 100}% loaded` );
+				board_progress.value = (xhr.loaded / xhr.total * 100);
 			});
 
 			loader.load('https://reversi.syntck.com/model_data/Disk.gltf', (obj) => {
@@ -79,6 +82,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			}, (xhr) => {
 				// console.log(xhr)
 				console.log(`[Model loading: Disk] ${xhr.loaded / xhr.total * 100}% loaded` );
+				disk_progress.value = (xhr.loaded / xhr.total * 100);
 			});
 		});
 	}
