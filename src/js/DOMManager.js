@@ -96,8 +96,10 @@ export default class DOMManager {
 		});
 	}
 
+
+
 	addDOMEventListeners() {
-		const cautionScreen = document.querySelector('.caution');
+		const cautionScreen = document.getElementById('caution_screen');
 		const onOrientationChange = () => {
 			let width = window.innerWidth;
 			let height = window.innerHeight;
@@ -111,21 +113,11 @@ export default class DOMManager {
 			this.#rendererManager.camera.updateProjectionMatrix();
 		}
 
-		window.addEventListener('DOMContentLoaded', () => {
-			if (screen.orientation.type.indexOf('landscape') == -1) {
-				this.show(cautionScreen, true);
-			}
-		}, { signal: this.#DOMEventController.signal });
-
-		screen.orientation.addEventListener('change', async () => {
-			if (screen.orientation.type.indexOf('landscape') == -1) {
-				cautionScreen.classList.remove('fadeOut');
+		screen.orientation.addEventListener('change', () => {
+			if (!screen.orientation.type.includes('landscape')) {
 				this.show(cautionScreen, true);
 			} else {
-				await sleep(650);
 				onOrientationChange();
-				cautionScreen.classList.add('fadeOut');
-				await sleep(1000);
 				this.hide(cautionScreen);
 			}
 		}, { signal: this.#DOMEventController.signal });

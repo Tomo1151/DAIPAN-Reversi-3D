@@ -84,7 +84,9 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	disableLoadingScreen() {
-		const loadingScreen = document.getElementById('loading');
+		const cautionScreen = document.getElementById('caution_screen');
+		if (screen.orientation.type.includes('landscape')) cautionScreen.style.display = 'none';
+		const loadingScreen = document.getElementById('loading_screen');
 		loadingScreen.style.display = 'none';
 	}
 

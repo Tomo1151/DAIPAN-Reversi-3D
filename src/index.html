@@ -324,7 +324,7 @@
 		}
 
 		.caution {
-			display: none;
+			display: flex;
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -377,7 +377,7 @@
 			transition-duration: 0.25s;
 		}
 
-		#loading {
+		#loading_screen {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
@@ -410,14 +410,14 @@
 	</head>
 
 	<body>
-		<div class="caution">
+		<div class="caution" id="caution_screen">
 			<p>スマホを横向きにしてください</p>
 			<div class="phone_image">
 				<img src="img/phone_rotation.png" alt="">
 			</div>
 		</div>
 
-		<div id="loading">
+		<div id="loading_screen">
 			<p>ロード中</p>
 			<div class="loading-image">
 				<img src="img/loading.gif">
