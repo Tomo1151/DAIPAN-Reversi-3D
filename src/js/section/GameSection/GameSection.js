@@ -40,7 +40,8 @@ export default class GameSection extends Section {
 		for (let i = 0; i < 8*8; i++) this.#currentTable[i] = Disk.EMPTY;
 
 		console.log("-- GAME SECTION --");
-		window.addEventListener('mousemove', (e) => {
+		const move = (e) => {
+			if (e.type == "touchmove") e = e.touches[0];
 			if (this.gameManager.player.order != this.gameManager.currentTurn || !this.#isSelectable) return;
 			this.rendererManager.setCursorPoint(e);
 			this.rendererManager.raycaster.setFromCamera(this.rendererManager.mouse, this.rendererManager.camera);
@@ -80,7 +81,12 @@ export default class GameSection extends Section {
 				default:
 					break;
 			}
-		}, {signal: mousemoveController.signal});
+		}
+
+		const press =
+
+		window.addEventListener('mousemove', move, {signal: mousemoveController.signal});
+		window.addEventListener('touchmove', move, {signal: mousemoveController.signal});
 
 		this.canvas.addEventListener('mousedown', () => {
 			switch(this.#mode) {
@@ -179,7 +185,7 @@ export default class GameSection extends Section {
 			this.scene.add(light);
 		}
 
-		this.scene.add(new THREE.AxesHelper(500));
+		// this.scene.add(new THREE.AxesHelper(500));
 		const cylinder = new THREE.Mesh(
 			new THREE.CylinderGeometry(10, 10, 1, 30),
 			new THREE.MeshPhongMaterial({color: 0xff0000, opacity: 0.5, transparent: true})
