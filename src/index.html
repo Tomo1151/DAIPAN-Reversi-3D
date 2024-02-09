@@ -410,9 +410,32 @@
 			margin: 0 auto;
 		}
 
-		@media (max-width: 768px) {
+		#log {
+			display: none;
+			font-family: monospace;
+			position: absolute;
+			bottom: 2rem;
+			left: 0;
+			border-radius: 5px;
+			height: 72.5%;
+			width: 35%;
+			padding: 1rem;
+
+			background: #bbb;
+
+			opacity: .5;
+			pointer-events: none;
+			overflow: hidden;
+			z-index: 100000;
+		}
+
+		@media (max-width: 1024px) {
 			html {
 				font-size: 10px;
+			}
+
+			#log {
+				font-size: 6px;
 			}
 		}
 		</style>
@@ -433,6 +456,10 @@
 			</div>
 			<progress value="0" max="100" id="disk_progress"></progress>
 			<progress value="0" max="100" id="board_progress"></progress>
+		</div>
+
+		<div id="log">
+			<h2>─ Log message ─</h2>
 		</div>
 
 		<div id="ingame_ui">

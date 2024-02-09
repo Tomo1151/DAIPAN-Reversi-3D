@@ -29,7 +29,7 @@ export default class RendererManager {
 		this.#renderer.setSize(window.innerWidth, window.innerHeight);
 
 		// def camera
-		this.#camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 10000);
+		this.#camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 		this.#camera.position.set(50, 50, 50);
 
 		// def controls

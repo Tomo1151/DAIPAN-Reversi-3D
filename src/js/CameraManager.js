@@ -21,7 +21,8 @@ export default class CameraManager {
 	}
 
 	moveTo(x, y, z, lookAt, controlable, callback, step) {
-		console.log(` |~ camera: move to (${x}, ${y}, ${z})`);
+		this.#gameManager.logger.log(` |~ camera: move to (${x.toPrecision(3)}, ${y.toPrecision(3)}, ${z.toPrecision(3)})`);
+		// console.log(` |~ camera: move to (${x}, ${y}, ${z})`);
 		this.#originalPosition = JSON.parse(JSON.stringify(this.#camera.position));
 		this.#target = {x, y, z, lookAt, controlable, callback, step};
 		this.#hasMoveCompleted = false;
@@ -45,7 +46,8 @@ export default class CameraManager {
 			this.#camera.position.set(this.#target.x, this.#target.y, this.#target.z);
 			this.#hasMoveCompleted = true;
 			if (this.#target.callback) this.#target.callback();
-			console.log(` |~ camera: moved to (${this.#target.x}, ${this.#target.y}, ${this.#target.z})`);
+			this.#gameManager.logger.log(` |~ camera: moved to (${this.#target.x.toPrecision(3)}, ${this.#target.y.toPrecision(3)}, ${this.#target.z.toPrecision(3)})`);
+			// console.log(` |~ camera: moved to (${this.#target.x.toPrecision(3)}, ${this.#target.y.toPrecision(3)}, ${this.#target.z.toPrecision(3)})`);
 			this.#target = undefined;
 		}
 	}

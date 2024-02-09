@@ -14,6 +14,7 @@ import Player from "./Player.js";
 import Enemy from "./Enemy.js";
 import * as Event from "./Event.js";
 import { Disk, Board } from "./Object.js";
+import Logger from "./Logger.js";
 import { sleep } from "./Utils.js";
 
 export default class GameManager extends THREE.EventDispatcher {
@@ -35,6 +36,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	#sectionManager;
 	#domManager;
 	#cameraManager;
+	#logger;
 
 	#board;
 	#player;
@@ -107,6 +109,9 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	init() {
+		const url = new URL(window.location.href);
+		const params = url.searchParams;
+
 		this.#frame = 0;
 		this.#scene = new THREE.Scene();
 
@@ -115,6 +120,9 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.#cameraManager = new CameraManager(this, this.#rendererManager, this.#scene);
 		this.#currentSection = new TitleSection(this, this.#rendererManager, this.#cameraManager, this.#scene);
 		this.#domManager = new DOMManager(this, this.#rendererManager, this.#cameraManager);
+		this.#logger = new Logger(document.getElementById('log'));
+		if (params.get('logged') === 'true') this.#logger.on();
+		this.#logger.enabled = true;
 		this.#domManager.addDOMEventListeners();
 		this.#sectionManager.changeSection(this.#currentSection);
 		this.GAME_STATE = GameManager.BEFORE_START;
@@ -130,7 +138,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#currentSection = new GameSection(this, this.#rendererManager, this.#cameraManager, this.#scene);
 			this.#sectionManager.changeSection(this.#currentSection);
 
-			console.log("[Event]: game_start");
+			this.#logger.log("[Event]: game_start");
+			// console.log("[Event]: game_start");
 
 			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
@@ -140,7 +149,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('turn_notice', () => {
-			console.log(`@gm > waiting ${this.#currentTurn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
+			this.#logger.log(`@gm > waiting ${this.#currentTurn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`);
+			// console.log(`@gm > waiting ${this.#currentTurn == Disk.BLACK ? "Enemy" : `${this.#player.name}`}'s response ...`)
 		});
 
 		this.addEventListener('put_notice', (data) => {
@@ -152,35 +162,42 @@ export default class GameManager extends THREE.EventDispatcher {
 
 			if (order !== this.#currentTurn) return;
 
-			console.log("gameManager received: put_notice");
+			this.#logger.log("gameManager received: put_notice");
+			// console.log("gameManager received: put_notice");
 
 			if (this.checkCanPut(x, y)) {
 				this.put(x, y);
-				console.log("gameManager send: put_success");
+				this.#logger.log("gameManager send: put_success");
+				// console.log("gameManager send: put_success");s
 				this.dispatchEvent(new Event.PutSuccessEvent(this.#currentTurn));
 			} else {
-				console.log("gameManager send: put_fail");
+				this.#logger.log("gameManager send: put_fail");
+				// console.log("gameManager send: put_fail");
 				this.dispatchEvent(new Event.PutFailEvent(this.#currentTurn));
 			}
 		});
 
 		this.addEventListener('bang_notice', (data) => {
-			console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
+			this.#logger.log(`[BANG] x: ${data.x}, y: ${data.y}`);
+			// console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
 			let pos = this.board.raffle(data.order, data.x, data.y, data.anger);
 			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#currentTurn, "pos": pos}));
 			this.#domManager.modeReset();
 		});
 
 		this.addEventListener('bang_succes', (e) => {
-			console.log("gameManager received: bang_success");
+			this.#logger.log("gameManager received: bang_success");
+			// console.log("gameManager received: bang_success");
 		});
 
 		this.addEventListener('confirmed', (e) => {
-			console.log("gameManager received: confirmed");
+			this.#logger.log("gameManager received: confirmed");
+			// console.log("gameManager received: confirmed");
 		});
 
 		this.addEventListener('updated', async () => {
-			console.log("gameManager received: updated")
+			this.#logger.log("gameManager received: updated");
+			// console.log("gameManager received: updated")
 			if (this.GAME_STATE == GameManager.BEFORE_START) {
 				this.GAME_STATE = GameManager.IN_GAME;
 				// await sleep(1000);
@@ -194,12 +211,14 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('put_pass', (e) => {
 			if (e.order !== this.#currentTurn) return;
 
-			console.log("gameManager received: put_pass");
+			this.#logger.log("gameManager received: put_pass");
+			// console.log("gameManager received: put_pass");
 			this.dispatchEvent(new Event.TurnChangeEvent());
 		});
 
 		this.addEventListener('turn_change', () => {
-			console.log("gameManager received: turn_change");console.log("");
+			this.#logger.log("gameManager received: turn_change");
+			// console.log("gameManager received: turn_change");console.log("");
 			this.player.retching(10);
 
 			this.#currentTurn == Disk.BLACK ? this.#currentTurn = Disk.WHITE : this.#currentTurn = Disk.BLACK;
@@ -211,7 +230,8 @@ export default class GameManager extends THREE.EventDispatcher {
 				this.#result = res;
 				this.dispatchEvent(new Event.GameOverEvent(res));
 			} else {
-				console.log(`[${this.#currentTurn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
+				this.#logger.log(`[${this.#currentTurn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
+				// console.log(`[${this.#currentTurn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
 				this.dispatchEvent(new Event.TurnNoticeEvent(this.#currentTurn, this.#board, this.checkTable(this.#currentTurn)));
 			}
 		});
@@ -297,4 +317,5 @@ export default class GameManager extends THREE.EventDispatcher {
 	get board() {return this.#board;}
 	get startTime() {return this.#startTime;}
 	get endTime() {return this.#endTime;}
+	get logger() {return this.#logger;}
 }

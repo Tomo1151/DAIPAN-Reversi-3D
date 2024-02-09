@@ -13,7 +13,8 @@ export default class ResultSection extends Section {
 		this.#result = result;
 		this.#hasMoveCompleted = false;
 
-		console.log("\n-- RESULT SECTION --");
+		this.logger.log("\n-- RESULT SECTION --");
+		// console.log("\n-- RESULT SECTION --");
 
 	}
 

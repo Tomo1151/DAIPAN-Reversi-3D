@@ -39,7 +39,8 @@ export default class GameSection extends Section {
 
 		for (let i = 0; i < 8*8; i++) this.#currentTable[i] = Disk.EMPTY;
 
-		console.log("-- GAME SECTION --");
+		this.logger.log("-- GAME SECTION --");
+		// console.log("-- GAME SECTION --");
 		const move = (e) => {
 			if (e.type == "touchmove") e = e.touches[0];
 			if (this.gameManager.player.order != this.gameManager.currentTurn || !this.#isSelectable) return;
@@ -152,10 +153,12 @@ export default class GameSection extends Section {
 
 		// Listener delete
 		this.gameManager.addEventListener('game_over', () => {
-				console.log("delete click callback");
-				clickController.abort();
-				console.log("delete mousemove callback");
-				mousemoveController.abort();
+			this.logger.log("delete click callback");
+			// console.log("delete click callback");
+			clickController.abort();
+			this.logger.log("delete mousemove callback");
+			// console.log("delete mousemove callback");
+			mousemoveController.abort();
 		});
 
 	}
@@ -220,10 +223,12 @@ export default class GameSection extends Section {
 		action.setLoop(THREE.LoopOnce);
 		action.clampWhenFinished = true;
 
-		console.log(` |... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
+		this.logger.log(` |... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
+		// console.log(` |... animation start [flip :to${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
 		await sleep(duration*1000);
-		console.log(" |... animation end");
+		this.logger.log(" |... animation end");
+		// console.log(" |... animation end");
 		action.stop();
 
 		disk.scene.rotation.z += Math.PI;
@@ -242,10 +247,12 @@ export default class GameSection extends Section {
 		action.setLoop(THREE.LoopOnce);
 		action.clampWhenFinished = true;
 
-		console.log(` |... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
+		this.logger.log(` |... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
+		// console.log(` |... animation start [put :${order == Disk.BLACK? "B": "W"}]`);
 		action.reset().play();
 		await sleep(duration*200);
-		console.log(" |... animation end");
+		this.logger.log(" |... animation end");
+		// console.log(" |... animation end");
 		action.stop();
 	}
 
@@ -336,7 +343,8 @@ export default class GameSection extends Section {
 		} else {
 			this.mode = mode;
 		}
-		console.log(`MODE UPDATE: ${this.mode}`)
+		this.logger.log(`MODE UPDATE: ${this.mode}`);
+		// console.log(`MODE UPDATE: ${this.mode}`)
 	}
 
 	get mode() {return this.#mode;}

@@ -5,6 +5,7 @@ import { Disk } from "./Object.js"
 export default class Player {
 	static PATIENCE = 80;
 	#gameManager;
+	#logger;
 	#order;
 	#name = 'player';
 	#point = 0;
@@ -12,27 +13,33 @@ export default class Player {
 
 	constructor (gameManager, order) {
 		this.#gameManager = gameManager;
+		this.#logger = this.#gameManager.logger;
 		this.#order = order;
 
 		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.order) return;
-			console.log(this.name + " received: turn_notice");
+			this.#logger.log(this.name + " received: turn_notice");
+			// console.log(this.name + " received: turn_notice");
 		});
 
 		this.#gameManager.addEventListener('put_success', (e) => {
 			if (e.order != this.order) return;
-			console.log(this.name + " received: put_success");
+			this.#logger.log(this.name + " received: put_success");
+			// console.log(this.name + " received: put_success");
 
-			console.log(`${this.name} send: confirmed`);
+			this.#logger.log(`${this.name} send: confirmed`);
+			// console.log(`${this.name} send: confirmed`);
 			if (e.order != this.order) return;
 			this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
 		});
 
 		this.#gameManager.addEventListener('bang_success', (e) => {
 			if (e.order != this.order) return;
-			console.log(this.name + " received: bang_success");
+			this.#logger.log(this.name + " received: bang_success");
+			// console.log(this.name + " received: bang_success");
 
-			console.log(`${this.name} send: confirmed`);
+			this.#logger.log(`${this.name} send: confirmed`);
+			// console.log(`${this.name} send: confirmed`);
 			if (e.order != this.order) return;
 			this.calmdown();
 			this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
@@ -40,12 +47,14 @@ export default class Player {
 
 		this.#gameManager.addEventListener('put_fail', (e) => {
 			if (e.order != this.order) return;
-			console.log(this.name + " received: put_fail");
+			this.#logger.log(this.name + " received: put_fail");
+			// console.log(this.name + " received: put_fail");
 		});
 
 		this.#gameManager.addEventListener('game_over', (e) => {
-			console.log(`${this.name} received: game_over`)
-			console.log(e);
+			this.#logger.log(`${this.name} received: game_over`);
+			// console.log(`${this.name} received: game_over`)
+			// console.log(e);
 		});
 	}
 
@@ -73,4 +82,5 @@ export default class Player {
 	set point(point) {this.#point = point;}
 	get anger() {return this.#anger;}
 	set anger(anger) {this.#anger = anger;}
+	get logger() {return this.#logger;}
 }
