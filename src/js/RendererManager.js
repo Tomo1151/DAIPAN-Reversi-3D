@@ -38,6 +38,7 @@ export default class RendererManager {
 		this.#controls.minDistance = 30;
 		this.#controls.maxZoom = 2;
 		this.#controls.minZoom = 1.25;
+		this.#controls.maxPolarAngle = Math.PI/2;
 		// this.#controls.enableDamping = true;
 		// this.#controls.dampingFactor = 0.2;
 
