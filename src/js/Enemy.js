@@ -39,7 +39,8 @@ export default class Enemy extends Player {
 			}
 
 			// await sleep(1000);
-			console.log(`enemy send: ${event.type}`);
+			this.logger.log(`enemy send: ${event.type}`);
+			// console.log(`enemy send: ${event.type}`);
 			this.gameManager.dispatchEvent(event);
 		});
 	}
@@ -153,7 +154,8 @@ export default class Enemy extends Player {
 			let putTable = this.#putDisk(table, order, pos.x, pos.y);
 			if (this.#jamCheck(putTable, this.#getOpponent(this.order))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -this.#negaMax(putTable, this.#getOpponent(order), depth-1, -beta, -alpha, false);
-			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			this.logger.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			// console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 			if (alpha == score) {
 				if (Math.random() > 0.5) {
 					alpha = score;
@@ -164,7 +166,8 @@ export default class Enemy extends Player {
 				evalPos = pos;
 			}
 		}
-		console.log(`\t > max: ${JSON.stringify(evalPos)}`);
+		this.logger.log(`\t > max: ${JSON.stringify(evalPos)}`);
+		// console.log(`\t > max: ${JSON.stringify(evalPos)}`);
 		return Object.assign({order}, evalPos);
 	}
 

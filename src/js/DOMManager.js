@@ -10,7 +10,6 @@ export default class DOMManager {
 	#gameManager;
 	#rendererManager;
 	#cameraManager;
-
 	#titleScreenDOM;
 	#startButton;
 
@@ -87,7 +86,8 @@ export default class DOMManager {
 		});
 
 		this.#gameManager.addEventListener('game_restart', () => {
-			console.log('GAME RESTART');
+			this.#gameManager.logger.log('GAME RESTART');
+			// console.log('GAME RESTART');
 			this.hide(this.#resultScreenDOM);
 			this.hide(this.#ingameUIContainer);
 			this.show(this.#titleScreenDOM);
@@ -125,7 +125,8 @@ export default class DOMManager {
 		// def Game Events
 		this.#startButton.addEventListener('click', () => {
 			// Setting DOMs
-			console.log("* send: game_start");console.log("");
+			this.#gameManager.logger.log("* send: game_start");
+			// console.log("* send: game_start");console.log("");
 			this.orderUpdate();
 
 			this.hide(this.#titleScreenDOM);
