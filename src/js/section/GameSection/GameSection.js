@@ -144,6 +144,7 @@ export default class GameSection extends Section {
 
 		this.gameManager.addEventListener('confirmed', async () => {
 			if (this.#playerAct == 'bang') {
+				await sleep(500);
 				await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
 			} else {
 				await this.diskMeshUpdate(this.gameManager.board.table);
@@ -300,6 +301,7 @@ export default class GameSection extends Section {
 
 	async diskMeshFlip(table, put_pos) {
 		let duration = this.#diskModels[0].animations[2].duration;
+		this.cameraManager.shake(duration);
 		for (let pos of put_pos) {
 			let num = pos.y*8+pos.x;
 			let order = table[num].state == Disk.WHITE ? Disk.WHITE : Disk.BLACK;
