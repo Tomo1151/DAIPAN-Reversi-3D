@@ -8,4 +8,10 @@ function isEmpty(object) {
 	return Object.keys(object).length === 0
 }
 
-export { sleep, isEmpty };
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min) + min);
+}
+
+export { sleep, isEmpty, getRandomInt};
