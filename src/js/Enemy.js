@@ -16,12 +16,17 @@ export default class Enemy extends Player {
 		[120, -20, 20,  5,  5, 20, -20, 120]
 	];
 
+	#worker = new Worker('./js/Search.js');
 	#count;
 
 	constructor (gameManager, order) {
 		super(gameManager, order);
 		this.name = 'COM';
 		this.#count = 0;
+		this.#worker.addEventListener('message', (e) => {
+			console.log(e);
+		});
+
 		this.gameManager.addEventListener('turn_notice', async (e) => {
 			if (e.order != this.order) return;
 			let board = e.board;
@@ -30,9 +35,10 @@ export default class Enemy extends Player {
 			if (e.canPut) {
 				// const data = this.searchFirst(board);
 				const data = this.#searchNegaAlpha(this.#getTableFromBoard(board), this.order, 5);
-				// let depth = (this.#count > 25) ? (32 - this.#count)*2 : 5;
-				// const data = this.searchNegaAlpha(this.getTableFromBoard(board), this.order, depth);
-				// console.log(`count: ${this.#count} | search depth: ${depth}`);
+
+				// 現在の盤面の状況を送り，最適なポジションを返す
+				this.#worker.postMessage(data);
+
 				event = new Event.PutNoticeEvent(data);
 			} else {
 				event = new Event.PutPassEvent(this.order);
