@@ -108,7 +108,6 @@ export default class GameSection extends Section {
 					if (this.#onBase) {
 						this.#selectArea.visible = false;
 						this.gameManager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
-						this.cameraManager.restore();
 					}
 
 					break;
@@ -144,6 +143,7 @@ export default class GameSection extends Section {
 
 		this.gameManager.addEventListener('confirmed', async () => {
 			if (this.#playerAct == 'bang') {
+				this.cameraManager.restore();
 				await sleep(500);
 				await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
 			} else {
@@ -231,6 +231,7 @@ export default class GameSection extends Section {
 		this.logger.log(" |... animation end");
 		// console.log(" |... animation end");
 		action.stop();
+		this.gameManager.audio.flip.cloneNode().play();
 
 		disk.scene.rotation.z += Math.PI;
 		disk.scene.rotation.z %= 2 * Math.PI;
@@ -253,6 +254,7 @@ export default class GameSection extends Section {
 		action.reset().play();
 		await sleep(duration*200);
 		this.logger.log(" |... animation end");
+		this.gameManager.audio.put.cloneNode().play();
 		// console.log(" |... animation end");
 		action.stop();
 	}
@@ -301,9 +303,12 @@ export default class GameSection extends Section {
 
 	async diskMeshFlip(table, put_pos) {
 		let duration = this.#diskModels[0].animations[2].duration;
+		this.gameManager.audio.bang.play();
+		await sleep(100);
 		this.cameraManager.shake(duration);
 		for (let pos of put_pos) {
 			let num = pos.y*8+pos.x;
+			if (table[num].state == Disk.EMPTY) continue;
 			let order = table[num].state == Disk.WHITE ? Disk.WHITE : Disk.BLACK;
 			this.#currentTable[num] = table[num].state;
 			this.animationFlip(num, order);
