@@ -48,7 +48,13 @@ export default class GameManager extends THREE.EventDispatcher {
 	#objectPool = {
 		"board": undefined,
 		"disk": undefined
-	}
+	};
+
+	#audio = {
+		"put": new Audio('./audio/put.mp3'),
+		"flip": new Audio('./audio/flip.mp3'),
+		"bang": new Audio('./audio/daipan.wav')
+	};
 
 	constructor() {
 		super();
@@ -200,10 +206,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			// console.log("gameManager received: updated")
 			if (this.GAME_STATE == GameManager.BEFORE_START) {
 				this.GAME_STATE = GameManager.IN_GAME;
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 			} else if (this.GAME_STATE == GameManager.IN_GAME) {
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnChangeEvent());
 			}
 		});
@@ -310,6 +316,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	get objects() {return this.#objectPool;}
+	get audio() {return this.#audio;}
 	get player() {return this.#player;}
 	get enemy() {return this.#enemy;}
 	get currentTurn() {return this.#currentTurn;}
