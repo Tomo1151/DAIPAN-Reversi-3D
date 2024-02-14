@@ -18,7 +18,7 @@ import { Disk } from "./Object.js";
 		// console.log(e.data);
 		const board = e.data;
 		const res = searchNegaAlpha(getTableFromBoard(board), COM_ORDER, 7);
-		console.log(res);
+		// console.log(res);
 		self.postMessage(res);
 	});
 

@@ -14,7 +14,6 @@ export default class Enemy extends Player {
 		this.#count = 0;
 
 		this.#worker.addEventListener('message', (e) => {
-			console.log(e.data);
 			this.logger.log(`enemy send: put_notice`);
 			this.gameManager.dispatchEvent(new Event.PutNoticeEvent(e.data));
 		});

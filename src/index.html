@@ -27,6 +27,11 @@
 		<script defer type="module" src="js/Main.js"></script>
 		<style type="text/css">
 		@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Sans+Mono:wght@400;600&display=swap');
+		@font-face {
+			font-family: "MPlus1";
+			src:
+				url("fonts/MPLUS1-VariableFont_wght.ttf") format("truetype");
+		}
 
 		:root {
 			--font-main-black: #333;
@@ -42,7 +47,7 @@
 
 		body {
 			margin: 0;
-			font-family: 'Noto Sans JP', sans-serif;
+			font-family: 'MPlus1', sans-serif;
 			font-weight: 600;
 			overflow: hidden;
 
@@ -59,7 +64,7 @@
 
 		.fadeIn {
 			animation-name: fadeInAnimation;
-			animation-duration: 1s;
+			animation-duration: .5s;
 			animation-fill-mode: forwards;
 			opacity: 0;
 		}
@@ -179,7 +184,7 @@
 			user-select: none;
 			transition-duration: 0.25s;
 			opacity: 0.85;
-			font-family: 'Noto Sans JP', sans-serif;
+/*			font-family: 'Noto Sans JP', sans-serif;*/
 
 			text-align-last: justify;
 			text-justify: inter-ideograph;
@@ -241,7 +246,7 @@
 			max-width: 50%;
 			/*			height: 470px;
 			max-height: 50%;*/
-
+/*			box-shadow: 0 0 25rem 2rem var(--font-main-black);*/
 			opacity: 0.75;
 
 			padding: 2rem;
@@ -252,7 +257,7 @@
 			position: absolute;
 			top: 50%;
 			left: 50%;
-			font-family: 'Noto Sans Mono', monospace;
+/*			font-family: 'Noto Sans Mono', monospace;*/
 			transform: translate(-50%, -50%);
 
 			background: var(--font-main-white);
@@ -429,6 +434,29 @@
 			z-index: 100000;
 		}
 
+		#cut {
+/*			background-color: rgba(255, 255, 255, .6);*/
+			color: var(--font-main-white);
+			font-weight: bolder;
+/*			box-shadow: 0 0 25rem 2.5rem #555;*/
+			-webkit-text-stroke: 4px var(--font-main-black);
+/*			text-shadow: 0 0 2rem var(--font-main-black);*/
+/*			border-top: 1rem solid black;*/
+/*			border-bottom: 1rem solid black;*/
+			font-size: 7.5rem;
+			text-align: center;
+			position: absolute;
+			top: 50%;
+			left: 0;
+/*			opacity: .75;*/
+
+			padding: 1rem 0;
+			width: 100%;
+
+			translate: 0 -50%;
+			z-index: 9999;
+		}
+
 		@media (max-width: 1024px) {
 			html {
 				font-size: 10px;
@@ -483,8 +511,12 @@
 			</div>
 		</div>
 
+		<div class="cut" id="cut" style="display: none;">
+			<p>ゲームスタート</p>
+		</div>
+
 		<div class="fadeIn" id="title_screen">
-			<h1 style="margin-bottom: 1rem;">オセロ</h1>
+			<h1 style="margin-bottom: 1rem;">台パンリバーシ<sup>3D</sup></h1>
 			<div>
 				<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
 				<p>※ Player 名はランキング <small>[未実装]</small> に使用します</p>
