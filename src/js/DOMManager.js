@@ -79,11 +79,16 @@ export default class DOMManager {
 		});
 
 		this.#gameManager.addEventListener('game_over', async (e) => {
-			await sleep(1500);
+			// await sleep(1500);
 			this.#putButton.classList.remove('active');
 			this.#putButton.classList.add('disabled');
 			this.#bangButton.classList.remove('active');
 			this.#bangButton.classList.add('disabled');
+
+			this.hide(this.#ingameUIContainer);
+			await sleep(50);
+			await this.cutin("ゲーム終了", this.#gameManager.audio.start);
+			await sleep(750);
 			this.drawResultScreen(e.result);
 		});
 
@@ -189,7 +194,6 @@ export default class DOMManager {
 
 		let result_str = '';
 
-		this.hide(this.#ingameUIContainer);
 		this.show(this.#resultScreenDOM);
 
 		if (result.result == 'draw') {
