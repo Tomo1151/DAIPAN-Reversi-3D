@@ -51,9 +51,10 @@ export default class GameManager extends THREE.EventDispatcher {
 	};
 
 	#audio = {
+		"start": new Audio('./audio/gamestart.mp3'),
 		"put": new Audio('./audio/put.mp3'),
 		"flip": new Audio('./audio/flip.mp3'),
-		"bang": new Audio('./audio/daipan.wav')
+		"bang": new Audio('./audio/daipan_audio.mp3')
 	};
 
 	constructor() {
@@ -140,6 +141,8 @@ export default class GameManager extends THREE.EventDispatcher {
 	addIngameListener() {
 		this.addEventListener('game_start', async (e) => {
 			if (this.GAME_STATE != GameManager.BEFORE_START) return;
+			// await this.#domManager.cutin("ゲームスタート", this.#audio.start);
+
 			this.#startTime = e.time;
 			this.#currentSection = new GameSection(this, this.#rendererManager, this.#cameraManager, this.#scene);
 			this.#sectionManager.changeSection(this.#currentSection);

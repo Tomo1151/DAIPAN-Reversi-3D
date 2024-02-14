@@ -14,6 +14,7 @@ export default class DOMManager {
 	#startButton;
 
 	#ingameUIContainer;
+	#cutDOM;
 	#ingameButtons;
 	#putButton;
 	#passButton;
@@ -34,6 +35,7 @@ export default class DOMManager {
 		this.#titleScreenDOM = document.getElementById('title_screen');
 		this.#startButton = document.getElementById('start_button');
 		this.#ingameUIContainer = document.getElementById('ingame_ui');
+		this.#cutDOM = document.getElementById('cut');
 		this.#ingameButtons = document.getElementById('action_button');
 		[this.#putButton, this.#passButton, this.#bangButton] = this.#ingameButtons.children;
 		this.#resultScreenDOM = document.getElementById('result_screen');
@@ -123,13 +125,16 @@ export default class DOMManager {
 		}, { signal: this.#DOMEventController.signal });
 
 		// def Game Events
-		this.#startButton.addEventListener('click', () => {
+		this.#startButton.addEventListener('click', async () => {
 			// Setting DOMs
 			this.#gameManager.logger.log("* send: game_start");
 			// console.log("* send: game_start");console.log("");
 			this.orderUpdate();
 
 			this.hide(this.#titleScreenDOM);
+
+			await this.cutin("ゲームスタート", this.#gameManager.audio.start);
+
 			this.show(this.#ingameUIContainer);
 
 			this.#gameManager.dispatchEvent(new Event.GameStartEvent());
@@ -153,12 +158,13 @@ export default class DOMManager {
 			this.#passButton.classList.add('disabled');
 		}, { signal: this.#DOMEventController.signal });
 
-		this.#bangButton.addEventListener('click', () => {
+		this.#bangButton.addEventListener('click', async () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
 			this.#putButton.classList.remove('active');
 			this.#bangButton.classList.toggle('active');
 			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
+			await this.cutin("たたけ!", this.#gameManager.audio.start);
 		}, { signal: this.#DOMEventController.signal });
 
 		/*
@@ -197,6 +203,19 @@ export default class DOMManager {
 		resultWhite.innerText = `${this.getPlayerName()} : ${result.white}`;
 		resultBlack.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
+	}
+
+	async cutin(str, sound) {
+		this.#cutDOM.children[0].innerText = str;
+		this.show(this.#cutDOM);
+		this.#cutDOM.classList.add('fadeIn');
+		await sleep(200);
+		sound.pause();
+		sound.currentTime = 0;
+		sound.play();
+		await sleep(1800);
+		this.hide(this.#cutDOM);
+		this.#cutDOM.classList.remove('fadeIn');
 	}
 
 	show(dom, isFlex = false) {
