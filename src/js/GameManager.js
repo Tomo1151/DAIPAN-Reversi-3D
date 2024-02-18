@@ -235,9 +235,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.angerUpdate();
 
 			if (this.checkGameOver()) {
-				const res = this.getResult();
-				this.#result = res;
-				this.dispatchEvent(new Event.GameOverEvent(res));
+				this.#result = this.getResult();
+				this.dispatchEvent(new Event.GameOverEvent(this.#result));
 			} else {
 				this.#logger.log(`[${this.#currentTurn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
 				// console.log(`[${this.#currentTurn == Disk.BLACK ? "Enemy's" : `${this.#player.name}'s`} turn]`);
@@ -303,19 +302,9 @@ export default class GameManager extends THREE.EventDispatcher {
 	getResult() {
 		let black =  this.#board.count(Disk.BLACK);
 		let white =  this.#board.count(Disk.WHITE);
-		let res;
-		if (black == white) {
-			res = "draw";
-		} else if (black < white) {
-			res = this.#player.name;
-		} else {
-			res = this.#enemy.name;
-		}
-		return {
-			"black": black,
-			"white": white,
-			"result": res
-		}
+		let result = (black < white) ? this.#player.name : this.#enemy.name;
+		if (black == white) result = "draw";
+		return {black, white, result};
 	}
 
 	get objects() {return this.#objectPool;}
