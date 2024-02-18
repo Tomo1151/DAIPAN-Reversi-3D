@@ -26,8 +26,8 @@ export default class TitleSection extends Section {
 		const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
 		const directionalLight3 = new THREE.DirectionalLight(0xffffff, 1);
 		const lights = [directionalLight0, directionalLight1, directionalLight2, directionalLight3];
-		directionalLight0.position.set(25, 25, -25);
-		directionalLight1.position.set(-25, 25, -25);
+		directionalLight0.position.set(25, 25, 25);
+		directionalLight1.position.set(25, 25, -25);
 		directionalLight2.position.set(-25, 25, 25);
 		directionalLight3.position.set(-25, 25, -25);
 		for (let light of lights) {
