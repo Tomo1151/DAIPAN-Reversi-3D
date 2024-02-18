@@ -33,25 +33,4 @@ export default class Enemy extends Player {
 
 	init() {
 	}
-
-	view(table) {
-		for (let i = 0; i < 8; i++) {
-			let row = '';
-			for (let j = 0; j < 8; j++) {
-				let disk_state = table[i][j];
-				switch (disk_state) {
-					case Disk.WHITE:
-						row += 'W　';
-						break;
-					case Disk.BLACK:
-						row += 'B　';
-						break;
-					default:
-						row += '.　';
-						break;
-				}
-			}
-			console.log(row);
-		}
-	}
 }
