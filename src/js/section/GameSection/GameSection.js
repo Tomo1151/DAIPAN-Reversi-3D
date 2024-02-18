@@ -79,12 +79,8 @@ export default class GameSection extends Section {
 					}
 
 					break;
-				default:
-					break;
 			}
 		}
-
-		const press =
 
 		window.addEventListener('mousemove', move, {signal: mousemoveController.signal});
 		window.addEventListener('touchmove', move, {signal: mousemoveController.signal});
@@ -110,8 +106,6 @@ export default class GameSection extends Section {
 						this.gameManager.dispatchEvent(new Event.BangNoticeEvent({"order": Disk.WHITE, "x": pos.x*10+400, "y": pos.z*10+400}));
 					}
 
-					break;
-				default:
 					break;
 			}
 		}, {signal: clickController.signal});
