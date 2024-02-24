@@ -15,11 +15,41 @@ import { Disk } from "./Object.js";
 	const COM_ORDER = Disk.BLACK
 
 	self.addEventListener('message', (e) => {
-		// console.log(e.data);
-		const board = e.data;
-		const res = searchNegaAlpha(getTableFromBoard(board), COM_ORDER, 7);
-		// console.log(res);
-		self.postMessage(res);
+		// console.log(e);
+		switch (e.data.type) {
+			case "search":
+				const board = e.data.table;
+				const res = searchNegaMax(getTableFromBoard(board), COM_ORDER, 5);
+				console.log(EVALUATION_MAP);
+				self.postMessage({type: 'search', pos: res});
+
+				break
+			case 'corner':
+				let inv = (e.data.order == COM_ORDER) ? 1 : -1;
+				switch (e.data.corner) {
+					case 'LU':
+						EVALUATION_MAP[0][1] = 20 * inv;
+						EVALUATION_MAP[1][1] = 40 * inv;
+						EVALUATION_MAP[1][0] = 20 * inv;
+						break;
+					case 'RU':
+						EVALUATION_MAP[0][6] = 20 * inv;
+						EVALUATION_MAP[1][6] = 40 * inv;
+						EVALUATION_MAP[1][7] = 20 * inv;
+						break;
+					case 'LD':
+						EVALUATION_MAP[6][0] = 20 * inv;
+						EVALUATION_MAP[6][1] = 40 * inv;
+						EVALUATION_MAP[7][1] = 20 * inv;
+						break;
+					case 'RD':
+						EVALUATION_MAP[6][7] = 20 * inv;
+						EVALUATION_MAP[6][6] = 40 * inv;
+						EVALUATION_MAP[7][6] = 20 * inv;
+						break;
+				}
+				break;
+		}
 	});
 
 	function jamCheck(table, target) {
@@ -28,6 +58,47 @@ import { Disk } from "./Object.js";
 			if (table[i].includes(target)) isJammed = false;
 		}
 		return isJammed;
+	}
+
+	function searchNegaMax(table, order, depth) {
+		let score;
+		let maxScore = Number.NEGATIVE_INFINITY;
+		let positions = getPlayablePosition(table, order);
+		let evalPos = positions[0];
+
+		for (let pos of positions) {
+			let putTable = putDisk(table, order, pos.x, pos.y);
+			if (jamCheck(putTable, getOpponent(COM_ORDER))) return {"order": order, "x": pos.x, "y": pos.y};
+			score = -negaMax(putTable, getOpponent(COM_ORDER), depth-1, false);
+			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			if (score > maxScore) {
+				maxScore = score;
+				evalPos = pos;
+			}
+		}
+		console.log(`\t > max: ${JSON.stringify(evalPos)}`);
+		return Object.assign({"order": order}, evalPos);
+	}
+
+	function negaMax(table, order, depth, isPassed) {
+		if (depth == 0) return evaluate(table, order);
+
+		let score;
+		let maxScore = Number.NEGATIVE_INFINITY;
+		let positions = getPlayablePosition(table, order);
+
+		for (let pos of positions) {
+			let putTable = putDisk(table, order, pos.x, pos.y);
+			score = -negaMax(putTable, getOpponent(order), depth-1, false);
+			maxScore = Math.max(maxScore, score);
+		}
+
+		if (maxScore == Number.NEGATIVE_INFINITY) {
+			if (isPassed) return evaluate(table, order);
+			return -negaMax(table, order, depth, true);
+		}
+
+		return maxScore;
 	}
 
 	function searchNegaAlpha(table, order, depth) {
@@ -41,7 +112,7 @@ import { Disk } from "./Object.js";
 			let putTable = putDisk(table, order, pos.x, pos.y);
 			if (jamCheck(putTable, getOpponent(COM_ORDER))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -negaAlpha(putTable, getOpponent(order), depth-1, -beta, -alpha, false);
-			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			// console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 			// console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 			if (alpha == score) {
 				if (Math.random() > 0.5) {
@@ -53,7 +124,7 @@ import { Disk } from "./Object.js";
 				evalPos = pos;
 			}
 		}
-		console.log(`\t > max: ${JSON.stringify(evalPos)}`);
+		// console.log(`\t > max: ${JSON.stringify(evalPos)}`);
 		// console.log(`\t > max: ${JSON.stringify(evalPos)}`);
 		return Object.assign({order}, evalPos);
 	}

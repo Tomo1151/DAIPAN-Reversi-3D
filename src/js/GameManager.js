@@ -42,6 +42,11 @@ export default class GameManager extends THREE.EventDispatcher {
 	#player;
 	#enemy;
 
+	#LU;
+	#LD;
+	#RU;
+	#RD;
+
 	#currentTurn;
 	#result;
 
@@ -145,13 +150,12 @@ export default class GameManager extends THREE.EventDispatcher {
 			// await this.#domManager.cutin("ゲームスタート", this.#audio.start);
 
 			this.#startTime = e.time;
+			this.#board = new Board(8, 8);
 			this.#currentSection = new GameSection(this, this.#rendererManager, this.#cameraManager, this.#scene);
 			this.#sectionManager.changeSection(this.#currentSection);
 
 			this.#logger.log("[Event]: game_start");
 			// console.log("[Event]: game_start");
-
-			this.#board = new Board(8, 8);
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 			this.#player.name = this.#domManager.getPlayerName();
@@ -175,10 +179,15 @@ export default class GameManager extends THREE.EventDispatcher {
 			// console.log("gameManager received: put_notice");
 
 			if (this.checkCanPut(x, y)) {
+				let count = this.countReversible(this.#currentTurn, x, y);
+				// this.#logger.log(`count: ${count}`);
+				// console.log(`count: ${count}`);
 				this.put(x, y);
 				this.#logger.log("gameManager send: put_success");
-				// console.log("gameManager send: put_success");s
-				this.dispatchEvent(new Event.PutSuccessEvent(this.#currentTurn));
+				// console.log("gameManager send: put_success");
+
+				this.checkCorner(order, x, y);
+				this.dispatchEvent(new Event.PutSuccessEvent(this.#currentTurn, {x, y}, count));
 			} else {
 				this.#logger.log("gameManager send: put_fail");
 				// console.log("gameManager send: put_fail");
@@ -190,6 +199,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#logger.log(`[BANG] x: ${data.x}, y: ${data.y}`);
 			// console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
 			let pos = this.board.raffle(data.order, data.x, data.y, data.anger);
+			// console.log(pos);
+			for (let p of pos) this.checkCorner(data.order, p.x, p.y);
+
 			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#currentTurn, "pos": pos}));
 			this.#domManager.modeReset();
 		});
@@ -228,7 +240,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		this.addEventListener('turn_change', () => {
 			this.#logger.log("gameManager received: turn_change");
 			// console.log("gameManager received: turn_change");console.log("");
-			this.player.retching(10);
+			// this.player.retching(10);
 
 			this.#currentTurn == Disk.BLACK ? this.#currentTurn = Disk.WHITE : this.#currentTurn = Disk.BLACK;
 			this.#domManager.orderUpdate();
@@ -248,8 +260,9 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#endTime = e.time;
-			this.#player.point += (e.result.white - e.result.black) * 10;
-			this.#player.point += (e.result.result == 'white') ? 1250 : 600;
+			this.#player.point += e.result.white * 10;
+			// this.#player.point += (e.result.white - e.result.black) * 10;
+			this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
 			this.#player.point = Math.floor(this.#player.point);
 			await sleep(1000);
 			this.#currentSection = new ResultSection(this, this.#rendererManager, this.#cameraManager, this.#scene, this.#result);
@@ -295,8 +308,36 @@ export default class GameManager extends THREE.EventDispatcher {
 		return this.#board.putJudgement(this.#currentTurn, x, y);
 	}
 
+	checkCorner(order, x, y) {
+		const corner = {
+			0: { 0: "LU", 7: "LD"},
+			7: { 0: "RU", 7: "RD"}
+		}
+
+		try {
+			let c = corner[x][y];
+			if (c) {
+				console.log(`${c} was taken by ${order == Disk.WHITE ? 'white' : 'black'}`);
+				this.getPlayerFromOrder(order).point += 250;
+				this.dispatchEvent(new Event.TakeCornerEvent(order, c))
+			}
+		} catch {}
+	}
+
 	put (x, y) {
 		this.#board.putDisk(this.#currentTurn, x, y);
+	}
+
+	countReversible(order, x, y) {
+		const dr = [-1, -1, -1, 0, 0, 1, 1, 1];
+		const dc = [-1, 0, 1, -1, 1, -1, 0, 1];
+		let count = 0;
+
+		for (let i = 0; i < 8; i++) {
+			count += this.#board.countReversible(order, x, y, dc[i], dr[i]);
+		}
+
+		return count;
 	}
 
 	getResult() {
@@ -307,11 +348,23 @@ export default class GameManager extends THREE.EventDispatcher {
 		return {black, white, result};
 	}
 
+	getPlayerFromOrder(order) {
+		if (order == Disk.WHITE) {
+			return this.#player;
+		} else if (order == Disk.BLACK) {
+			return this.#enemy;
+		}
+	}
+
 	get objects() {return this.#objectPool;}
 	get audio() {return this.#audio;}
 	get player() {return this.#player;}
 	get enemy() {return this.#enemy;}
 	get currentTurn() {return this.#currentTurn;}
+	get LU() {return this.#LU;}
+	get LD() {return this.#LD;}
+	get RU() {return this.#RU;}
+	get RD() {return this.#RD;}
 	get currentSection() {return this.#currentSection;}
 	get board() {return this.#board;}
 	get startTime() {return this.#startTime;}

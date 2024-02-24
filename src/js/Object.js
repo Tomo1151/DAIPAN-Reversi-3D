@@ -74,10 +74,14 @@ export class Board {
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				// str += `(${j}, ${i})`;
+				if (this.getDisk(j, i).state == Disk.EMPTY) continue;
 				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
 				if (dist < this.#shockThreshold) {
 					// console.log(`prob: ${1-(dist/this.#shockThreshold)}`)
-					if (Math.random() < 1-(dist/this.#shockThreshold/2)) {
+					let div = (this.getDisk(j, i).state == Disk.BLACK) ? 1.15 : 0.75;
+					let prob = 1-(dist/this.#shockThreshold / div);
+					console.log(`${j}, ${i}, ${dist} [${this.getDisk(j, i).state == 0? 'WHITE': 'BLACK'}]: ${prob}`);
+					if (Math.random() < prob) {
 						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});

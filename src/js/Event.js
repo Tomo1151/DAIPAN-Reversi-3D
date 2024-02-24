@@ -110,13 +110,19 @@ export class PutFailEvent extends CustomEvent {
 export class PutSuccessEvent extends CustomEvent {
 	static EVENT_NAME = "put_success";
 	#order;
+	#pos;
+	#count;
 
-	constructor(order) {
+	constructor(order, pos, count) {
 		super (PutSuccessEvent.EVENT_NAME);
 		this.#order = order;
+		this.#pos = pos;
+		this.#count = count;
 	}
 
 	get order() {return this.#order;}
+	get pos() {return this.#pos;}
+	get count() {return this.#count;}
 }
 
 export class BangNoticeEvent extends CustomEvent {
@@ -176,6 +182,21 @@ export class PutPassEvent extends CustomEvent {
 	}
 
 	get order() {return this.#order;}
+}
+
+export class TakeCornerEvent extends CustomEvent {
+	static EVENT_NAME = "take_corner";
+	#order;
+	#corner;
+
+	constructor(order, corner) {
+		super(TakeCornerEvent.EVENT_NAME);
+		this.#order = order;
+		this.#corner = corner;
+	}
+
+	get order() {return this.#order;}
+	get corner() {return this.#corner;}
 }
 
 export class UpdateCompleteEvent extends CustomEvent {
