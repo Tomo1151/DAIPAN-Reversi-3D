@@ -365,21 +365,57 @@
 			width: 3.5rem;
 			height: 50%;
 			opacity: 0.85;
+			border-radius: 3px;
 
 			transform: translateY(-50%);
 			pointer-events: none;
+		}
+
+		.meter-name {
+			color: var(--color-border-black);
+			position: absolute;
+			top: 50%;
+			right: -2em;
+			font-size: 1.5em;
+			white-space: nowrap;
+			writing-mode: vertical-lr;
+			font-family: monospace;
+			translate: 0 -50%;
+			z-index: 15;
 		}
 
 		#meter_value {
 			position: absolute;
 			bottom: 1%;
 			left: 50%;
-			background-color: red;
+			background: linear-gradient(to top, yellow, red);
 			width: 90%;
 			height: 0%;
 
 			transform: translateX(-50%);
 			transition-duration: 2s;
+		}
+
+		.steam-left {
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			object-fit: contain;
+			translate: 0 -100%;
+			z-index: 10;
+		}
+
+		.steam-right {
+			position: absolute;
+			top: 0;
+			left: none;
+			right: -100%;
+			transform: scale(-1, 1);
+			width: 100%;
+			object-fit: contain;
+			translate: 0 -100%;
+			z-index: 10;
 		}
 
 		#loading_screen {
@@ -507,6 +543,9 @@
 				<p>の手番です</p>
 			</div>
 			<div class="meter" id="meter">
+				<img src="img/steam.gif" class="steam-left">
+				<img src="img/steam.gif" class="steam-right">
+				<span class="meter-name">frustration meter</span>
 				<div id="meter_value"></div>
 			</div>
 		</div>
