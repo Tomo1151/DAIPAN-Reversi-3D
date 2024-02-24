@@ -14,8 +14,11 @@ export default class Enemy extends Player {
 		this.#count = 0;
 
 		this.#worker.addEventListener('message', (e) => {
-			this.logger.log(`enemy send: put_notice`);
-			this.gameManager.dispatchEvent(new Event.PutNoticeEvent(e.data));
+			console.log(e)
+			if (e.data.type == 'search') {
+				this.logger.log(`enemy send: put_notice`);
+				this.gameManager.dispatchEvent(new Event.PutNoticeEvent(e.data.pos));
+			}
 		});
 
 		this.gameManager.addEventListener('turn_notice', async (e) => {
@@ -24,10 +27,16 @@ export default class Enemy extends Player {
 			this.#count++;
 
 			if (e.canPut) {
-				this.#worker.postMessage(board);
+				this.#worker.postMessage({type: "search", table: board});
 			} else {
 				this.gameManager.dispatchEvent(new Event.PutPassEvent(this.order));
 			}
+		});
+
+		this.gameManager.addEventListener('take_corner', (e) => {
+			// if (e.order != this.order) return;
+			this.#worker.postMessage({type: "corner", order: e.order, corner: e.corner});
+			console.log(e);
 		});
 	}
 

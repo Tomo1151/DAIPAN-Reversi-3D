@@ -20,17 +20,33 @@ export default class Player {
 			if (e.order != this.order) return;
 			this.#logger.log(this.name + " received: turn_notice");
 			// console.log(this.name + " received: turn_notice");
+
+			let diff = this.#gameManager.board.count(this.#gameManager.enemy.order) - this.#gameManager.board.count(this.order);
+
+			if (diff > 5) this.retching(Math.floor(diff / 5) * 1.5);
+			if (!e.canPut) this.retching(7.5);
 		});
 
 		this.#gameManager.addEventListener('put_success', (e) => {
-			if (e.order != this.order) return;
-			this.#logger.log(this.name + " received: put_success");
-			// console.log(this.name + " received: put_success");
+			if (e.order == this.order) {
+				this.#logger.log(this.name + " received: put_success");
+				// console.log(this.name + " received: put_success");
 
-			this.#logger.log(`${this.name} send: confirmed`);
-			// console.log(`${this.name} send: confirmed`);
-			if (e.order != this.order) return;
-			this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
+				this.#logger.log(`${this.name} send: confirmed`);
+				// console.log(`${this.name} send: confirmed`);
+				this.#gameManager.dispatchEvent(new Event.ConfirmationEvent());
+			} else {
+				// console.log(e);
+				if (e.count > 4) {
+					this.retching(5);
+				}
+			}
+		});
+
+		this.#gameManager.addEventListener('take_corner', (e) => {
+			if (e.order == this.order) return;
+			this.#logger.log(this.name + " received: take_corner");
+			this.retching(20);
 		});
 
 		this.#gameManager.addEventListener('bang_success', (e) => {
