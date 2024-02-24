@@ -239,6 +239,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		});
 
 		this.addEventListener('turn_change', () => {
+			// this.#player.retching(100)
 			this.#logger.log("gameManager received: turn_change");
 			// console.log("gameManager received: turn_change");console.log("");
 			// this.player.retching(10);
@@ -263,7 +264,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#endTime = e.time;
 			this.#player.point += e.result.white * 10;
 			// this.#player.point += (e.result.white - e.result.black) * 10;
-			this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
+			this.#player.point += (e.result.result == this.#player.name) ? 1250 : 600;
 			this.#player.point = Math.floor(this.#player.point);
 			await sleep(1000);
 			this.#currentSection = new ResultSection(this, this.#rendererManager, this.#cameraManager, this.#scene, this.#result);
