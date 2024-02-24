@@ -87,7 +87,7 @@ export default class DOMManager {
 
 			this.hide(this.#ingameUIContainer);
 			await sleep(50);
-			await this.cutin("ゲーム終了", this.#gameManager.audio.start);
+			await this.cutin("ゲーム終了", this.#gameManager.audio.start, 2000);
 			await sleep(750);
 			this.drawResultScreen(e.result);
 		});
@@ -139,7 +139,7 @@ export default class DOMManager {
 			this.hide(this.#titleScreenDOM);
 
 			this.#gameManager.audio.open.play();
-			await this.cutin("ゲームスタート", this.#gameManager.audio.start);
+			await this.cutin("ゲームスタート", this.#gameManager.audio.start, 2000);
 
 			this.show(this.#ingameUIContainer);
 
@@ -170,7 +170,7 @@ export default class DOMManager {
 			this.#bangButton.classList.toggle('active');
 			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
-			await this.cutin("たたけ!", this.#gameManager.audio.start);
+			await this.cutin("たたけ!", this.#gameManager.audio.bang_cut, 1000);
 		}, { signal: this.#DOMEventController.signal });
 
 		/*
@@ -210,15 +210,15 @@ export default class DOMManager {
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
 
-	async cutin(str, sound) {
+	async cutin(str, sound, ms) {
 		this.#cutDOM.children[0].innerText = str;
 		this.show(this.#cutDOM);
 		this.#cutDOM.classList.add('fadeIn');
-		await sleep(200);
+		await sleep(ms / 10 * 1);
 		sound.pause();
 		sound.currentTime = 0;
 		sound.play();
-		await sleep(1800);
+		await sleep(ms / 10 * 9);
 		this.hide(this.#cutDOM);
 		this.#cutDOM.classList.remove('fadeIn');
 	}

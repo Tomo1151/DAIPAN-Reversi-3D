@@ -60,7 +60,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		open: new Audio('./audio/open.mp3'),
 		put: new Audio('./audio/put__.mp3'),
 		flip: new Audio('./audio/flip__.mp3'),
-		bang: new Audio('./audio/daipan_audio.mp3')
+		bang: new Audio('./audio/daipan_audio.mp3'),
+		bang_cut: new Audio('./audio/d_cutin.mp3')
 	};
 
 	constructor() {
