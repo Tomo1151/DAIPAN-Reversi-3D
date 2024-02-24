@@ -1,7 +1,7 @@
 import { Disk } from "./Object.js";
 
 (function(){
-	const EVALUATION_MAP = [
+	let EVALUATION_MAP = [
 		[120, -20, 20,  5,  5, 20, -20, 120],
 		[-20, -40, -5, -5, -5, -5, -40, -20],
 		[ 20,  -5, 15,  3,  3, 15,  -5,  20],

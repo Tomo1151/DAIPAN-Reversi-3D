@@ -138,6 +138,7 @@ export default class DOMManager {
 
 			this.hide(this.#titleScreenDOM);
 
+			this.#gameManager.audio.open.play();
 			await this.cutin("ゲームスタート", this.#gameManager.audio.start);
 
 			this.show(this.#ingameUIContainer);

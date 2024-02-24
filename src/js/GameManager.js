@@ -51,10 +51,11 @@ export default class GameManager extends THREE.EventDispatcher {
 	};
 
 	#audio = {
-		"start": new Audio('./audio/gamestart.mp3'),
-		"put": new Audio('./audio/put.mp3'),
-		"flip": new Audio('./audio/flip.mp3'),
-		"bang": new Audio('./audio/daipan_audio.mp3')
+		start: new Audio('./audio/gamestart.mp3'),
+		open: new Audio('./audio/open.mp3'),
+		put: new Audio('./audio/put__.mp3'),
+		flip: new Audio('./audio/flip__.mp3'),
+		bang: new Audio('./audio/daipan_audio.mp3')
 	};
 
 	constructor() {
@@ -154,7 +155,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#enemy = new Enemy(this, Disk.BLACK);
 			this.#player = new Player(this, Disk.WHITE);
 			this.#player.name = this.#domManager.getPlayerName();
-
 		});
 
 		this.addEventListener('turn_notice', () => {
