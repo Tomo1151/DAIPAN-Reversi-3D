@@ -74,7 +74,7 @@ export default class DOMManager {
 				this.#putButton.classList.add('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.add('disabled');
-				this.hide(this.#bangButton);
+				this.show(this.#ingameButtons);
 			}
 		});
 
@@ -168,6 +168,8 @@ export default class DOMManager {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
 			this.#putButton.classList.remove('active');
 			this.#bangButton.classList.toggle('active');
+			this.hide(this.#ingameButtons);
+			this.hide(this.#bangButton);
 			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
 			await this.cutin("たたけ!", this.#gameManager.audio.bang_cut, 1000);
@@ -250,7 +252,7 @@ export default class DOMManager {
 
 	angerUpdate() {
 		let angerValue = this.#gameManager.player.anger;
-		this.#playerAngerDOM.style.height = `${angerValue}%`;
+		this.#playerAngerDOM.style.height = `${Math.min(angerValue, 98)}%`;
 	}
 
 	hide(dom) {
