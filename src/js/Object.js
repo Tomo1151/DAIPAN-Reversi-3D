@@ -82,6 +82,7 @@ export class Board {
 					let prob = 1-(dist/this.#shockThreshold / div);
 					console.log(`${j}, ${i}, ${dist} [${this.getDisk(j, i).state == 0? 'WHITE': 'BLACK'}]: ${prob}`);
 					if (Math.random() < prob) {
+					// if (true) {
 						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});
