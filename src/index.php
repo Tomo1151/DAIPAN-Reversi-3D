@@ -437,6 +437,17 @@
 			z-index: 10;
 		}
 
+		#boiling_point {
+			position: absolute;
+			bottom: 80%;
+			width: 100%;
+			border-style: dashed;
+			border-width: 3px;
+			border-color: var(--font-main-white);
+
+			z-index: 20;
+		}
+
 		#loading_screen {
 			display: flex;
 			flex-direction: column;
@@ -562,6 +573,7 @@
 				<p>の手番です</p>
 			</div>
 			<div class="meter" id="meter">
+				<hr id="boiling_point">
 				<img src="img/steam.gif" class="steam-left" id="steam_left" style="display: none;">
 				<img src="img/steam.gif" class="steam-right" id="steam_right" style="display: none;">
 				<span class="meter-name">frustration meter</span>

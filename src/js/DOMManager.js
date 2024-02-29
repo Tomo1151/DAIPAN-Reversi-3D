@@ -153,6 +153,7 @@ export default class DOMManager {
 			if (this.#gameManager.mode === GameManager.MODE_HOTHEADED) this.#gameManager.player.patience = 10;
 			// console.log(this.#gameManager.player)
 			// console.log(`MODE: ${this.#gameManager.mode == 0? "normal" : "hotheaded"}`);
+			document.getElementById("boiling_point").style.bottom = `${this.#gameManager.player.patience}%`;
 		}, { signal: this.#DOMEventController.signal });
 
 
