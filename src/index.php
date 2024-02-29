@@ -9,7 +9,8 @@
 
 	$token = bin2hex(openssl_random_pseudo_bytes(16));
 	$_SESSION["token"] = $token;
-	$_SESSION["registered"] = false;
+	$_SESSION["GAME_COUNT"] = -1;
+	// $_SESSION["registered"] = false;
 	consolelog($_SESSION["token"]);
 ?>
 
@@ -304,14 +305,17 @@
 
 		#score::before {
 			content: 'Score : ';
+			font-family: monospace;
 		}
 
 		#order_black::before {
 			content: '[ Black ] ';
+			font-family: monospace;
 		}
 
 		#order_white::before {
 			content: '[ White ] ';
+			font-family: monospace;
 		}
 
 		.disabled {
@@ -575,6 +579,10 @@
 				<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
 				<p>※ Player 名はランキング <small>[未実装]</small> に使用します</p>
 			</div>
+			<div class="settings">
+				<label for="game_mode">短気モード</label>
+				<input type="checkbox" name="mode" id="game_mode">
+			</div>
 			<div class="button" id="start_button">
 				<p>はじめる</p>
 			</div>
@@ -596,7 +604,7 @@
 
 		<canvas id="main-canvas"></canvas>
 		<input type="hidden" name="token" value="<?php echo $_SESSION['token']?>" id="token">
-		<script>
+<!-- 		<script>
 			function f() {
 				const form = new FormData();
 				const token = document.getElementById("token").value;
@@ -612,15 +620,15 @@
 
 				console.log(`value: ${token}`);
 
-				fetch("score_registration.php", params)
+				fetch("php/score_registration.php", params)
 				.then((response) => response.json())
 				.then((res) => {
 					console.log(`res:`);
 					console.log(res);
 				});
 			}
-		</script>
-		<button onclick="f()" style="position: absolute; top: 0; left: 0; width: 300px; height: 100px;">fetch()</button>
+		</script> -->
+		<!-- <button onclick="f()" style="position: absolute; top: 0; left: 0; width: 300px; height: 100px;">fetch()</button> -->
 	</body>
 
 </html>

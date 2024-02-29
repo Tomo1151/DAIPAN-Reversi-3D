@@ -53,7 +53,7 @@ export default class DOMManager {
 				this.#putButton.classList.remove('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.remove('disabled');
-				if(this.#gameManager.player.anger >= Player.PATIENCE) this.show(this.#bangButton);
+				if(this.#gameManager.player.anger >= this.#gameManager.player.patience) this.show(this.#bangButton);
 			} else {
 				this.#putButton.classList.add('disabled');
 				this.#passButton.classList.remove('disabled');
@@ -135,7 +135,6 @@ export default class DOMManager {
 			this.#gameManager.logger.log("* send: game_start");
 			// console.log("* send: game_start");console.log("");
 			this.orderUpdate();
-
 			this.hide(this.#titleScreenDOM);
 
 			this.#gameManager.audio.open.play();
@@ -144,6 +143,10 @@ export default class DOMManager {
 			this.show(this.#ingameUIContainer);
 
 			this.#gameManager.dispatchEvent(new Event.GameStartEvent());
+			this.#gameManager.mode = (document.getElementById('game_mode').checked) ? GameManager.MODE_HOTHEADED : GameManager.MODE_NORMAL;
+			if (this.#gameManager.mode === GameManager.MODE_HOTHEADED) this.#gameManager.player.patience = 10;
+			console.log(this.#gameManager.player)
+			console.log(`MODE: ${this.#gameManager.mode == 0? "normal" : "hotheaded"}`);
 		}, { signal: this.#DOMEventController.signal });
 
 
@@ -199,10 +202,10 @@ export default class DOMManager {
 
 		this.show(this.#resultScreenDOM);
 
-		if (result.result == 'draw') {
+		if (result.result == Disk.EMPTY) {
 			result_str = '引き分け!';
 		} else {
-			result_str = `${result.result}の勝ち!`;
+			result_str = `${(result.result == Disk.WHITE) ? this.#gameManager.player.name : "COM"}の勝ち!`;
 		}
 
 		resultWinner.innerText = result_str;

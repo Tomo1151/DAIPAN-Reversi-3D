@@ -183,7 +183,7 @@ export default class GameSection extends Section {
 			this.scene.add(light);
 		}
 
-		const radius = this.gameManager.board.shockThreshold / 20;
+		const radius = this.gameManager.board.shockThreshold / 16;
 		const cylinder = new THREE.Mesh(
 			new THREE.CylinderGeometry(radius, radius, 1, 30),
 			new THREE.MeshPhongMaterial({color: 0xff0000, opacity: 0.5, transparent: true})

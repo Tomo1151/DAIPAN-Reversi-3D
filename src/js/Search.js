@@ -20,7 +20,7 @@ import { Disk } from "./Object.js";
 			case "search":
 				const board = e.data.table;
 				const res = searchNegaMax(getTableFromBoard(board), COM_ORDER, 5);
-				console.log(EVALUATION_MAP);
+				// console.log(EVALUATION_MAP);
 				self.postMessage({type: 'search', pos: res});
 
 				break
@@ -70,13 +70,13 @@ import { Disk } from "./Object.js";
 			let putTable = putDisk(table, order, pos.x, pos.y);
 			if (jamCheck(putTable, getOpponent(COM_ORDER))) return {"order": order, "x": pos.x, "y": pos.y};
 			score = -negaMax(putTable, getOpponent(COM_ORDER), depth-1, false);
-			console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
+			// console.log(`\t - pos: ${JSON.stringify(pos)}, score: ${score}\n`);
 			if (score > maxScore) {
 				maxScore = score;
 				evalPos = pos;
 			}
 		}
-		console.log(`\t > max: ${JSON.stringify(evalPos)}`);
+		// console.log(`\t > max: ${JSON.stringify(evalPos)}`);
 		return Object.assign({"order": order}, evalPos);
 	}
 

@@ -22,7 +22,11 @@ export default class GameManager extends THREE.EventDispatcher {
 	static IN_GAME = 1;
 	static GAME_OVER = 2;
 
+	static MODE_NORMAL = 0;
+	static MODE_HOTHEADED = 1;
+
 	GAME_STATE;
+	GAME_MODE;
 	GAME_PLAY_COUNT = 0;
 
 	#frame;
@@ -207,9 +211,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#domManager.modeReset();
 		});
 
-		this.addEventListener('bang_succes', (e) => {
+		this.addEventListener('bang_success', (e) => {
 			this.#logger.log("gameManager received: bang_success");
 			// console.log("gameManager received: bang_success");
+			this.getPlayerFromOrder(e.order).bang += e.pos.length;
 		});
 
 		this.addEventListener('confirmed', (e) => {
@@ -262,10 +267,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (this.GAME_STATE != GameManager.IN_GAME) return;
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#endTime = e.time;
-			this.#player.point += e.result.white * 10;
-			// this.#player.point += (e.result.white - e.result.black) * 10;
-			this.#player.point += (e.result.result == this.#player.name) ? 1250 : 600;
-			this.#player.point = Math.floor(this.#player.point);
+			this.calcScore(e);
 			await sleep(1000);
 			this.#currentSection = new ResultSection(this, this.#rendererManager, this.#cameraManager, this.#scene, this.#result);
 			this.#sectionManager.changeSection(this.#currentSection);
@@ -320,7 +322,6 @@ export default class GameManager extends THREE.EventDispatcher {
 			let c = corner[x][y];
 			if (c) {
 				console.log(`${c} was taken by ${order == Disk.WHITE ? 'white' : 'black'}`);
-				this.getPlayerFromOrder(order).point += 250;
 				this.dispatchEvent(new Event.TakeCornerEvent(order, c))
 			}
 		} catch {}
@@ -342,11 +343,59 @@ export default class GameManager extends THREE.EventDispatcher {
 		return count;
 	}
 
+	calcScore(e) {
+		this.#player.point += e.result.white * 12.5;
+		this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
+		this.#player.point += this.#player.bang * 10;
+		this.#player.point = Math.floor(this.#player.point);
+		const corners = [
+			{x: 0, y: 0},
+			{x: 0, y: 7},
+			{x: 7, y: 0},
+			{x: 7, y: 7},
+		];
+		// console.log("台パンで" + this.player.bang + "個の石をひっくり返した");
+		// console.log(e);
+		for (let pos of corners) {
+			const order = this.board.getDisk(pos.x, pos.y).state;
+			// console.log(order);
+			if (order !== Disk.EMPTY) this.getPlayerFromOrder(order).point += 250;
+		}
+
+		// 盤面と台パン回数とスコアを渡す
+		// PHPサイドでスコア計算
+		const form = new FormData();
+		const token = document.getElementById("token").value;
+		form.append("token", token);
+		form.append("name", this.player.name);
+		form.append("board", JSON.stringify(this.board.table));
+		form.append("bang", this.player.bang);
+		form.append("score", this.player.point);
+		form.append("gc", this.GAME_PLAY_COUNT);
+		form.append("mode", this.GAME_MODE);
+		form.append("result", e.result.result);
+
+		const params = {
+			method: "POST",
+			body: form
+		};
+
+		console.log(`value: ${token}`);
+		console.log(params);
+
+		fetch("php/score_registration.php", params)
+		.then((response) => response.json())
+		.then((res) => {
+			console.log(`res:`);
+			console.log(res);
+		});
+	}
+
 	getResult() {
 		let black =  this.#board.count(Disk.BLACK);
 		let white =  this.#board.count(Disk.WHITE);
-		let result = (black < white) ? this.#player.name : this.#enemy.name;
-		if (black == white) result = "draw";
+		let result = (black < white) ? this.#player.order : this.#enemy.order;
+		if (black == white) result = Disk.EMPTY;
 		return {black, white, result};
 	}
 
@@ -369,6 +418,8 @@ export default class GameManager extends THREE.EventDispatcher {
 	get RD() {return this.#RD;}
 	get currentSection() {return this.#currentSection;}
 	get board() {return this.#board;}
+	get mode() {return this.GAME_MODE;}
+	set mode(mode) {this.GAME_MODE = mode;}
 	get startTime() {return this.#startTime;}
 	get endTime() {return this.#endTime;}
 	get logger() {return this.#logger;}

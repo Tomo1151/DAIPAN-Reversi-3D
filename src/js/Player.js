@@ -3,13 +3,14 @@ import * as Event from "./Event.js";
 import { Disk } from "./Object.js"
 
 export default class Player {
-	static PATIENCE = 80;
+	#patience = 0;
 	#gameManager;
 	#logger;
 	#order;
 	#name = 'player';
 	#point = 0;
 	#anger = 0;
+	#bang = 0;
 
 	constructor (gameManager, order) {
 		this.#gameManager = gameManager;
@@ -98,5 +99,9 @@ export default class Player {
 	set point(point) {this.#point = point;}
 	get anger() {return this.#anger;}
 	set anger(anger) {this.#anger = anger;}
+	get bang() {return this.#bang;}
+	set bang(bang) {this.#bang = bang;}
 	get logger() {return this.#logger;}
+	get patience() {return this.#patience;}
+	set patience(patience) {this.#patience = patience;}
 }

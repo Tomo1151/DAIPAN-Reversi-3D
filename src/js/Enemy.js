@@ -14,7 +14,7 @@ export default class Enemy extends Player {
 		this.#count = 0;
 
 		this.#worker.addEventListener('message', (e) => {
-			console.log(e)
+			// console.log(e)
 			if (e.data.type == 'search') {
 				this.logger.log(`enemy send: put_notice`);
 				this.gameManager.dispatchEvent(new Event.PutNoticeEvent(e.data.pos));
@@ -36,7 +36,7 @@ export default class Enemy extends Player {
 		this.gameManager.addEventListener('take_corner', (e) => {
 			// if (e.order != this.order) return;
 			this.#worker.postMessage({type: "corner", order: e.order, corner: e.corner});
-			console.log(e);
+			// console.log(e);
 		});
 	}
 
