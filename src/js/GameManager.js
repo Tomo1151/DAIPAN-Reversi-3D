@@ -344,10 +344,11 @@ export default class GameManager extends THREE.EventDispatcher {
 	}
 
 	calcScore(e) {
+		const time = Math.round((this.endTime - this.startTime) / 1000);
 		this.#player.point += e.result.white * 12.5;
 		this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
 		this.#player.point += this.#player.bang * 10;
-		this.#player.point = Math.floor(this.#player.point);
+		this.#player.point += Math.max(360 - time, 0);
 		const corners = [
 			{x: 0, y: 0},
 			{x: 0, y: 7},
@@ -362,8 +363,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			if (order !== Disk.EMPTY) this.getPlayerFromOrder(order).point += 250;
 		}
 
-		// 盤面と台パン回数とスコアを渡す
-		// PHPサイドでスコア計算
+		this.#player.point = Math.floor(this.#player.point);
 		const form = new FormData();
 		const token = document.getElementById("token").value;
 		form.append("token", token);
@@ -373,6 +373,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		form.append("score", this.player.point);
 		form.append("gc", this.GAME_PLAY_COUNT);
 		form.append("mode", this.GAME_MODE);
+		form.append("time", time);
 		form.append("result", e.result.result);
 
 		const params = {

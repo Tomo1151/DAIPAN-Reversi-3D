@@ -576,8 +576,8 @@
 		<div class="fadeIn" id="title_screen">
 			<h1 style="margin-bottom: 1rem;">台パンリバーシ<sup>3D</sup></h1>
 			<div>
-				<input type="text" id="player_name" placeholder="プレイヤーを入力してください" maxlength="15">
-				<p>※ Player 名はランキング <small>[未実装]</small> に使用します</p>
+				<input type="text" id="player_name" placeholder="プレイヤー名を入力してください" maxlength="15">
+				<p>※ プレイヤー名はランキング <small>[未実装]</small> に使用します</p>
 			</div>
 			<div class="settings">
 				<label for="game_mode">短気モード</label>

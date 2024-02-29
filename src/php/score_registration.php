@@ -38,6 +38,7 @@
 		$player_score += $player_count * 12.5;
 		$player_score += $corner * 250;
 		$player_score += $bang * 10;
+		$player_score += max(360 - $_POST["time"], 0);
 		$player_score = floor($player_score);
 
 		return min($player_score, $_POST["score"]);
@@ -61,7 +62,7 @@
 
 			$stmt = $mysqli -> prepare($q);
 			$stmt -> bind_param('isiiii', $id, $name, $score, $game_mode, $game_result, $timestamp);
-			$stmt -> execute();
+			// $stmt -> execute();
 
 			$q = "SELECT * FROM Users";
 			$stmt = $mysqli -> prepare($q);

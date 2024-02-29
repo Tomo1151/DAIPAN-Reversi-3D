@@ -53,7 +53,9 @@ export default class DOMManager {
 				this.#putButton.classList.remove('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.remove('disabled');
-				if(this.#gameManager.player.anger >= this.#gameManager.player.patience) this.show(this.#bangButton);
+				if(this.#gameManager.player.anger >= this.#gameManager.player.patience) {
+					this.show(this.#bangButton);
+				}
 			} else {
 				this.#putButton.classList.add('disabled');
 				this.#passButton.classList.remove('disabled');
@@ -145,8 +147,8 @@ export default class DOMManager {
 			this.#gameManager.dispatchEvent(new Event.GameStartEvent());
 			this.#gameManager.mode = (document.getElementById('game_mode').checked) ? GameManager.MODE_HOTHEADED : GameManager.MODE_NORMAL;
 			if (this.#gameManager.mode === GameManager.MODE_HOTHEADED) this.#gameManager.player.patience = 10;
-			console.log(this.#gameManager.player)
-			console.log(`MODE: ${this.#gameManager.mode == 0? "normal" : "hotheaded"}`);
+			// console.log(this.#gameManager.player)
+			// console.log(`MODE: ${this.#gameManager.mode == 0? "normal" : "hotheaded"}`);
 		}, { signal: this.#DOMEventController.signal });
 
 
