@@ -35,6 +35,15 @@
 			$res_str .= "connection failed";
 		} else {
 			$res_str .= "{$mysqli -> server_version}\n";
+			$res_str .= $_SESSION["registered"] . "\n";
+			$res_str .= $_POST["name"] . " ";
+			$res_str .= $_POST["score"] . " ";
+			$res_str .= $_POST["result"] . "\n";
+
+			$q = "INSERT INTO `users` (`id`, `name`, `score`, `result`, `registered_at`) VALUES (NULL, '{$_POST["name"]}', '{$_POST["score"]}', '{$_POST["result"]}', current_timestamp());";
+
+			$stmt = $mysqli -> prepare($q);
+			$stmt -> execute();
 
 			$q = "SELECT * FROM Users";
 			$stmt = $mysqli -> prepare($q);
@@ -45,6 +54,8 @@
 				$result = "{$id}: {$name}, {$score}pts. {$registered_at}\n";
 				$res_str .= $result;
 			}
+
+			// $_SESSION["registered"] = true;
 		}
 
 		echo json_encode($res_str, JSON_UNESCAPED_UNICODE);

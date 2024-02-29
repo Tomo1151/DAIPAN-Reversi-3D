@@ -9,6 +9,7 @@
 
 	$token = bin2hex(openssl_random_pseudo_bytes(16));
 	$_SESSION["token"] = $token;
+	$_SESSION["registered"] = false;
 	consolelog($_SESSION["token"]);
 ?>
 
@@ -600,6 +601,9 @@
 				const form = new FormData();
 				const token = document.getElementById("token").value;
 				form.append("token", token);
+				form.append("name", "test_name");
+				form.append("score", 600);
+				form.append("result", 1);
 
 				const params = {
 					method: "POST",
