@@ -5,13 +5,13 @@
 		EOS;
 	}
 	session_start();
-	consolelog(session_id());
+	// consolelog(session_id());
 
 	$token = bin2hex(openssl_random_pseudo_bytes(16));
 	$_SESSION["token"] = $token;
 	$_SESSION["GAME_COUNT"] = -1;
 	// $_SESSION["registered"] = false;
-	consolelog($_SESSION["token"]);
+	// consolelog($_SESSION["token"]);
 ?>
 
 <!DOCTYPE html>
@@ -562,8 +562,8 @@
 				<p>の手番です</p>
 			</div>
 			<div class="meter" id="meter">
-				<img src="img/steam.gif" class="steam-left">
-				<img src="img/steam.gif" class="steam-right">
+				<img src="img/steam.gif" class="steam-left" id="steam_left" style="display: none;">
+				<img src="img/steam.gif" class="steam-right" id="steam_right" style="display: none;">
 				<span class="meter-name">frustration meter</span>
 				<div id="meter_value"></div>
 			</div>

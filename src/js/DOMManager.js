@@ -48,13 +48,15 @@ export default class DOMManager {
 
 		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#gameManager.player.order) return;
-			console.log(this.#gameManager.player);
+			// console.log(this.#gameManager.player);
 			if (e.canPut) {
 				this.#putButton.classList.remove('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.remove('disabled');
 				if(this.#gameManager.player.anger >= this.#gameManager.player.patience) {
 					this.show(this.#bangButton);
+					this.show(document.getElementById("steam_left"));
+					this.show(document.getElementById("steam_right"));
 				}
 			} else {
 				this.#putButton.classList.add('disabled');
@@ -77,6 +79,8 @@ export default class DOMManager {
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.add('disabled');
 				this.show(this.#ingameButtons);
+				this.hide(document.getElementById("steam_left"));
+				this.hide(document.getElementById("steam_right"));
 			}
 		});
 
