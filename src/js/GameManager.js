@@ -80,7 +80,7 @@ export default class GameManager extends THREE.EventDispatcher {
 
 		return new Promise((res) => {
 			// @TODO 読み込みに時間が掛かっている時の処理を書く
-			loader.load('https://reversi.syntck.com/model_data/Board_low.gltf', (obj) => {
+			loader.load('model_data/Board_low.gltf', (obj) => {
 				this.#objectPool.board = obj;
 				loadingQueue.board = true;
 				if (Object.values(loadingQueue).every(v => {return v})) res();
@@ -90,7 +90,7 @@ export default class GameManager extends THREE.EventDispatcher {
 				board_progress.value = (xhr.loaded / xhr.total * 100);
 			});
 
-			loader.load('https://reversi.syntck.com/model_data/Disk.gltf', (obj) => {
+			loader.load('model_data/Disk.gltf', (obj) => {
 				this.#objectPool.disk = obj;
 				loadingQueue.disk = true;
 
