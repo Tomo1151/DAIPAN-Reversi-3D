@@ -16,10 +16,18 @@
 		// die(var_dump_text($_SESSION["id"]));
 		die(json_encode("無効なセッション"));
 	} else {
-		$res = [
-			'request' => $_POST['token'],
-			'session' => $_SESSION['token']
-		];
-		echo json_encode("有効なセッション" . var_dump_text($res), JSON_UNESCAPED_UNICODE);
+		// $res = [
+		// 	'request' => $_POST['token'],
+		// 	'session' => $_SESSION['token']
+		// ];
+		// echo json_encode("有効なセッション" . var_dump_text($res), JSON_UNESCAPED_UNICODE);
+		$id = session_id();
+		$res_str = <<< EOS
+		[有効なセッション]
+		SESSION_ID: {$id}
+		POST_TOKEN: {$_POST["token"]}
+		SESSION_TOKEN: {$_SESSION["token"]}
+		EOS;
+		echo json_encode($res_str, JSON_UNESCAPED_UNICODE);
 	}
 ?>
