@@ -48,7 +48,7 @@ export default class DOMManager {
 
 		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#gameManager.player.order) return;
-
+			console.log(this.#gameManager.player);
 			if (e.canPut) {
 				this.#putButton.classList.remove('disabled');
 				this.#passButton.classList.add('disabled');
@@ -207,12 +207,12 @@ export default class DOMManager {
 		if (result.result == Disk.EMPTY) {
 			result_str = '引き分け!';
 		} else {
-			result_str = `${(result.result == Disk.WHITE) ? this.#gameManager.player.name : "COM"}の勝ち!`;
+			result_str = `${(result.result == Disk.WHITE) ? (this.#gameManager.player.name || "Player") : "COM"}の勝ち!`;
 		}
 
 		resultWinner.innerText = result_str;
 		resultScore.innerText = this.#gameManager.player.point;
-		resultWhite.innerText = `${this.getPlayerName()} : ${result.white}`;
+		resultWhite.innerText = `${this.getPlayerName() || "Player"} : ${result.white}`;
 		resultBlack.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
@@ -239,7 +239,7 @@ export default class DOMManager {
 	}
 
 	getPlayerName() {
-		return document.getElementById('player_name').value || 'Player';
+		return document.getElementById('player_name').value || null;
 	}
 
 	orderUpdate(){

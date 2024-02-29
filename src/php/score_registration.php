@@ -90,6 +90,9 @@
 			die(json_encode("Error_0: data duplication"));
 		}
 
+		if (!isset($_POST["name"])) {
+			die(json_encode("property [\"name\"] isn't set"));
+		}
 		// $res = [
 		// 	'request' => $_POST['token'],
 		// 	'session' => $_SESSION['token']
@@ -109,6 +112,7 @@
 		$res_str .= "player_score: {$player_score}\n";
 
 		score_registration($_POST["name"], (int)$player_score, (int)$_POST["result"], (int)$_POST["mode"]);
+
 		echo json_encode($res_str, JSON_UNESCAPED_UNICODE);
 	}
 ?>

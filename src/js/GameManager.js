@@ -367,7 +367,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		const form = new FormData();
 		const token = document.getElementById("token").value;
 		form.append("token", token);
-		form.append("name", this.player.name);
+		if (this.player.name !== null) form.append("name", this.player.name);
 		form.append("board", JSON.stringify(this.board.table));
 		form.append("bang", this.player.bang);
 		form.append("score", this.player.point);
