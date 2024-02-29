@@ -381,8 +381,8 @@ export default class GameManager extends THREE.EventDispatcher {
 			body: form
 		};
 
-		console.log(`value: ${token}`);
-		console.log(params);
+		// console.log(`value: ${token}`);
+		// console.log(params);
 
 		fetch("php/score_registration.php", params)
 		.then((response) => response.json())
