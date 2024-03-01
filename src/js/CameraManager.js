@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { getRandomInt } from "./Utils.js";
+import { getRandomInt, sleep } from "./Utils.js";
 
 export default class CameraManager {
 	#gameManager;
@@ -21,15 +21,18 @@ export default class CameraManager {
 		if (!this.#hasMoveCompleted) this.move();
 	}
 
-	shake(delay) {
-		setTimeout(() => {
+	async shake() {
+		// setTimeout(() => {
 			this.controlable = false;
-			this.#camera.lookAt(getRandomInt(2, 10), getRandomInt(2, 10), getRandomInt(2, 10));
+			const [x, y, z] = [getRandomInt(2, 10), getRandomInt(2, 10), getRandomInt(2, 10)];
+			this.#camera.lookAt(x, y, z);
 			setTimeout(() => {
 				this.#camera.lookAt(new THREE.Vector3(0, 0, 0));
 				this.controlable = true;
 			}, getRandomInt(50, 75));
-		}, delay);
+		// }, Math.floor(delay));
+
+		// await sleep(1000);
 	}
 
 	moveTo(x, y, z, lookAt, controlable, callback, step) {
@@ -65,7 +68,7 @@ export default class CameraManager {
 
 	restore(callback) {
 		let pos = this.#originalPosition;
-		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true, () => {this.controlable = true;}, 10);
+		this.moveTo(pos.x, pos.y, pos.z, new THREE.Vector3(0, 0, 0), true, () => {this.controlable = true;callback();}, 10);
 	}
 
 	set controlable(bool) {this.#rendererManager.controls.enabled = bool;}
