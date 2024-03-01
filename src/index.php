@@ -103,8 +103,8 @@
 				<p class="annotation">プレイヤー名はランキングに使用します<br>プレイヤー名が<wbr>空の場合は<wbr>ランキングに登録<wbr>されません</p>
 			</div>
 			<div class="settings">
-				<label for="game_mode" id="hotheaded">短気モード</label>
 				<input type="checkbox" name="mode" id="game_mode">
+				<label for="game_mode" id="hotheaded">短気モード</label>
 			</div>
 			<div class="button" id="start_button">
 				<p>はじめる</p>
