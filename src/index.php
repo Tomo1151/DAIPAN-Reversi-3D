@@ -100,10 +100,10 @@
 			<h1 style="margin-bottom: 1rem;">台パンリバーシ<sup>3D</sup></h1>
 			<div>
 				<input type="text" id="player_name" placeholder="プレイヤー名を入力してください" maxlength="15">
-				<p>※ プレイヤー名はランキング <small>[未実装]</small> に使用します</p>
+				<p class="annotation">プレイヤー名はランキングに使用します<br>プレイヤー名が<wbr>空の場合は<wbr>ランキングに登録<wbr>されません</p>
 			</div>
 			<div class="settings">
-				<label for="game_mode">短気モード</label>
+				<label for="game_mode" id="hotheaded">短気モード</label>
 				<input type="checkbox" name="mode" id="game_mode">
 			</div>
 			<div class="button" id="start_button">
