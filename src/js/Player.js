@@ -3,7 +3,7 @@ import * as Event from "./Event.js";
 import { Disk } from "./Object.js"
 
 export default class Player {
-	#patience = 0;
+	#patience = 80;
 	#gameManager;
 	#logger;
 	#order;
