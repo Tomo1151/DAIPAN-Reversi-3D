@@ -137,13 +137,16 @@ export default class GameSection extends Section {
 
 		this.gameManager.addEventListener('confirmed', async () => {
 			if (this.#playerAct == 'bang') {
-				this.cameraManager.restore();
-				await sleep(500);
-				await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
+				this.cameraManager.restore(async () => {
+					this.cameraManager.shake();
+					await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
+					this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
+				});
+				// await sleep(500);
 			} else {
 				await this.diskMeshUpdate(this.gameManager.board.table);
+				this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
 			}
-			this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
 		});
 
 		// Listener delete
@@ -299,7 +302,7 @@ export default class GameSection extends Section {
 		let duration = this.#diskModels[0].animations[2].duration;
 		this.gameManager.audio.bang.play();
 		await sleep(100);
-		this.cameraManager.shake(duration);
+
 		for (let pos of put_pos) {
 			let num = pos.y*8+pos.x;
 			if (table[num].state == Disk.EMPTY) continue;
