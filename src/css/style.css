@@ -496,8 +496,20 @@
 		}
 
 		.settings {
+			display: flex;
+			align-items: center;
 			font-size: 1.2em;
 			padding: 1em 0 .25em;
+		}
+
+		#game_mode {
+			accent-color: red;
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+
+		#hotheaded {
+			padding-left: .5rem;
 		}
 
 		@media (max-width: 1024px) {
