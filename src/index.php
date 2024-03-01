@@ -22,6 +22,9 @@
 		<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<title>3Dオセロ</title>
+		<!-- ICON Load -->
+		<link rel="apple-touch-icon" type="image/vnd.microsoft.icon" href="favicon.ico">
+		<link rel="icon" type="image/vnd.microsoft.icon" href="img/favicon.ico">
 		<!-- CSS Load -->
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<!-- JS Load -->
