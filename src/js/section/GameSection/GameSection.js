@@ -138,7 +138,7 @@ export default class GameSection extends Section {
 		this.gameManager.addEventListener('confirmed', async () => {
 			if (this.#playerAct == 'bang') {
 				this.cameraManager.restore(async () => {
-					this.cameraManager.shake();console.log("shake");
+					this.cameraManager.shake();
 					await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
 					this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
 				});
