@@ -44,9 +44,6 @@
 			}, { passive: false });
 		</script>
 		<script defer type="module" src="js/Main.js"></script>
-		<style type="text/css">
-
-		</style>
 	</head>
 
 	<body>
