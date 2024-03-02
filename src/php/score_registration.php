@@ -57,11 +57,10 @@
 			$res_str .= "connection failed";
 		} else {
 			global $res_str;
-			$q = "INSERT INTO `users` (`id`, `name`, `score`, `mode`, `result`, `time`, `registered_at`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 			$id = null;
 			$timestamp = null;
 
-			$stmt = $mysqli -> prepare($q);
+			$stmt = $mysqli -> prepare("INSERT INTO Users (id, name, score, mode, result, time, registered_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			$stmt -> bind_param('isiiiii', $id, $name, $score, $game_mode, $game_result, $gametime, $timestamp);
 			$stmt -> execute();
 		}
