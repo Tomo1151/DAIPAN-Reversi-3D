@@ -118,6 +118,20 @@
 	<script type="text/javascript">
 		const result = ["勝利", "敗北", "引き分け"];
 
+		function toggleFullScreen() {
+			if (!document.fullscreenElement) {
+				document.documentElement.requestFullscreen();
+			} else if (document.exitFullscreen) {
+				document.exitFullscreen();
+			}
+		}
+
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") {
+				toggleFullScreen();
+			}
+		},false);
+
 		function getOrdinalNumber(num) {
 			num = Math.abs(num);
 			let r = num % 100;
