@@ -56,17 +56,6 @@
 			$stmt = $mysqli -> prepare($q);
 			$stmt -> bind_param('isiiii', $id, $name, $score, $game_mode, $game_result, $timestamp);
 			$stmt -> execute();
-
-			$q = "SELECT * FROM Users";
-			$stmt = $mysqli -> prepare($q);
-			$stmt -> execute();
-			$stmt -> bind_result($id, $name, $score, $mode, $result, $registered_at);
-
-			while($stmt -> fetch()) {
-				$result_str = "{$id}: {$name}, {$score}pts. {$registered_at}\n";
-				global $res_str;
-				$res_str .= $result_str;
-			}
 		}
 
 		$mysqli -> close();
