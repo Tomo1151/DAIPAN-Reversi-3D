@@ -116,8 +116,17 @@
 			<h3 id="winner">Player の勝ち！</h3>
 			<div id="result">
 				<p id="score"></p>
-				<p id="order_black"></p>
-				<p id="order_white"></p>
+				<div class="order-count">
+					<p>[black]</p>
+					<p id="order_black_name"></p>
+					<p id="order_black"></p>
+				</div>
+				<div class="order-count">
+					<p>[white]</p>
+					<p id="order_white_name"></p>
+					<p id="order_white"></p>
+				</div>
+
 				<p id="time"></p>
 			</div>
 			<div class="button" id="restart_button">
@@ -127,31 +136,6 @@
 
 		<canvas id="main-canvas"></canvas>
 		<input type="hidden" name="token" value="<?php echo $_SESSION['token']?>" id="token">
-<!-- 		<script>
-			function f() {
-				const form = new FormData();
-				const token = document.getElementById("token").value;
-				form.append("token", token);
-				form.append("name", "test_name");
-				form.append("score", 600);
-				form.append("result", 1);
-
-				const params = {
-					method: "POST",
-					body: form
-				};
-
-				console.log(`value: ${token}`);
-
-				fetch("php/score_registration.php", params)
-				.then((response) => response.json())
-				.then((res) => {
-					console.log(`res:`);
-					console.log(res);
-				});
-			}
-		</script> -->
-		<!-- <button onclick="f()" style="position: absolute; top: 0; left: 0; width: 300px; height: 100px;">fetch()</button> -->
 	</body>
 
 </html>

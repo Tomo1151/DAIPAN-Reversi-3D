@@ -264,14 +264,24 @@
 			font-family: monospace;
 		}
 
-		#order_black::before {
-			content: '[ Black ] ';
+		.order-count {
+			display: flex;
+			align-items: center;
+			vertical-align: middle;
+		}
+
+		.order-count p:first-child {
 			font-family: monospace;
 		}
 
-		#order_white::before {
-			content: '[ White ] ';
-			font-family: monospace;
+		#order_black_name,
+		#order_white_name {
+			width: 17rem;
+			padding-left: .75rem;
+		}
+
+		#winner {
+			padding-bottom: 1rem;
 		}
 
 		.disabled {

@@ -196,9 +196,12 @@ export default class DOMManager {
 	drawResultScreen(result) {
 		let resultWinner = document.getElementById('winner');
 		let resultScore = document.getElementById('score');
+		let resultNameBlack = document.getElementById('order_black_name');
+		let resultNameWhite = document.getElementById('order_white_name');
 		let resultBlack = document.getElementById('order_black');
 		let resultWhite = document.getElementById('order_white');
 		let resultTime = document.getElementById('time');
+		let maxLength = Math.max(3, (this.#gameManager.player.name?.length || 6));
 
 		let dt = this.#gameManager.endTime.getTime() - this.#gameManager.startTime.getTime();
 		let dh = dt / (1000*60*60);
@@ -215,10 +218,15 @@ export default class DOMManager {
 			result_str = `${(result.result == Disk.WHITE) ? (this.#gameManager.player.name || "Player") : "COM"}の勝ち!`;
 		}
 
+
 		resultWinner.innerText = result_str;
 		resultScore.innerText = this.#gameManager.player.point;
-		resultWhite.innerText = `${this.getPlayerName() || "Player"} : ${result.white}`;
-		resultBlack.innerText = `${this.#gameManager.enemy.name} : ${result.black}`;
+		resultNameWhite.innerText = `${this.getPlayerName() || "Player"}`;
+		resultNameWhite.style.width = `${maxLength+1}rem`;
+		resultWhite.innerText = ` : ${result.white}`;
+		resultNameBlack.innerText = `${this.#gameManager.enemy.name}`
+		resultNameBlack.style.width = `${maxLength+1}rem`;
+		resultBlack.innerText = ` : ${result.black}`;
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
 	}
 
