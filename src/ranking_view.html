@@ -25,13 +25,19 @@
 /*			height: 100vh;*/
 			font-family: "MPlus1";
 			font-weight: bold;
+			background: #efefef;
 		}
 
 		main {
-			background: #efefef;
 /*			width: 1000px;*/
-			height: 100vh;
+/*			height: 100vh;*/
 			margin: 0 auto;
+		}
+
+		h1, h2 {
+			position: relative;
+			text-align: center;
+			margin-top: 3rem;
 		}
 
 		.section-wrapper {
@@ -49,6 +55,10 @@
 
 		.lost {
 			color: red;
+		}
+
+		.data-container {
+			margin: 0 3rem;
 		}
 
 		.data {
@@ -75,7 +85,7 @@
 		}
 
 		.data .name {
-			width: 17rem;
+/*			width: 17rem;*/
 		}
 
 		.data .score {
@@ -89,9 +99,9 @@
 		}
 
 		.data .time {
-			text-align: right;
+			text-align: center;
+			width: 7rem;
 		}
-
 	</style>
 </head>
 <body>
@@ -99,7 +109,7 @@
 		<h1>ランキング</h1>
 		<div class="section-wrapper">
 			<section>
-				<h2>通常モード</h2>
+				<h2>─　通常モード　─</h2>
 				<div class="data-container" id="data_container_0">
 <!-- 					<div class="data">
 						<p class="name">Player_0</p>
@@ -110,7 +120,7 @@
 				</div>
 			</section>
 			<section>
-				<h2>短気モード</h2>
+				<h2>─　短気モード　─</h2>
 				<div class="data-container" id="data_container_1">
 <!-- 					<div class="data">
 						<p class="name">Player_0</p>
@@ -152,6 +162,13 @@
 			return "th";
 		}
 
+		function timeFormat(time) {
+			const hours = Math.floor(time / 3600);
+			const minutes = Math.floor((time % 3600) / 60);
+			const seconds = time % 60;
+			return `${`${hours}`.padStart(2, "0")}:${`${minutes}`.padStart(2, "0")}:${`${seconds}`.padStart(2, "0")}`;
+		}
+
 		function getRanking() {
 			fetch("php/ranking.php")
 			.then((response) => response.json())
@@ -165,15 +182,13 @@
 					const data_container = document.getElementById(`data_container_${mode}`);
 					const standings = [0, 0];
 					for (let data of res[mode]) {
-						const date = new Date(data.registered_at);
-						const d = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 						const cnt = ++ standings[mode];
 						const node = `
 							<div class="data">
 								<p class="name"><span class="standings">${`${cnt}${getOrdinalNumber(cnt)}`} :</span>${data.name}</p>
 								<p class="score">${data.score}</p>
 								<p class="result ${result_class[data.result]}">${result[data.result]}</p>
-								<p class="time">${d}</p>
+								<p class="time">${timeFormat(data.time)}</p>
 							</div>
 						`;
 						data_container.insertAdjacentHTML("beforeend", node);
