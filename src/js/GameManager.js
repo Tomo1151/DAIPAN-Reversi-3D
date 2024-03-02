@@ -374,6 +374,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		form.append("gc", this.GAME_PLAY_COUNT);
 		form.append("mode", this.GAME_MODE);
 		form.append("time", time);
+		form.append("gametime", Math.round((this.endTime - this.startTime) / 1000));
 		form.append("result", e.result.result);
 
 		const params = {
