@@ -220,6 +220,7 @@
 			max-height: 50%;*/
 /*			box-shadow: 0 0 25rem 2rem var(--font-main-black);*/
 			opacity: 0.75;
+			font-weight: normal;
 
 			padding: 2rem;
 		}
@@ -243,20 +244,21 @@
 			max-width: 50%;
 			/*			height: 480px;
 			max-height: 50%;*/
+			font-weight: normal;
 
 			padding: 2rem;
 		}
 
 		#result_screen h2 {
 			font-size: 1.5rem;
-			font-weight: normal;
 			text-align: center;
+			font-weight: normal;
 		}
 
 		#result_screen h3 {
 			font-size: 2.5rem;
-			font-weight: normal;
 			text-align: center;
+			font-weight: normal;
 		}
 
 		#score::before {
@@ -323,6 +325,7 @@
 			align-items: center;
 			flex-direction: column;
 			font-size: 2.5rem;
+			font-weight: normal;
 			color: var(--font-main-black);
 			width: 100vw;
 			height: 100vh;
