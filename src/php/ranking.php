@@ -12,7 +12,7 @@
 		$q = "SELECT * FROM Users WHERE mode = 0 ORDER BY score DESC";
 		$stmt = $mysqli -> prepare($q);
 		$stmt -> execute();
-		$stmt -> bind_result($id, $name, $score, $mode, $result, $registered_at);
+		$stmt -> bind_result($id, $name, $score, $mode, $result, $time, $registered_at);
 
 		while($stmt -> fetch()) {
 			$result_data = [
@@ -21,6 +21,7 @@
 				"score" => $score,
 				"mode" => $mode,
 				"result" => $result,
+				"time" => $time,
 				"registered_at" => $registered_at
 			];
 
@@ -30,7 +31,7 @@
 		$q = "SELECT * FROM Users WHERE mode = 1 ORDER BY score DESC";
 		$stmt = $mysqli -> prepare($q);
 		$stmt -> execute();
-		$stmt -> bind_result($id, $name, $score, $mode, $result, $registered_at);
+		$stmt -> bind_result($id, $name, $score, $mode, $result, $time, $registered_at);
 
 		while($stmt -> fetch()) {
 			$result_data = [
@@ -39,6 +40,7 @@
 				"score" => $score,
 				"mode" => $mode,
 				"result" => $result,
+				"time" => $time,
 				"registered_at" => $registered_at
 			];
 
