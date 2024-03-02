@@ -22,7 +22,7 @@ export default class RendererManager {
 		// def renderer
 		this.#renderer = new THREE.WebGLRenderer({
 			canvas: document.getElementById('main-canvas'),
-			antialias: true,
+			antialias: false,
 			alpha: true,
 		});
 		this.#renderer.setPixelRatio(window.devicePixelRatio);
