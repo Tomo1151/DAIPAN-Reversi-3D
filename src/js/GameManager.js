@@ -346,7 +346,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	calcScore(e) {
 		const time = Math.round((this.endTime - this.startTime) / 1000);
 		this.#player.point += e.result.white * 12.5;
-		this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
+		// this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
 		this.#player.point += this.#player.bang * 10;
 		this.#player.point += Math.max(360 - time, 0);
 		const corners = [
@@ -362,6 +362,19 @@ export default class GameManager extends THREE.EventDispatcher {
 			// console.log(order);
 			if (order !== Disk.EMPTY) this.getPlayerFromOrder(order).point += 250;
 		}
+
+		let includeEmpty = false;
+		if (e.result.result == this.#player.order) {
+			this.#player.point += 1250;
+			for (let disk of this.board.table) {
+				console.log(disk);
+				if (disk.state == Disk.EMPTY) includeEmpty = true;
+			}
+		} else {
+			this.#player.point += 600;
+		}
+
+		if (includeEmpty) this.#player.point += 320;
 
 		this.#player.point = Math.floor(this.#player.point);
 		const form = new FormData();

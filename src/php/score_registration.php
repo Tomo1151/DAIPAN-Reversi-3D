@@ -21,6 +21,7 @@
 		$enemy_count = 0;
 		$bang = ($_POST["bang"]);
 		$board = json_decode($_POST["board"]);
+		$includeEmpty = false;
 
 		for ($i = 0; $i < count($board); $i++) {
 			if ($board[$i]->state === DISK_WHITE) {
@@ -28,10 +29,17 @@
 				if ($i === 0 || $i === 7 || $i === 56 || $i === 63) $corner++;
 			} else if ($board[$i]->state === DISK_BLACK) {
 				$enemy_count++;
+			} else {
+				$includeEmpty = true;
 			}
 		}
 
-		$player_score += ($player_count > $enemy_count) ? 1250 : 600;
+		if ($player_count > $enemy_count) {
+			$player_score += 1250;
+			if ($includeEmpty) $player_score += 320;
+		} else {
+			$player_score +=  600;
+		}
 
 		$player_score += $player_count * 12.5;
 		$player_score += $corner * 250;
@@ -42,19 +50,19 @@
 		return min($player_score, $_POST["score"]);
 	}
 
-	function score_registration($name, $score, $game_result, $game_mode) {
+	function score_registration($name, $score, $game_mode, $game_result, $gametime) {
 		$mysqli = new mysqli('localhost', 'root', '', 'reversi_ranking_test');
-		if (mysqli_connect_error()) {
+		if ($mysqli->connect_error) {
 			global $res_str;
 			$res_str .= "connection failed";
 		} else {
 			global $res_str;
-			$q = "INSERT INTO `users` (`id`, `name`, `score`, `mode`, `result`, `registered_at`) VALUES (?, ?, ?, ?, ?, ?)";
+			$q = "INSERT INTO `users` (`id`, `name`, `score`, `mode`, `result`, `time`, `registered_at`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 			$id = null;
 			$timestamp = null;
 
 			$stmt = $mysqli -> prepare($q);
-			$stmt -> bind_param('isiiii', $id, $name, $score, $game_mode, $game_result, $timestamp);
+			$stmt -> bind_param('isiiiii', $id, $name, $score, $game_mode, $game_result, $gametime, $timestamp);
 			$stmt -> execute();
 		}
 
@@ -62,7 +70,9 @@
 	}
 
 	if (!isset($_POST["token"]) || $_POST["token"] !== $_SESSION["token"]) {
-		die(json_encode("無効なセッション"));
+		// echo $_POST["token"];
+		// echo $_SESSION["token"];
+		die(json_encode("無効なセッション", JSON_UNESCAPED_UNICODE));
 	} else {
 		if ($_SESSION["GAME_COUNT"] === $_POST["gc"]) {
 			die(json_encode("Error_0: data duplication"));
@@ -77,7 +87,7 @@
 		$player_score = comfirm_score();
 		$res_str .= "player_score: {$player_score}\n";
 
-		score_registration($_POST["name"], (int)$player_score, (int)$_POST["result"], (int)$_POST["mode"]);
+		score_registration($_POST["name"], (int)$player_score, (int)$_POST["mode"], (int)$_POST["result"], (int)$_POST["gametime"]);
 		echo json_encode($res_str, JSON_UNESCAPED_UNICODE);
 	}
 ?>
