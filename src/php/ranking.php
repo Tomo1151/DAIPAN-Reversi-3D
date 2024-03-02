@@ -9,7 +9,7 @@
 	// if (true) {
 		die(json_encode("connection failed"));
 	} else {
-		$q = "SELECT * FROM Users WHERE mode = 0";
+		$q = "SELECT * FROM Users WHERE mode = 0 ORDER BY score DESC";
 		$stmt = $mysqli -> prepare($q);
 		$stmt -> execute();
 		$stmt -> bind_result($id, $name, $score, $mode, $result, $registered_at);
@@ -27,7 +27,7 @@
 			array_push($data_0, $result_data);
 		}
 
-		$q = "SELECT * FROM Users WHERE mode = 1";
+		$q = "SELECT * FROM Users WHERE mode = 1 ORDER BY score DESC";
 		$stmt = $mysqli -> prepare($q);
 		$stmt -> execute();
 		$stmt -> bind_result($id, $name, $score, $mode, $result, $registered_at);
