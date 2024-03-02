@@ -43,6 +43,14 @@
 			flex-basis: 50%;
 		}
 
+		.won {
+			color: green;
+		}
+
+		.lost {
+			color: red;
+		}
+
 		.data {
 			display: flex;
 			background-color: white;
@@ -59,10 +67,11 @@
 
 		.data p:first-of-type {
 			border: none;
+			flex-grow: 1;
 		}
 
 		.data span {
-			padding-left: .5rem;
+			padding-right:.5rem;
 		}
 
 		.data .name {
@@ -80,7 +89,6 @@
 		}
 
 		.data .time {
-			flex-grow: 1;
 			text-align: right;
 		}
 
@@ -117,6 +125,7 @@
 
 	<script type="text/javascript">
 		const result = ["勝利", "敗北", "引き分け"];
+		const result_class = ["won", "lost", ""];
 
 		function toggleFullScreen() {
 			if (!document.fullscreenElement) {
@@ -156,14 +165,15 @@
 					const data_container = document.getElementById(`data_container_${mode}`);
 					const standings = [0, 0];
 					for (let data of res[mode]) {
+						const date = new Date(data.registered_at);
+						const d = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 						const cnt = ++ standings[mode];
 						const node = `
 							<div class="data">
-								<span class="standings">${`${cnt}${getOrdinalNumber(cnt)}`} :</span>
-								<p class="name">${data.name}</p>
+								<p class="name"><span class="standings">${`${cnt}${getOrdinalNumber(cnt)}`} :</span>${data.name}</p>
 								<p class="score">${data.score}</p>
-								<p class="result">${result[data.result]}</p>
-								<p class="time">${data.registered_at}</p>
+								<p class="result ${result_class[data.result]}">${result[data.result]}</p>
+								<p class="time">${d}</p>
 							</div>
 						`;
 						data_container.insertAdjacentHTML("beforeend", node);
