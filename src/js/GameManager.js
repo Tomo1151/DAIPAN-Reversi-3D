@@ -25,6 +25,8 @@ export default class GameManager extends THREE.EventDispatcher {
 	static MODE_NORMAL = 0;
 	static MODE_HOTHEADED = 1;
 
+	#isMobile = false;
+
 	GAME_STATE;
 	GAME_MODE;
 	GAME_PLAY_COUNT = 0;
@@ -74,6 +76,15 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.init();
 			this.disableLoadingScreen();
 		});
+
+		const { userAgent, userAgentData } = navigator;
+		if (userAgentData == null) {
+			this.#isMobile = userAgent.match(/iPhone|Android.+Mobile/) != null;
+		} else {
+			this.#isMobile = userAgentData.mobile;
+		}
+
+		console.log(this.#isMobile);
 	}
 
 	modelLoad() {
@@ -117,6 +128,7 @@ export default class GameManager extends THREE.EventDispatcher {
 	run() {
 		const tick = () => {
 			this.#frame += 1;
+			if (this.#isMobile && this.#frame % 2 == 0) return;
 			if(this.#currentSection) this.#currentSection.run();
 			if(this.#cameraManager) this.#cameraManager.update();
 			if(this.#rendererManager && this.#scene) this.#rendererManager.render(this.#scene);
@@ -422,6 +434,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		}
 	}
 
+	get isMobile() {return this.#isMobile;}
 	get objects() {return this.#objectPool;}
 	get audio() {return this.#audio;}
 	get player() {return this.#player;}
