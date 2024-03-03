@@ -25,8 +25,8 @@ export default class RendererManager {
 			antialias: false,
 			alpha: true,
 		});
-		this.#renderer.setPixelRatio(1);
-		// this.#renderer.setPixelRatio(window.devicePixelRatio);
+		// this.#renderer.setPixelRatio(1);
+		this.#renderer.setPixelRatio(window.devicePixelRatio);
 		this.#renderer.setSize(window.innerWidth, window.innerHeight);
 
 		// def camera
