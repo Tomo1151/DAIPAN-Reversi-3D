@@ -84,7 +84,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.#isMobile = userAgentData.mobile;
 		}
 
-		console.log(this.#isMobile);
+		// console.log(this.#isMobile);
 	}
 
 	modelLoad() {
@@ -379,7 +379,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		if (e.result.result == this.#player.order) {
 			this.#player.point += 1250;
 			for (let disk of this.board.table) {
-				console.log(disk);
+				// console.log(disk);
 				if (disk.state == Disk.EMPTY) includeEmpty = true;
 			}
 		} else {
@@ -413,8 +413,8 @@ export default class GameManager extends THREE.EventDispatcher {
 		fetch("php/score_registration.php", params)
 		.then((response) => response.json())
 		.then((res) => {
-			console.log(`res:`);
-			console.log(res);
+			// console.log(`res:`);
+			// console.log(res);
 		});
 	}
 
