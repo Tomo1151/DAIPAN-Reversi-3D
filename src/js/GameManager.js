@@ -127,12 +127,12 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	run() {
 		const tick = () => {
+			requestAnimationFrame(tick)
 			this.#frame += 1;
 			if (this.#isMobile && this.#frame % 2 == 0) return;
 			if(this.#currentSection) this.#currentSection.run();
 			if(this.#cameraManager) this.#cameraManager.update();
 			if(this.#rendererManager && this.#scene) this.#rendererManager.render(this.#scene);
-			requestAnimationFrame(tick)
 		}
 
 		tick();
