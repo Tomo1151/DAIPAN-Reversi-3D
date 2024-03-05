@@ -17,16 +17,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-	<head>
+	<head prefix="og: https://ogp.me/ns#">
 		<meta charset="utf-8">
-		<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+		<!-- OGP -->
+		<meta property="og:site_name" content="syntck.com">
+		<meta property="og:title" content="台パンリバーシ3D">
+		<meta property="og:description" content="台パンで不利な局面と石をひっくり返せ！">
+		<meta property="og:url" content="reversi.syntck.com">
+		<meta property="og:type" content="game">
+		<meta property="og:image" content="img/ogp_image.png">
+		<meta property="og:twitter:card" content="summary">
+		<meta property="og:twitter:site" content="@Tomo_1151">
+		<meta property="og:twitter:domain" content="reversi.syntck.com">
+		<meta property="og:twitter:image" content="img/ogp_image.png">
+
+
 		<title>台パンリバーシ3D</title>
+
 		<!-- ICON Load -->
 		<link rel="apple-touch-icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 		<link rel="icon" type="image/vnd.microsoft.icon" href="img/favicon.ico">
+
 		<!-- CSS Load -->
 		<link rel="stylesheet" type="text/css" href="css/style.css">
+
 		<!-- JS Load -->
 		<script type="importmap">
 			{
