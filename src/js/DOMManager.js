@@ -80,6 +80,7 @@ export default class DOMManager {
 				this.#putButton.classList.add('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.add('disabled');
+				this.#gameManager.currentSection.mode = GameSection.MODE_PUT;
 				this.show(this.#ingameButtons);
 				this.hide(document.getElementById("steam_left"));
 				this.hide(document.getElementById("steam_right"));
@@ -181,10 +182,10 @@ export default class DOMManager {
 		this.#bangButton.addEventListener('click', async () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
 			this.#putButton.classList.remove('active');
-			this.#bangButton.classList.toggle('active');
+			// this.#bangButton.classList.toggle('active');
 			this.hide(this.#ingameButtons);
 			this.hide(this.#bangButton);
-			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
+			this.#gameManager.currentSection.mode = GameSection.MODE_BANG;
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
 			await this.cutin("たたけ!", this.#gameManager.audio.bang_cut, 1000);
 		}, { signal: this.#DOMEventController.signal });

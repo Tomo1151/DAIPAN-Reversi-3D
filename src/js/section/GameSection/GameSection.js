@@ -24,7 +24,7 @@ export default class GameSection extends Section {
 	#animationMixers = [];
 	#intersects = [];
 	#selectedColor = new THREE.Color(0xff0000);
-	#mode = GameSection.MODE_NONE;
+	#mode = GameSection.MODE_PUT;
 	#playerAct;
 	#posDiff;
 	#clock;
@@ -131,6 +131,7 @@ export default class GameSection extends Section {
 		});
 
 		this.gameManager.addEventListener('bang_success', (e) => {
+			this.#isSelectable = false;
 			this.#playerAct = 'bang';
 			this.#posDiff = e.pos;
 		});
