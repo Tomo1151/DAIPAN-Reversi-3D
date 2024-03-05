@@ -24,7 +24,7 @@ export default class GameSection extends Section {
 	#animationMixers = [];
 	#intersects = [];
 	#selectedColor = new THREE.Color(0xff0000);
-	#mode = GameSection.MODE_NONE;
+	#mode = GameSection.MODE_PUT;
 	#playerAct;
 	#posDiff;
 	#clock;
@@ -131,6 +131,7 @@ export default class GameSection extends Section {
 		});
 
 		this.gameManager.addEventListener('bang_success', (e) => {
+			this.#isSelectable = false;
 			this.#playerAct = 'bang';
 			this.#posDiff = e.pos;
 		});
@@ -257,16 +258,16 @@ export default class GameSection extends Section {
 	}
 
 	async object_set() {
+		const m = new THREE.MeshStandardMaterial({
+			color:0xff0000,
+			opacity: 0.75,
+			transparent: true
+		});
+
 		return new Promise(async (res) => {
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 8; j++) {
 					const g = new THREE.BoxGeometry(10, 1.15, 10);
-					const m = new THREE.MeshStandardMaterial({
-						color:0xff0000,
-						opacity: 0.75,
-						transparent: true
-					});
-
 					const box = new THREE.Mesh(g, m);
 					box.position.set(10*j - (10*3+5), 0.1, 10*i - (10*3+5));
 					box.cellX = j;

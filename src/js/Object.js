@@ -78,11 +78,11 @@ export class Board {
 				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
 				if (dist < this.#shockThreshold) {
 					// console.log(`prob: ${1-(dist/this.#shockThreshold)}`)
-					let div = (this.getDisk(j, i).state == Disk.BLACK) ? 1.15 : 0.75;
+					let div = (this.getDisk(j, i).state == Disk.BLACK) ? 3.5 : 0.75;
 					let prob = 1-(dist/this.#shockThreshold / div);
 					// console.log(`${j}, ${i}, ${dist} [${this.getDisk(j, i).state == 0? 'WHITE': 'BLACK'}]: ${prob}`);
-					// if (Math.random() < prob) {
-					if (true) {
+					if (Math.random() < prob) {
+					// if (true) {
 						// console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});

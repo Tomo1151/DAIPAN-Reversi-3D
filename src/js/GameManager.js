@@ -25,6 +25,8 @@ export default class GameManager extends THREE.EventDispatcher {
 	static MODE_NORMAL = 0;
 	static MODE_HOTHEADED = 1;
 
+	#isMobile = false;
+
 	GAME_STATE;
 	GAME_MODE;
 	GAME_PLAY_COUNT = 0;
@@ -74,6 +76,15 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.init();
 			this.disableLoadingScreen();
 		});
+
+		const { userAgent, userAgentData } = navigator;
+		if (userAgentData == null) {
+			this.#isMobile = userAgent.match(/iPhone|Android.+Mobile/) != null;
+		} else {
+			this.#isMobile = userAgentData.mobile;
+		}
+
+		// console.log(this.#isMobile);
 	}
 
 	modelLoad() {
@@ -116,11 +127,12 @@ export default class GameManager extends THREE.EventDispatcher {
 
 	run() {
 		const tick = () => {
+			requestAnimationFrame(tick)
 			this.#frame += 1;
+			if (this.#isMobile && this.#frame % 2 == 0) return;
 			if(this.#currentSection) this.#currentSection.run();
 			if(this.#cameraManager) this.#cameraManager.update();
 			if(this.#rendererManager && this.#scene) this.#rendererManager.render(this.#scene);
-			requestAnimationFrame(tick)
 		}
 
 		tick();
@@ -208,7 +220,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			for (let p of pos) this.checkCorner(data.order, p.x, p.y);
 
 			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#currentTurn, "pos": pos}));
-			this.#domManager.modeReset();
+			// this.#domManager.modeReset();
 		});
 
 		this.addEventListener('bang_success', (e) => {
@@ -227,10 +239,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			// console.log("gameManager received: updated")
 			if (this.GAME_STATE == GameManager.BEFORE_START) {
 				this.GAME_STATE = GameManager.IN_GAME;
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 			} else if (this.GAME_STATE == GameManager.IN_GAME) {
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnChangeEvent());
 			}
 		});
@@ -268,6 +280,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#endTime = e.time;
 			this.calcScore(e);
+			this.sendResult(e);
 			await sleep(1000);
 			this.#currentSection = new ResultSection(this, this.#rendererManager, this.#cameraManager, this.#scene, this.#result);
 			this.#sectionManager.changeSection(this.#currentSection);
@@ -367,7 +380,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		if (e.result.result == this.#player.order) {
 			this.#player.point += 1250;
 			for (let disk of this.board.table) {
-				console.log(disk);
+				// console.log(disk);
 				if (disk.state == Disk.EMPTY) includeEmpty = true;
 			}
 		} else {
@@ -377,7 +390,12 @@ export default class GameManager extends THREE.EventDispatcher {
 		if (includeEmpty) this.#player.point += 320;
 
 		this.#player.point = Math.floor(this.#player.point);
+		return this.#player.point;
+	}
+
+	sendResult(e) {
 		const form = new FormData();
+		const time = Math.round((this.endTime - this.startTime) / 1000);
 		const token = document.getElementById("token").value;
 		form.append("token", token);
 		if (this.player.name !== null) form.append("name", this.player.name);
@@ -395,13 +413,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			body: form
 		};
 
-		// console.log(`value: ${token}`);
-		// console.log(params);
-
 		fetch("php/score_registration.php", params)
 		.then((response) => response.json())
 		.then((res) => {
-			console.log(`res:`);
+			// console.log(`res:`);
 			console.log(res);
 		});
 	}
@@ -422,6 +437,7 @@ export default class GameManager extends THREE.EventDispatcher {
 		}
 	}
 
+	get isMobile() {return this.#isMobile;}
 	get objects() {return this.#objectPool;}
 	get audio() {return this.#audio;}
 	get player() {return this.#player;}

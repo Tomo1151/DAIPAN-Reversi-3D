@@ -16,7 +16,7 @@ export default class DOMManager {
 	#ingameUIContainer;
 	#cutDOM;
 	#ingameButtons;
-	#putButton;
+	// #putButton;
 	#passButton;
 	#bangButton;
 
@@ -24,6 +24,7 @@ export default class DOMManager {
 	#restartButton;
 
 	#playerAngerDOM;
+	#shareLink;
 
 	#DOMEventController;
 
@@ -37,11 +38,12 @@ export default class DOMManager {
 		this.#ingameUIContainer = document.getElementById('ingame_ui');
 		this.#cutDOM = document.getElementById('cut');
 		this.#ingameButtons = document.getElementById('action_button');
-		[this.#putButton, this.#passButton, this.#bangButton] = this.#ingameButtons.children;
+		[this.#passButton, this.#bangButton] = this.#ingameButtons.children;
 		this.#resultScreenDOM = document.getElementById('result_screen');
 		this.#restartButton = document.getElementById('restart_button');
 		this.#playerAngerDOM = document.getElementById('meter_value');
 		this.#playerAngerDOM.style.height = `0%`;
+		this.#shareLink = document.getElementById('share_button');
 		this.hide(this.#bangButton);
 
 		this.#DOMEventController = new AbortController();
@@ -49,8 +51,10 @@ export default class DOMManager {
 		this.#gameManager.addEventListener('turn_notice', (e) => {
 			if (e.order != this.#gameManager.player.order) return;
 			// console.log(this.#gameManager.player);
+
+
 			if (e.canPut) {
-				this.#putButton.classList.remove('disabled');
+				// this.#putButton.classList.remove('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.remove('disabled');
 				if(this.#gameManager.player.anger >= this.#gameManager.player.patience) {
@@ -59,7 +63,7 @@ export default class DOMManager {
 					this.show(document.getElementById("steam_right"));
 				}
 			} else {
-				this.#putButton.classList.add('disabled');
+				// this.#putButton.classList.add('disabled');
 				this.#passButton.classList.remove('disabled');
 				this.#bangButton.classList.add('disabled');
 			}
@@ -67,7 +71,7 @@ export default class DOMManager {
 
 		this.#gameManager.addEventListener('put_success', (e) => {
 			if (e.order == this.#gameManager.player.order) {
-				this.#putButton.classList.add('disabled');
+				// this.#putButton.classList.add('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.add('disabled');
 			}
@@ -75,9 +79,10 @@ export default class DOMManager {
 
 		this.#gameManager.addEventListener('bang_success', (e) => {
 			if (e.order == this.#gameManager.player.order) {
-				this.#putButton.classList.add('disabled');
+				// this.#putButton.classList.add('disabled');
 				this.#passButton.classList.add('disabled');
 				this.#bangButton.classList.add('disabled');
+				this.#gameManager.currentSection.mode = GameSection.MODE_PUT;
 				this.show(this.#ingameButtons);
 				this.hide(document.getElementById("steam_left"));
 				this.hide(document.getElementById("steam_right"));
@@ -86,8 +91,8 @@ export default class DOMManager {
 
 		this.#gameManager.addEventListener('game_over', async (e) => {
 			// await sleep(1500);
-			this.#putButton.classList.remove('active');
-			this.#putButton.classList.add('disabled');
+			// this.#putButton.classList.remove('active');
+			// this.#putButton.classList.add('disabled');
 			this.#bangButton.classList.remove('active');
 			this.#bangButton.classList.add('disabled');
 
@@ -95,6 +100,8 @@ export default class DOMManager {
 			await sleep(50);
 			await this.cutin("ゲーム終了", this.#gameManager.audio.start, 2000);
 			await sleep(750);
+			// console.log(e.result);
+			this.createShareLink(e.result.result);
 			this.drawResultScreen(e.result);
 		});
 
@@ -161,12 +168,12 @@ export default class DOMManager {
 		 * GameSection
 		 */
 
-		this.#putButton.addEventListener('click', () => {
-			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
-			this.#bangButton.classList.remove('active');
-			this.#putButton.classList.toggle('active');
-			this.#gameManager.currentSection.toggleMode(GameSection.MODE_PUT);
-		}, { signal: this.#DOMEventController.signal });
+		// this.#putButton.addEventListener('click', () => {
+		// 	if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
+		// 	this.#bangButton.classList.remove('active');
+		// 	this.#putButton.classList.toggle('active');
+		// 	this.#gameManager.currentSection.toggleMode(GameSection.MODE_PUT);
+		// }, { signal: this.#DOMEventController.signal });
 
 		this.#passButton.addEventListener('click', () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order || this.#gameManager.checkTable(this.#gameManager.player.order)) return;
@@ -176,11 +183,11 @@ export default class DOMManager {
 
 		this.#bangButton.addEventListener('click', async () => {
 			if (this.#gameManager.currentTurn != this.#gameManager.player.order) return;
-			this.#putButton.classList.remove('active');
-			this.#bangButton.classList.toggle('active');
+			// this.#putButton.classList.remove('active');
+			// this.#bangButton.classList.toggle('active');
 			this.hide(this.#ingameButtons);
 			this.hide(this.#bangButton);
-			this.#gameManager.currentSection.toggleMode(GameSection.MODE_BANG);
+			this.#gameManager.currentSection.mode = GameSection.MODE_BANG;
 			this.#cameraManager.moveTo(0, 100, 0, new THREE.Vector3(0, 0, 0), false, () => {}, 20)
 			await this.cutin("たたけ!", this.#gameManager.audio.bang_cut, 1000);
 		}, { signal: this.#DOMEventController.signal });
@@ -228,6 +235,15 @@ export default class DOMManager {
 		resultNameBlack.style.width = `${maxLength+1}rem`;
 		resultBlack.innerText = ` : ${result.black}`;
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
+	}
+
+	createShareLink(result) {
+		const result_str = [" 勝利😎", " 敗北☹️", " 引き分け😶"];
+		const score = this.#gameManager.player.point;
+		const text = `台パンリバーシで${score}点を取ったよ！ [${result_str[result]}]\n`;
+		const link = `http://twitter.com/share?url=reversi.syntck.com&text=${text}&hashtags=台パンリバーシ`;
+		this.#shareLink.setAttribute("href", link);
+
 	}
 
 	async cutin(str, sound, ms) {
@@ -278,7 +294,7 @@ export default class DOMManager {
 	}
 
 	modeReset() {
-		this.#putButton.classList.remove('active');
+		// this.#putButton.classList.remove('active');
 		this.#bangButton.classList.remove('active');
 		this.#gameManager.currentSection.mode = GameSection.MODE_NONE;
 	}
