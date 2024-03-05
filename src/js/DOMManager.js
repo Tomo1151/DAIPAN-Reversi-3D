@@ -235,9 +235,9 @@ export default class DOMManager {
 	}
 
 	createShareLink(result) {
-		const result_str = ["勝利", "敗北", "引き分け"];
+		const result_str = [" 勝利😎", " 敗北☹️", " 引き分け😶"];
 		const score = this.#gameManager.player.point;
-		const text = `台パンリバーシで${score}点を取ったよ！ [${result_str[result]}！]`;
+		const text = `台パンリバーシで${score}点を取ったよ！ [${result_str[result]}]\n`;
 		const link = `http://twitter.com/share?url=reversi.syntck.com&text=${text}&hashtags=台パンリバーシ`;
 		this.#shareLink.setAttribute("href", link);
 
