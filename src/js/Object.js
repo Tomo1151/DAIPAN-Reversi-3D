@@ -3,22 +3,22 @@ export class Disk {
 	static BLACK = 1;
 	static EMPTY = 2;
 
-	#x;
-	#y;
-	#state = Disk.EMPTY;
+	x;
+	y;
+	state = Disk.EMPTY;
 
 	constructor (x, y) {
-		this.#x = x;
-		this.#y = y;
+		this.x = x;
+		this.y = y;
 	}
 
-	get x() {return this.#x;}
-	get y() {return this.#y;}
-	get state() {return this.#state;}
+	// get x() {return this.#x;}
+	// get y() {return this.#y;}
+	// get state() {return this.#state;}
 
-	set x(x) {this.#x = x;}
-	set y(y) {this.#y = y;}
-	set state(state) {this.#state = state;}
+	// set x(x) {this.#x = x;}
+	// set y(y) {this.#y = y;}
+	// set state(state) {this.#state = state;}
 
 	put(order) {
 		if (this.state != Disk.EMPTY) return false;
@@ -32,29 +32,26 @@ export class Disk {
 }
 
 export class Board {
-	#shock_threshold = 200;
-	#width;
-	#height;
-	#table = new Array();
+	#shockThreshold = 200;
+	width;
+	height;
+	table = new Array();
 
 	constructor (width, height) {
-		this.#width = width;
-		this.#height = height;
+		this.width = width;
+		this.height = height;
 
 		for (let i = 0; i < height; i++) {
 			for (let j = 0; j < width; j++) {
 				let disk = new Disk(j, i);
-				this.#table.push(disk);
+				this.table.push(disk);
 			}
 		}
 
 		this.init();
 	}
 
-	get table() {return this.#table}
-	get width() {return this.#width}
-	get height() {return this.#height}
-	get shock_threshold() {return this.#shock_threshold}
+	get shockThreshold() {return this.#shockThreshold;}
 
 	init() {
 		this.getDisk(3, 3).put(Disk.WHITE);
@@ -65,7 +62,7 @@ export class Board {
 
 	count(order) {
 		if (order == Disk.WHITE || order == Disk.BLACK) {
-			return this.#table.filter(e => e.state == order).length;
+			return this.table.filter(e => e.state == order).length;
 		} else {
 			return false;
 		}
@@ -77,11 +74,16 @@ export class Board {
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				// str += `(${j}, ${i})`;
+				if (this.getDisk(j, i).state == Disk.EMPTY) continue;
 				let dist = Math.sqrt(((j*100+50 - x) ** 2) + ((i*100+50 - y) ** 2));
-				if (dist < this.#shock_threshold) {
-					// console.log(`prob: ${1-(dist/this.#shock_threshold)}`)
-					if (Math.random() < 1-(dist/this.#shock_threshold/2)) {
-						console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
+				if (dist < this.#shockThreshold) {
+					// console.log(`prob: ${1-(dist/this.#shockThreshold)}`)
+					let div = (this.getDisk(j, i).state == Disk.BLACK) ? 3.5 : 0.75;
+					let prob = 1-(dist/this.#shockThreshold / div);
+					// console.log(`${j}, ${i}, ${dist} [${this.getDisk(j, i).state == 0? 'WHITE': 'BLACK'}]: ${prob}`);
+					if (Math.random() < prob) {
+					// if (true) {
+						// console.log(`\t- (${j}, ${i}) -> distance: ${dist}`);
 						this.getDisk(j, i).reverse();
 						pos.push({"x": j, "y": i});
 					}
@@ -189,12 +191,12 @@ export class Board {
 	}
 
 	view() {
-		for (let i = 0; i < this.#height; i++) {
+		for (let i = 0; i < this.height; i++) {
 			// console.log();
 			let row = '';
-			for (let j = 0; j < this.#width; j++) {
-				let disk_state = this.#table[this.#width * i + j].state;
-				switch (disk_state) {
+			for (let j = 0; j < this.width; j++) {
+				let diskState = this.table[this.width * i + j].state;
+				switch (diskState) {
 					case Disk.WHITE:
 						row += '〇　';
 						break;

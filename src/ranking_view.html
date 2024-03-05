@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>ランキング | 台パンリバーシ3D</title>
+
+	<style type="text/css">
+		@font-face {
+			font-family: "MPlus1";
+			src:
+				url("../fonts/MPLUS1-VariableFont_wght.ttf") format("truetype");
+		}
+
+		* {
+			margin: 0;
+			box-sizing: border-box;
+		}
+
+		html {
+			font-size: 18px;
+		}
+
+		body {
+/*			height: 100vh;*/
+			font-family: "MPlus1";
+			font-weight: bold;
+			background: #efefef;
+		}
+
+		main {
+/*			width: 1000px;*/
+/*			height: 100vh;*/
+			margin: 0 auto;
+		}
+
+		h1, h2 {
+			position: relative;
+			text-align: center;
+			margin-top: 3rem;
+		}
+
+		.section-wrapper {
+			display: flex;
+		}
+
+		section {
+			flex-grow: 1;
+			flex-basis: 50%;
+		}
+
+		.won {
+			color: green;
+		}
+
+		.lost {
+			color: red;
+		}
+
+		.data-container {
+			margin: 0 3rem;
+		}
+
+		.data {
+			display: flex;
+			background-color: white;
+			padding: 1rem;
+			margin: 1rem;
+			box-shadow: 0 0 6px #555;
+			border-radius: 5px;
+		}
+
+		.data p {
+			padding: 0 1rem;
+			border-left: 2px dashed #555;
+		}
+
+		.data p:first-of-type {
+			border: none;
+			flex-grow: 1;
+		}
+
+		.data span {
+			padding-right:.5rem;
+		}
+
+		.data .name {
+/*			width: 17rem;*/
+		}
+
+		.data .score {
+			width: 7rem;
+			text-align: center;
+		}
+
+		.data .result {
+			width: 7rem;
+			text-align: center;
+		}
+
+		.data .time {
+			text-align: center;
+			width: 7rem;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>ランキング</h1>
+		<div class="section-wrapper">
+			<section>
+				<h2>─　通常モード　─</h2>
+				<div class="data-container" id="data_container_0">
+<!-- 					<div class="data">
+						<p class="name">Player_0</p>
+						<p class="score">1600</p>
+						<p class="result">WON</p>
+						<p class="time">[3/2] 12:04</p>
+					</div> -->
+				</div>
+			</section>
+			<section>
+				<h2>─　短気モード　─</h2>
+				<div class="data-container" id="data_container_1">
+<!-- 					<div class="data">
+						<p class="name">Player_0</p>
+						<p class="score">1600</p>
+						<p class="result">WON</p>
+						<p class="time">[3/2] 12:04</p>
+					</div> -->
+				</div>
+			</section>
+		</div>
+	</main>
+
+	<script type="text/javascript">
+		const result = ["勝利", "敗北", "引き分け"];
+		const result_class = ["won", "lost", ""];
+
+		function toggleFullScreen() {
+			if (!document.fullscreenElement) {
+				document.documentElement.requestFullscreen();
+			} else if (document.exitFullscreen) {
+				document.exitFullscreen();
+			}
+		}
+
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") {
+				toggleFullScreen();
+			}
+		},false);
+
+		function getOrdinalNumber(num) {
+			num = Math.abs(num);
+			let r = num % 100;
+			if (10 <= r && r <= 20) return "th";
+			num %= 10;
+			if (num === 1) return "st";
+			if (num === 2) return "nd";
+			if (num === 3) return "rd";
+			return "th";
+		}
+
+		function timeFormat(time) {
+			const hours = Math.floor(time / 3600);
+			const minutes = Math.floor((time % 3600) / 60);
+			const seconds = time % 60;
+			return `${`${hours}`.padStart(2, "0")}:${`${minutes}`.padStart(2, "0")}:${`${seconds}`.padStart(2, "0")}`;
+		}
+
+		function getRanking() {
+			fetch("php/ranking.php")
+			.then((response) => response.json())
+			.then((res) => {
+				let container_0 = document.getElementById("data_container_0");
+				let container_1 = document.getElementById("data_container_1");
+				while(container_0.firstChild) container_0.removeChild(container_0.firstChild);
+				while(container_1.firstChild) container_1.removeChild(container_1.firstChild);
+				console.log(res);
+				for (const mode in res) {
+					const data_container = document.getElementById(`data_container_${mode}`);
+					const standings = [0, 0];
+					for (let data of res[mode]) {
+						const cnt = ++ standings[mode];
+						const node = `
+							<div class="data">
+								<p class="name"><span class="standings">${`${cnt}${getOrdinalNumber(cnt)}`} :</span>${data.name}</p>
+								<p class="score">${data.score}</p>
+								<p class="result ${result_class[data.result]}">${result[data.result]}</p>
+								<p class="time">${timeFormat(data.time)}</p>
+							</div>
+						`;
+						data_container.insertAdjacentHTML("beforeend", node);
+					}
+				}
+			});
+		}
+		window.addEventListener("load", getRanking);
+		setInterval(() => {
+			getRanking();
+		}, 10000);
+	</script>
+</body>
+</html>

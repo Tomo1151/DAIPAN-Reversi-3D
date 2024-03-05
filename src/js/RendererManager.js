@@ -7,8 +7,7 @@ export default class RendererManager {
 	static SCREEN_WIDTH;
 	static SCREEN_HEIGHT;
 
-	#game_manager;
-	#object_pool;
+	#gameManager;
 
 	#renderer;
 	#camera;
@@ -16,21 +15,22 @@ export default class RendererManager {
 	#mouse;
 	#raycaster;
 
-	constructor (game_manager, object_pool) {
+	constructor (gameManager) {
 		// set game manager
-		this.#game_manager = game_manager;
+		this.#gameManager = gameManager;
 
 		// def renderer
 		this.#renderer = new THREE.WebGLRenderer({
 			canvas: document.getElementById('main-canvas'),
-			antialias: true,
+			antialias: false,
 			alpha: true,
 		});
+		// this.#renderer.setPixelRatio(1);
 		this.#renderer.setPixelRatio(window.devicePixelRatio);
 		this.#renderer.setSize(window.innerWidth, window.innerHeight);
 
 		// def camera
-		this.#camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 10000);
+		this.#camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200);
 		this.#camera.position.set(50, 50, 50);
 
 		// def controls
@@ -39,6 +39,7 @@ export default class RendererManager {
 		this.#controls.minDistance = 30;
 		this.#controls.maxZoom = 2;
 		this.#controls.minZoom = 1.25;
+		this.#controls.maxPolarAngle = Math.PI/2;
 		// this.#controls.enableDamping = true;
 		// this.#controls.dampingFactor = 0.2;
 
