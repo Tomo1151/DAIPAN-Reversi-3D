@@ -1,17 +1,1 @@
-async function sleep(ms) {
-	return new Promise(res => setInterval(res, ms));
-}
-
-function isEmpty(object) {
-	if (object == null) return true;
-	if (object == undefined) return true;
-	return Object.keys(object).length === 0
-}
-
-function getRandomInt(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min) + min);
-}
-
-export { sleep, isEmpty, getRandomInt};
+async function n(t){return new Promise(n=>setInterval(n,t))}function t(n){if(n==null)return true;if(n==undefined)return true;return Object.keys(n).length===0}function e(n,t){n=Math.ceil(n);t=Math.floor(t);return Math.floor(Math.random()*(t-n)+n)}export{n as sleep,t as isEmpty,e as getRandomInt};
