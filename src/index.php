@@ -69,9 +69,9 @@
 
 		<div id="ingame_ui">
 			<div class="buttons-wrapper" id="action_button">
-				<div class="button disabled" id="put_button">
+<!-- 				<div class="button disabled" id="put_button">
 					<p>おく</p>
-				</div>
+				</div> -->
 				<div class="button disabled" id="pass_button">
 					<p>パス</p>
 				</div>

@@ -220,7 +220,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			for (let p of pos) this.checkCorner(data.order, p.x, p.y);
 
 			this.dispatchEvent(new Event.BangSuccessEvent({"order": this.#currentTurn, "pos": pos}));
-			this.#domManager.modeReset();
+			// this.#domManager.modeReset();
 		});
 
 		this.addEventListener('bang_success', (e) => {
@@ -239,10 +239,10 @@ export default class GameManager extends THREE.EventDispatcher {
 			// console.log("gameManager received: updated")
 			if (this.GAME_STATE == GameManager.BEFORE_START) {
 				this.GAME_STATE = GameManager.IN_GAME;
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnNoticeEvent(Disk.BLACK, this.#board, true))
 			} else if (this.GAME_STATE == GameManager.IN_GAME) {
-				// await sleep(1000);
+				await sleep(1000);
 				this.dispatchEvent(new Event.TurnChangeEvent());
 			}
 		});

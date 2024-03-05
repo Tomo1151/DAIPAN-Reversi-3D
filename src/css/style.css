@@ -22,7 +22,7 @@
 			font-family: 'MPlus1', sans-serif;
 			font-weight: 600;
 			overflow: hidden;
-
+			-webkit-text-size-adjust: 100%;
 			-webkit-touch-callout: none;
 			-webkit-user-select: none;
 			-khtml-user-select: none;
@@ -396,7 +396,7 @@
 			right: -2em;
 			font-size: 1.5em;
 			font-weight: 900;
-			-webkit-text-stroke: 1px var(--font-main-white);
+			-webkit-text-stroke: .5px var(--font-main-white);
 			white-space: nowrap;
 			writing-mode: vertical-lr;
 			font-family: monospace;
