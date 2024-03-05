@@ -24,6 +24,7 @@ export default class DOMManager {
 	#restartButton;
 
 	#playerAngerDOM;
+	#shareLink;
 
 	#DOMEventController;
 
@@ -42,6 +43,7 @@ export default class DOMManager {
 		this.#restartButton = document.getElementById('restart_button');
 		this.#playerAngerDOM = document.getElementById('meter_value');
 		this.#playerAngerDOM.style.height = `0%`;
+		this.#shareLink = document.getElementById('share_button');
 		this.hide(this.#bangButton);
 
 		this.#DOMEventController = new AbortController();
@@ -95,6 +97,8 @@ export default class DOMManager {
 			await sleep(50);
 			await this.cutin("ゲーム終了", this.#gameManager.audio.start, 2000);
 			await sleep(750);
+			// console.log(e.result);
+			this.createShareLink(e.result.result);
 			this.drawResultScreen(e.result);
 		});
 
@@ -228,6 +232,15 @@ export default class DOMManager {
 		resultNameBlack.style.width = `${maxLength+1}rem`;
 		resultBlack.innerText = ` : ${result.black}`;
 		resultTime.innerText = `${('00' + Math.floor(dh)).slice(-2)}:${('00' + Math.floor(dm)).slice(-2)}:${('00' + Math.round(ds)).slice(-2)}`;
+	}
+
+	createShareLink(result) {
+		const result_str = ["勝利", "敗北", "引き分け"];
+		const score = this.#gameManager.player.point;
+		const text = `台パンリバーシで${score}点を取ったよ！ [${result_str[result]}！]`;
+		const link = `http://twitter.com/share?url=reversi.syntck.com&text=${text}&hashtags=台パンリバーシ`;
+		this.#shareLink.setAttribute("href", link);
+
 	}
 
 	async cutin(str, sound, ms) {

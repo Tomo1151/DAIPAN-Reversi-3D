@@ -113,7 +113,7 @@
 
 		<div class="fadeIn" id="result_screen">
 			<h2>Result</h2>
-			<h3 id="winner">Player の勝ち！</h3>
+			<h3 id="winner"></h3>
 			<div id="result">
 				<p id="score"></p>
 				<div class="order-count">
@@ -129,8 +129,14 @@
 
 				<p id="time"></p>
 			</div>
-			<div class="button" id="restart_button">
-				<p>タイトルに戻る</p>
+			<div class="result-buttons">
+				<div class="button" id="restart_button">
+					<p>タイトルに戻る</p>
+				</div>
+				<div class="button">
+					<p><img src="img/twitter_logo.png" class="twitter">Twitterで結果を共有する！</p>
+					<a href="" rel="nofollow noopener noreferrer" target="_blank" id="share_button"></a>
+				</div>
 			</div>
 		</div>
 

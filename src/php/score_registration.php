@@ -82,7 +82,6 @@
 		}
 
 		$_SESSION["GAME_COUNT"] = $_POST["gc"];
-
 		$player_score = comfirm_score();
 		$res_str .= "player_score: {$player_score}\n";
 

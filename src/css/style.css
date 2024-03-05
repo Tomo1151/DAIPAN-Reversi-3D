@@ -34,6 +34,11 @@
 			/* mobile webkit */
 		}
 
+		a, a:visited {
+			color: inherit;
+			text-decoration: none;
+		}
+
 		.fadeIn {
 			animation-name: fadeInAnimation;
 			animation-duration: .5s;
@@ -249,6 +254,11 @@
 			padding: 2rem;
 		}
 
+		.result-buttons {
+			display: flex;
+			justify-content: space-between;
+		}
+
 		#result_screen h2 {
 			font-size: 1.5rem;
 			text-align: center;
@@ -259,6 +269,26 @@
 			font-size: 2.5rem;
 			text-align: center;
 			font-weight: normal;
+		}
+
+		.twitter {
+			width: 1.25em;
+			height: 1.25em;
+			object-fit: contain;
+			padding-right: .5em;
+			vertical-align: middle;
+		}
+
+		#share_button {
+			position: absolute;
+			inset: 0;
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		.result-buttons .button:last-child {
+			position: relative;
 		}
 
 		#score::before {

@@ -280,6 +280,7 @@ export default class GameManager extends THREE.EventDispatcher {
 			this.GAME_STATE = GameManager.GAME_OVER;
 			this.#endTime = e.time;
 			this.calcScore(e);
+			this.sendResult(e);
 			await sleep(1000);
 			this.#currentSection = new ResultSection(this, this.#rendererManager, this.#cameraManager, this.#scene, this.#result);
 			this.#sectionManager.changeSection(this.#currentSection);
@@ -389,7 +390,12 @@ export default class GameManager extends THREE.EventDispatcher {
 		if (includeEmpty) this.#player.point += 320;
 
 		this.#player.point = Math.floor(this.#player.point);
+		return this.#player.point;
+	}
+
+	sendResult(e) {
 		const form = new FormData();
+		const time = Math.round((this.endTime - this.startTime) / 1000);
 		const token = document.getElementById("token").value;
 		form.append("token", token);
 		if (this.player.name !== null) form.append("name", this.player.name);
@@ -407,14 +413,11 @@ export default class GameManager extends THREE.EventDispatcher {
 			body: form
 		};
 
-		// console.log(`value: ${token}`);
-		// console.log(params);
-
 		fetch("php/score_registration.php", params)
 		.then((response) => response.json())
 		.then((res) => {
 			// console.log(`res:`);
-			// console.log(res);
+			console.log(res);
 		});
 	}
 
