@@ -5,6 +5,7 @@ import { sleep } from "../../Utils.js";
 import { Disk, Board } from "../../Object.js";
 import Section from "../Section.js";
 import * as Event from "../../Event.js";
+import { P2P_TYPES } from "../../network/MessageSchema.js";
 
 export default class GameSection extends Section {
   static MODE_NONE = -1;
@@ -27,6 +28,10 @@ export default class GameSection extends Section {
   #mode = GameSection.MODE_PUT;
   #playerAct;
   #posDiff;
+  #bangImpact;
+  #remoteBangPreviewing = false;
+  #remoteBangCameraPosition = null;
+  #lastBangPreviewSentAt = 0;
   #clock;
 
   constructor(gameManager, rendererManager, cameraManager, scene) {
@@ -84,6 +89,23 @@ export default class GameSection extends Section {
             this.#selectArea.visible = true;
             this.#selectArea.position.x = intersect.point.x;
             this.#selectArea.position.z = intersect.point.z;
+
+            if (
+              this.gameManager.isOnlineMode &&
+              this.gameManager.player.order === this.gameManager.currentTurn
+            ) {
+              const now = Date.now();
+              if (now - this.#lastBangPreviewSentAt > 80) {
+                this.#lastBangPreviewSentAt = now;
+                this.gameManager.sendP2PAction(P2P_TYPES.ACTION_BANG_PREVIEW, {
+                  order: this.gameManager.player.order,
+                  impact: {
+                    x: intersect.point.x * 10 + 400,
+                    y: intersect.point.z * 10 + 400,
+                  },
+                });
+              }
+            }
           } else {
             this.#onBase = false;
             this.#selectArea.visible = false;
@@ -169,15 +191,90 @@ export default class GameSection extends Section {
       this.#isSelectable = false;
       this.#playerAct = "bang";
       this.#posDiff = e.pos;
+      this.#bangImpact = e.impact || null;
+    });
+
+    this.gameManager.addEventListener("bang_preview", (e) => {
+      if (!this.gameManager.isOnlineMode) return;
+      if (e.order === this.gameManager.player.order) return;
+      if (this.gameManager.currentTurn !== e.order) return;
+
+      if (!this.#remoteBangPreviewing) {
+        this.#remoteBangPreviewing = true;
+        this.#remoteBangCameraPosition = {
+          x: this.cameraManager.position.x,
+          y: this.cameraManager.position.y,
+          z: this.cameraManager.position.z,
+        };
+        this.gameManager.audio.bang_cut.cloneNode().play();
+        this.cameraManager.moveTo(
+          0,
+          100,
+          0,
+          new THREE.Vector3(0, 0, 0),
+          false,
+          () => {},
+          20,
+        );
+      }
+      this.showBangImpact(e.impact);
     });
 
     this.gameManager.addEventListener("confirmed", async () => {
       if (this.#playerAct == "bang") {
-        this.cameraManager.restore(async () => {
+        const runBangAndUpdate = async () => {
           this.cameraManager.shake();
           await this.diskMeshFlip(this.gameManager.board.table, this.#posDiff);
+          this.#selectArea.visible = false;
+          this.#bangImpact = null;
+          this.#remoteBangPreviewing = false;
+          this.#remoteBangCameraPosition = null;
           this.gameManager.dispatchEvent(new Event.UpdateCompleteEvent());
-        });
+        };
+
+        const restoreAfterBang = () => {
+          const restorePos = this.#remoteBangCameraPosition;
+          if (restorePos) {
+            this.cameraManager.moveTo(
+              restorePos.x,
+              restorePos.y,
+              restorePos.z,
+              new THREE.Vector3(0, 0, 0),
+              true,
+              async () => {
+                await runBangAndUpdate();
+              },
+              10,
+            );
+            return;
+          }
+
+          this.cameraManager.restore(async () => {
+            await runBangAndUpdate();
+          });
+        };
+
+        if (this.#bangImpact) {
+          this.showBangImpact(this.#bangImpact);
+          await sleep(300);
+        }
+
+        const isTopView = this.cameraManager.position.y >= 90;
+        if (!isTopView) {
+          this.cameraManager.moveTo(
+            0,
+            100,
+            0,
+            new THREE.Vector3(0, 0, 0),
+            false,
+            () => {
+              restoreAfterBang();
+            },
+            20,
+          );
+        } else {
+          restoreAfterBang();
+        }
         // await sleep(500);
       } else {
         await this.diskMeshUpdate(this.gameManager.board.table);
@@ -193,6 +290,9 @@ export default class GameSection extends Section {
       this.logger.log("delete mousemove callback");
       // console.log("delete mousemove callback");
       mousemoveController.abort();
+      this.#remoteBangPreviewing = false;
+      this.#remoteBangCameraPosition = null;
+      this.#selectArea.visible = false;
     });
   }
 
@@ -371,6 +471,14 @@ export default class GameSection extends Section {
       this.animationFlip(num, order);
     }
     await sleep(duration * 400);
+  }
+
+  showBangImpact(impact) {
+    const worldX = (impact.x - 400) / 10;
+    const worldZ = (impact.y - 400) / 10;
+    this.#selectArea.position.x = worldX;
+    this.#selectArea.position.z = worldZ;
+    this.#selectArea.visible = true;
   }
 
   async diskMeshUpdate(table, put_pos, rev_pos) {

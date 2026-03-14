@@ -212,15 +212,37 @@ export class BangFailEvent extends CustomEvent {
   }
 }
 
+export class BangPreviewEvent extends CustomEvent {
+  static EVENT_NAME = "bang_preview";
+  #order;
+  #impact;
+
+  constructor(data) {
+    super(BangPreviewEvent.EVENT_NAME);
+    this.#order = data.order;
+    this.#impact = data.impact;
+  }
+
+  get order() {
+    return this.#order;
+  }
+
+  get impact() {
+    return this.#impact;
+  }
+}
+
 export class BangSuccessEvent extends CustomEvent {
   static EVENT_NAME = "bang_success";
   #order;
   #pos;
+  #impact;
 
   constructor(data) {
     super(BangSuccessEvent.EVENT_NAME);
     this.#order = data.order;
     this.#pos = data.pos;
+    this.#impact = data.impact || null;
   }
 
   get order() {
@@ -228,6 +250,10 @@ export class BangSuccessEvent extends CustomEvent {
   }
   get pos() {
     return this.#pos;
+  }
+
+  get impact() {
+    return this.#impact;
   }
 }
 

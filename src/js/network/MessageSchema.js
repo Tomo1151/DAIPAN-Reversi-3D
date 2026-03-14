@@ -14,6 +14,8 @@ export const SIGNALING_TYPES = {
 export const P2P_TYPES = {
   MATCH_START: "match_start",
   ACTION_PUT: "action_put",
+  ACTION_BANG_PREVIEW: "action_bang_preview",
+  ACTION_BANG_RESULT: "action_bang_result",
   ACTION_PASS: "action_pass",
   ACTION_RESTART: "action_restart",
   STATE_SYNC: "state_sync",

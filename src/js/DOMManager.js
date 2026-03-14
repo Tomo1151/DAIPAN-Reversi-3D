@@ -105,19 +105,11 @@ export default class DOMManager {
       if (e.order != this.#gameManager.player.order) return;
       // console.log(this.#gameManager.player);
 
-      if (this.#gameManager.isOnlineMode) {
-        this.hide(this.#bangButton);
-        this.hide(document.getElementById("steam_left"));
-        this.hide(document.getElementById("steam_right"));
-      }
-
       if (e.canPut) {
         // this.#putButton.classList.remove('disabled');
         this.#passButton.classList.add("disabled");
-        if (!this.#gameManager.isOnlineMode)
-          this.#bangButton.classList.remove("disabled");
+        this.#bangButton.classList.remove("disabled");
         if (
-          !this.#gameManager.isOnlineMode &&
           this.#gameManager.player.anger >= this.#gameManager.player.patience
         ) {
           this.show(this.#bangButton);
@@ -175,9 +167,11 @@ export default class DOMManager {
       this.show(this.#titleScreenDOM);
       this.showNamePage();
       this.hide(this.#playerInfoDOM);
-
-      this.#DOMEventController.abort();
     });
+  }
+
+  dispose() {
+    this.#DOMEventController.abort();
   }
 
   addDOMEventListeners() {
@@ -426,7 +420,13 @@ export default class DOMManager {
     let resultBlack = document.getElementById("order_black");
     let resultWhite = document.getElementById("order_white");
     let resultTime = document.getElementById("time");
-    let maxLength = Math.max(3, this.#gameManager.player.name?.length || 6);
+    const playerName = this.#gameManager.player.name || "Player";
+    const enemyName = this.#gameManager.enemy.name || "Opponent";
+    const playerOrder = this.#gameManager.player.order;
+    const blackName = playerOrder === Disk.BLACK ? playerName : enemyName;
+    const whiteName = playerOrder === Disk.WHITE ? playerName : enemyName;
+    const selfScore = playerOrder === Disk.BLACK ? result.black : result.white;
+    const maxLength = Math.max(3, blackName.length, whiteName.length);
 
     let dt =
       this.#gameManager.endTime.getTime() -
@@ -442,15 +442,20 @@ export default class DOMManager {
     if (result.result == Disk.EMPTY) {
       result_str = "引き分け!";
     } else {
-      result_str = `${result.result == Disk.WHITE ? this.#gameManager.player.name || "Player" : "COM"}の勝ち!`;
+      result_str = `${result.result == playerOrder ? playerName : enemyName}の勝ち!`;
+      if (result.reason === "disconnect") {
+        result_str += " (切断)";
+      }
     }
 
     resultWinner.innerText = result_str;
-    resultScore.innerText = this.#gameManager.player.point;
-    resultNameWhite.innerText = `${this.getPlayerName() || "Player"}`;
+    resultScore.innerText = this.#gameManager.isOnlineMode
+      ? selfScore
+      : this.#gameManager.player.point;
+    resultNameWhite.innerText = whiteName;
     resultNameWhite.style.width = `${maxLength + 1}rem`;
     resultWhite.innerText = ` : ${result.white}`;
-    resultNameBlack.innerText = `${this.#gameManager.enemy.name}`;
+    resultNameBlack.innerText = blackName;
     resultNameBlack.style.width = `${maxLength + 1}rem`;
     resultBlack.innerText = ` : ${result.black}`;
     resultTime.innerText = `${("00" + Math.floor(dh)).slice(-2)}:${("00" + Math.floor(dm)).slice(-2)}:${("00" + Math.round(ds)).slice(-2)}`;
@@ -531,13 +536,18 @@ export default class DOMManager {
     this.show(this.#ingameUIContainer);
   }
 
-  updatePlayerInfo(playerName, order, isOnlineMode) {
+  updatePlayerInfo(players, isOnlineMode) {
     const modeLabel = isOnlineMode ? "MULTI" : "SINGLE";
-    const colorLabel =
-      order === Disk.BLACK ? "あなたの色: 黒" : "あなたの色: 白";
+    const sortedPlayers = [...(players || [])].sort(
+      (a, b) => a.order - b.order,
+    );
+    const playerLines = sortedPlayers.map((player) => {
+      const colorLabel = player.order === Disk.BLACK ? "黒" : "白";
+      return `${colorLabel}: ${player.name || "Player"}`;
+    });
     this.#playerInfoModeDOM.innerText = modeLabel;
-    this.#playerInfoNameDOM.innerText = playerName || "Player";
-    this.#playerInfoColorDOM.innerText = colorLabel;
+    this.#playerInfoNameDOM.innerHTML = playerLines.join("<br>");
+    this.#playerInfoColorDOM.innerText = "";
     this.show(this.#playerInfoDOM);
   }
 

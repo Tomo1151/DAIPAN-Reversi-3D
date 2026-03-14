@@ -431,6 +431,23 @@ export default class GameManager extends THREE.EventDispatcher {
           new Event.PutNoticeEvent({ ...payload, fromRemote: true }),
         );
         break;
+      case P2P_TYPES.ACTION_BANG_PREVIEW:
+        if (this.GAME_STATE !== GameManager.IN_GAME) break;
+        this.dispatchEvent(new Event.BangPreviewEvent(payload));
+        break;
+      case P2P_TYPES.ACTION_BANG_RESULT:
+        if (this.GAME_STATE !== GameManager.IN_GAME) break;
+        this.clearTurnTimeout();
+        this.applyBangResult(payload.order, payload.pos || []);
+        this.dispatchEvent(
+          new Event.BangSuccessEvent({
+            order: payload.order,
+            pos: payload.pos || [],
+            impact: payload.impact || null,
+          }),
+        );
+        this.dispatchEvent(new Event.ConfirmationEvent(payload.order));
+        break;
       case P2P_TYPES.ACTION_PASS:
         this.dispatchEvent(new Event.PutPassEvent(payload.order, true));
         break;
@@ -442,7 +459,7 @@ export default class GameManager extends THREE.EventDispatcher {
     }
   }
 
-  startOnlineMatch({ localOrder, remoteName }) {
+  async startOnlineMatch({ localOrder, remoteName }) {
     if (
       this.#isStartingOnlineMatch ||
       this.GAME_STATE !== GameManager.BEFORE_START
@@ -454,6 +471,8 @@ export default class GameManager extends THREE.EventDispatcher {
     this.#domManager.hideLobbyScreens();
     this.#domManager.orderUpdate();
     this.#domManager.hideTitle();
+    this.#audio.open.play();
+    await this.#domManager.cutin("ゲームスタート", this.#audio.start, 2000);
     this.#domManager.showIngameUI();
     this.dispatchEvent(
       new Event.GameStartEvent({
@@ -566,8 +585,10 @@ export default class GameManager extends THREE.EventDispatcher {
       document.getElementById("boiling_point").style.bottom =
         `${this.#player.patience}%`;
       this.#domManager.updatePlayerInfo(
-        this.#player.name,
-        this.#player.order,
+        [
+          { name: this.#player.name, order: this.#player.order },
+          { name: this.#enemy.name, order: this.#enemy.order },
+        ],
         this.#matchMode === GameManager.MATCH_ONLINE,
       );
     });
@@ -622,12 +643,28 @@ export default class GameManager extends THREE.EventDispatcher {
     this.addEventListener("bang_notice", (data) => {
       this.#logger.log(`[BANG] x: ${data.x}, y: ${data.y}`);
       // console.log(`[BANG] x: ${data.x}, y: ${data.y}`);
+      this.clearTurnTimeout();
       let pos = this.board.raffle(data.order, data.x, data.y, data.anger);
       // console.log(pos);
       for (let p of pos) this.checkCorner(data.order, p.x, p.y);
 
+      if (
+        this.#matchMode === GameManager.MATCH_ONLINE &&
+        data.order === this.#player.order
+      ) {
+        this.sendP2PAction(P2P_TYPES.ACTION_BANG_RESULT, {
+          order: data.order,
+          pos,
+          impact: { x: data.x, y: data.y },
+        });
+      }
+
       this.dispatchEvent(
-        new Event.BangSuccessEvent({ order: this.#currentTurn, pos: pos }),
+        new Event.BangSuccessEvent({
+          order: this.#currentTurn,
+          pos,
+          impact: { x: data.x, y: data.y },
+        }),
       );
       // this.#domManager.modeReset();
     });
@@ -744,6 +781,7 @@ export default class GameManager extends THREE.EventDispatcher {
   }
 
   restart() {
+    this.#domManager?.dispose?.();
     this.cleanupNetwork();
     this._listeners = {};
     this.init();
@@ -789,6 +827,15 @@ export default class GameManager extends THREE.EventDispatcher {
     } catch {}
   }
 
+  applyBangResult(order, positions) {
+    for (const pos of positions) {
+      const disk = this.#board.getDisk(pos.x, pos.y);
+      if (!disk || disk.state === Disk.EMPTY) continue;
+      disk.reverse();
+      this.checkCorner(order, pos.x, pos.y);
+    }
+  }
+
   put(x, y) {
     this.#board.putDisk(this.#currentTurn, x, y);
   }
@@ -807,7 +854,9 @@ export default class GameManager extends THREE.EventDispatcher {
 
   calcScore(e) {
     const time = Math.round((this.endTime - this.startTime) / 1000);
-    this.#player.point += e.result.white * 12.5;
+    const myDiskCount =
+      this.#player.order === Disk.BLACK ? e.result.black : e.result.white;
+    this.#player.point += myDiskCount * 12.5;
     // this.#player.point += (e.result.result == this.#player.order) ? 1250 : 600;
     this.#player.point += this.#player.bang * 10;
     this.#player.point += Math.max(360 - time, 0);
@@ -873,7 +922,7 @@ export default class GameManager extends THREE.EventDispatcher {
   getResult() {
     let black = this.#board.count(Disk.BLACK);
     let white = this.#board.count(Disk.WHITE);
-    let result = black < white ? this.#player.order : this.#enemy.order;
+    let result = black < white ? Disk.WHITE : Disk.BLACK;
     if (black == white) result = Disk.EMPTY;
     return { black, white, result };
   }
