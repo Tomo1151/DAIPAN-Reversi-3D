@@ -1,205 +1,277 @@
 class CustomEvent {
-	#type;
-	#time;
+  #type;
+  #time;
 
-	constructor(type) {
-		this.#type = type;
-		this.#time = new Date();
-	}
+  constructor(type) {
+    this.#type = type;
+    this.#time = new Date();
+  }
 
-	get type() {return this.#type;}
-	get time() {return this.#time;}
+  get type() {
+    return this.#type;
+  }
+  get time() {
+    return this.#time;
+  }
 }
 
 export class GameStartEvent extends CustomEvent {
-	static EVENT_NAME = "game_start";
+  static EVENT_NAME = "game_start";
+  #options;
 
-	constructor() {
-		super (GameStartEvent.EVENT_NAME);
-	}
+  constructor(options = {}) {
+    super(GameStartEvent.EVENT_NAME);
+    this.#options = options;
+  }
+
+  get options() {
+    return this.#options;
+  }
 }
 
 export class GameOverEvent extends CustomEvent {
-	static EVENT_NAME = "game_over";
-	#result;
+  static EVENT_NAME = "game_over";
+  #result;
 
-	constructor(result) {
-		super (GameOverEvent.EVENT_NAME);
-		this.#result = result;
-	}
+  constructor(result) {
+    super(GameOverEvent.EVENT_NAME);
+    this.#result = result;
+  }
 
-	get result () {return this.#result}
+  get result() {
+    return this.#result;
+  }
 }
 
 export class GameRestartEvent extends CustomEvent {
-	static EVENT_NAME = "game_restart";
+  static EVENT_NAME = "game_restart";
+  #fromRemote;
 
-	constructor() {
-		super (GameRestartEvent.EVENT_NAME);
-	}
+  constructor(fromRemote = false) {
+    super(GameRestartEvent.EVENT_NAME);
+    this.#fromRemote = fromRemote;
+  }
+
+  get fromRemote() {
+    return this.#fromRemote;
+  }
 }
 
 export class ConfirmationEvent extends CustomEvent {
-	static EVENT_NAME = "confirmed";
-	#order;
+  static EVENT_NAME = "confirmed";
+  #order;
 
-	constructor(order) {
-		super (ConfirmationEvent.EVENT_NAME);
-		this.#order = order;
-	}
+  constructor(order) {
+    super(ConfirmationEvent.EVENT_NAME);
+    this.#order = order;
+  }
 
-	get order() {return this.#order}
+  get order() {
+    return this.#order;
+  }
 }
 
 export class TurnChangeEvent extends CustomEvent {
-	static EVENT_NAME = "turn_change";
+  static EVENT_NAME = "turn_change";
 
-	constructor() {
-		super (TurnChangeEvent.EVENT_NAME);
-	}
+  constructor() {
+    super(TurnChangeEvent.EVENT_NAME);
+  }
 }
 
 export class TurnNoticeEvent extends CustomEvent {
-	static EVENT_NAME = "turn_notice";
-	#board;
-	#canPut;
-	#order;
+  static EVENT_NAME = "turn_notice";
+  #board;
+  #canPut;
+  #order;
 
-	constructor(order, board, canPut) {
-		super(TurnNoticeEvent.EVENT_NAME);
-		this.#board = board;
-		this.#canPut = canPut;
-		this.#order = order;
-	}
+  constructor(order, board, canPut) {
+    super(TurnNoticeEvent.EVENT_NAME);
+    this.#board = board;
+    this.#canPut = canPut;
+    this.#order = order;
+  }
 
-	get board() {return this.#board;}
-	get canPut() {return this.#canPut;}
-	get order() {return this.#order;}
+  get board() {
+    return this.#board;
+  }
+  get canPut() {
+    return this.#canPut;
+  }
+  get order() {
+    return this.#order;
+  }
 }
 
 export class PutNoticeEvent extends CustomEvent {
-	static EVENT_NAME = "put_notice";
-	#order;
-	#x;
-	#y;
+  static EVENT_NAME = "put_notice";
+  #order;
+  #x;
+  #y;
+  #fromRemote;
 
-	constructor(data) {
-		super (PutNoticeEvent.EVENT_NAME);
-		this.#order = data.order;
-		this.#x = data.x;
-		this.#y = data.y;
-	}
+  constructor(data) {
+    super(PutNoticeEvent.EVENT_NAME);
+    this.#order = data.order;
+    this.#x = data.x;
+    this.#y = data.y;
+    this.#fromRemote = data.fromRemote || false;
+  }
 
-	get order() {return this.#order;}
-	get x() {return this.#x;}
-	get y() {return this.#y;}
+  get order() {
+    return this.#order;
+  }
+  get x() {
+    return this.#x;
+  }
+  get y() {
+    return this.#y;
+  }
+  get fromRemote() {
+    return this.#fromRemote;
+  }
 }
 
 export class PutFailEvent extends CustomEvent {
-	static EVENT_NAME = "put_fail";
-	#order;
+  static EVENT_NAME = "put_fail";
+  #order;
 
-	constructor(order) {
-		super (PutFailEvent.EVENT_NAME);
-		this.#order = order;
-	}
+  constructor(order) {
+    super(PutFailEvent.EVENT_NAME);
+    this.#order = order;
+  }
 
-	get order() {return this.#order;}
+  get order() {
+    return this.#order;
+  }
 }
 
 export class PutSuccessEvent extends CustomEvent {
-	static EVENT_NAME = "put_success";
-	#order;
-	#pos;
-	#count;
+  static EVENT_NAME = "put_success";
+  #order;
+  #pos;
+  #count;
 
-	constructor(order, pos, count) {
-		super (PutSuccessEvent.EVENT_NAME);
-		this.#order = order;
-		this.#pos = pos;
-		this.#count = count;
-	}
+  constructor(order, pos, count) {
+    super(PutSuccessEvent.EVENT_NAME);
+    this.#order = order;
+    this.#pos = pos;
+    this.#count = count;
+  }
 
-	get order() {return this.#order;}
-	get pos() {return this.#pos;}
-	get count() {return this.#count;}
+  get order() {
+    return this.#order;
+  }
+  get pos() {
+    return this.#pos;
+  }
+  get count() {
+    return this.#count;
+  }
 }
 
 export class BangNoticeEvent extends CustomEvent {
-	static EVENT_NAME = "bang_notice";
-	#order;
-	#x;
-	#y;
-	#anger = 100;
+  static EVENT_NAME = "bang_notice";
+  #order;
+  #x;
+  #y;
+  #anger = 100;
 
-	constructor(data) {
-		super (BangNoticeEvent.EVENT_NAME);
-		this.#order = data.order;
-		this.#x = data.x;
-		this.#y = data.y;
-	}
+  constructor(data) {
+    super(BangNoticeEvent.EVENT_NAME);
+    this.#order = data.order;
+    this.#x = data.x;
+    this.#y = data.y;
+  }
 
-	get order() {return this.#order;}
-	get x() {return this.#x;}
-	get y() {return this.#y;}
-	get anger() {return this.#anger;}
+  get order() {
+    return this.#order;
+  }
+  get x() {
+    return this.#x;
+  }
+  get y() {
+    return this.#y;
+  }
+  get anger() {
+    return this.#anger;
+  }
 }
 
 export class BangFailEvent extends CustomEvent {
-	static EVENT_NAME = "bang_fail";
-	#order;
+  static EVENT_NAME = "bang_fail";
+  #order;
 
-	constructor(order) {
-		super (BangFailEvent.EVENT_NAME);
-		this.#order = order;
-	}
+  constructor(order) {
+    super(BangFailEvent.EVENT_NAME);
+    this.#order = order;
+  }
 
-	get order() {return this.#order;}
+  get order() {
+    return this.#order;
+  }
 }
 
 export class BangSuccessEvent extends CustomEvent {
-	static EVENT_NAME = "bang_success";
-	#order;
-	#pos;
+  static EVENT_NAME = "bang_success";
+  #order;
+  #pos;
 
-	constructor(data) {
-		super (BangSuccessEvent.EVENT_NAME);
-		this.#order = data.order;
-		this.#pos = data.pos;
-	}
+  constructor(data) {
+    super(BangSuccessEvent.EVENT_NAME);
+    this.#order = data.order;
+    this.#pos = data.pos;
+  }
 
-	get order() {return this.#order;}
-	get pos() {return this.#pos;}
+  get order() {
+    return this.#order;
+  }
+  get pos() {
+    return this.#pos;
+  }
 }
 
 export class PutPassEvent extends CustomEvent {
-	static EVENT_NAME = "put_pass";
-	#order;
+  static EVENT_NAME = "put_pass";
+  #order;
+  #fromRemote;
 
-	constructor(order) {
-		super (PutPassEvent.EVENT_NAME);
-		this.#order = order;
-	}
+  constructor(order, fromRemote = false) {
+    super(PutPassEvent.EVENT_NAME);
+    this.#order = order;
+    this.#fromRemote = fromRemote;
+  }
 
-	get order() {return this.#order;}
+  get order() {
+    return this.#order;
+  }
+  get fromRemote() {
+    return this.#fromRemote;
+  }
 }
 
 export class TakeCornerEvent extends CustomEvent {
-	static EVENT_NAME = "take_corner";
-	#order;
-	#corner;
+  static EVENT_NAME = "take_corner";
+  #order;
+  #corner;
 
-	constructor(order, corner) {
-		super(TakeCornerEvent.EVENT_NAME);
-		this.#order = order;
-		this.#corner = corner;
-	}
+  constructor(order, corner) {
+    super(TakeCornerEvent.EVENT_NAME);
+    this.#order = order;
+    this.#corner = corner;
+  }
 
-	get order() {return this.#order;}
-	get corner() {return this.#corner;}
+  get order() {
+    return this.#order;
+  }
+  get corner() {
+    return this.#corner;
+  }
 }
 
 export class UpdateCompleteEvent extends CustomEvent {
-	static EVENT_NAME = "updated";
-	constructor() {super(UpdateCompleteEvent.EVENT_NAME);}
+  static EVENT_NAME = "updated";
+  constructor() {
+    super(UpdateCompleteEvent.EVENT_NAME);
+  }
 }
