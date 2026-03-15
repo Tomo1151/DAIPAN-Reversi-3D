@@ -44,6 +44,7 @@ export default class DOMManager {
   // #putButton;
   #passButton;
   #bangButton;
+  #turnTimerDOM;
 
   #resultScreenDOM;
   #restartButton;
@@ -51,6 +52,8 @@ export default class DOMManager {
   #playerAngerDOM;
   #shareLink;
   #remoteBangCutinShown = false;
+  #turnCountdownInterval = null;
+  #turnDeadlineMs = null;
 
   #DOMEventController;
 
@@ -92,17 +95,26 @@ export default class DOMManager {
     this.#cutDOM = document.getElementById("cut");
     this.#ingameButtons = document.getElementById("action_button");
     [this.#passButton, this.#bangButton] = this.#ingameButtons.children;
+    this.#turnTimerDOM = document.getElementById("turn_timer");
     this.#resultScreenDOM = document.getElementById("result_screen");
     this.#restartButton = document.getElementById("restart_button");
     this.#playerAngerDOM = document.getElementById("meter_value");
     this.#playerAngerDOM.style.height = `0%`;
     this.#shareLink = document.getElementById("share_button");
+    this.updateTurnTimerText(null);
+    this.setTurnTimerVisibility(false);
     this.hide(this.#bangButton);
     this.showNamePage();
 
     this.#DOMEventController = new AbortController();
 
     this.#gameManager.addEventListener("turn_notice", (e) => {
+      if (this.#gameManager.isOnlineMode) {
+        this.startTurnCountdown(GameManager.TURN_TIMEOUT_MS);
+      } else {
+        this.stopTurnCountdown(true);
+      }
+
       if (e.order != this.#gameManager.player.order) return;
       // console.log(this.#gameManager.player);
 
@@ -157,6 +169,8 @@ export default class DOMManager {
     });
 
     this.#gameManager.addEventListener("game_over", async (e) => {
+      this.stopTurnCountdown();
+
       // await sleep(1500);
       // this.#putButton.classList.remove('active');
       // this.#putButton.classList.add('disabled');
@@ -173,6 +187,7 @@ export default class DOMManager {
     });
 
     this.#gameManager.addEventListener("game_restart", () => {
+      this.stopTurnCountdown(true);
       this.#gameManager.logger.log("GAME RESTART");
       // console.log('GAME RESTART');
       this.hide(this.#resultScreenDOM);
@@ -184,7 +199,58 @@ export default class DOMManager {
   }
 
   dispose() {
+    this.stopTurnCountdown(true);
     this.#DOMEventController.abort();
+  }
+
+  updateTurnTimerText(remainingMs) {
+    if (!this.#turnTimerDOM) return;
+    if (remainingMs == null) {
+      this.#turnTimerDOM.innerText = "残り時間: --秒";
+      this.#turnTimerDOM.classList.remove("turn-timer-warning");
+      return;
+    }
+
+    const remainingSec = Math.max(Math.ceil(remainingMs / 1000), 0);
+    this.#turnTimerDOM.innerText = `残り時間: ${remainingSec}秒`;
+    if (remainingSec <= 10) {
+      this.#turnTimerDOM.classList.add("turn-timer-warning");
+    } else {
+      this.#turnTimerDOM.classList.remove("turn-timer-warning");
+    }
+  }
+
+  setTurnTimerVisibility(visible) {
+    if (!this.#turnTimerDOM) return;
+    this.#turnTimerDOM.style.display = visible ? "block" : "none";
+  }
+
+  startTurnCountdown(durationMs) {
+    this.stopTurnCountdown();
+    this.#turnDeadlineMs = Date.now() + durationMs;
+    this.updateTurnTimerText(durationMs);
+
+    this.#turnCountdownInterval = window.setInterval(() => {
+      if (this.#turnDeadlineMs == null) return;
+
+      const remaining = this.#turnDeadlineMs - Date.now();
+      if (remaining <= 0) {
+        this.updateTurnTimerText(0);
+        this.stopTurnCountdown();
+        return;
+      }
+
+      this.updateTurnTimerText(remaining);
+    }, 200);
+  }
+
+  stopTurnCountdown(reset = false) {
+    if (this.#turnCountdownInterval) {
+      clearInterval(this.#turnCountdownInterval);
+      this.#turnCountdownInterval = null;
+    }
+    this.#turnDeadlineMs = null;
+    if (reset) this.updateTurnTimerText(null);
   }
 
   addDOMEventListeners() {
@@ -547,20 +613,28 @@ export default class DOMManager {
 
   showIngameUI() {
     this.show(this.#ingameUIContainer);
+    this.setTurnTimerVisibility(this.#gameManager.isOnlineMode);
   }
 
   updatePlayerInfo(players, isOnlineMode) {
     const modeLabel = isOnlineMode ? "MULTI" : "SINGLE";
+    const localOrder = this.#gameManager.player?.order;
     const sortedPlayers = [...(players || [])].sort(
       (a, b) => a.order - b.order,
     );
     const playerLines = sortedPlayers.map((player) => {
       const colorLabel = player.order === Disk.BLACK ? "黒" : "白";
-      return `${colorLabel}: ${player.name || "Player"}`;
+      const name = player.name || "Player";
+      const selfSuffix =
+        isOnlineMode && localOrder != null && player.order === localOrder
+          ? "(あなた)"
+          : "";
+      return `${colorLabel}: ${name}${selfSuffix}`;
     });
     this.#playerInfoModeDOM.innerText = modeLabel;
     this.#playerInfoNameDOM.innerHTML = playerLines.join("<br>");
     this.#playerInfoColorDOM.innerText = "";
+    this.#playerInfoDOM.style.textAlign = "left";
     this.show(this.#playerInfoDOM);
   }
 

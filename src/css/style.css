@@ -173,6 +173,23 @@ a:visited {
   border: 2px solid var(--font-main-black);
 }
 
+.turn-timer {
+  position: absolute;
+  top: 4.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 10rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--font-main-black);
+  pointer-events: none;
+}
+
+.turn-timer-warning {
+  color: #ff3333;
+}
+
 .button {
   /*			position: absolute;
 			top: 1rem;
