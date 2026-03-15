@@ -50,6 +50,7 @@ export default class DOMManager {
 
   #playerAngerDOM;
   #shareLink;
+  #remoteBangCutinShown = false;
 
   #DOMEventController;
 
@@ -140,7 +141,19 @@ export default class DOMManager {
         this.show(this.#ingameButtons);
         this.hide(document.getElementById("steam_left"));
         this.hide(document.getElementById("steam_right"));
+      } else {
+        this.#remoteBangCutinShown = false;
       }
+    });
+
+    this.#gameManager.addEventListener("bang_preview", async (e) => {
+      if (!this.#gameManager.isOnlineMode) return;
+      if (e.order === this.#gameManager.player.order) return;
+      if (this.#gameManager.currentTurn !== e.order) return;
+      if (this.#remoteBangCutinShown) return;
+
+      this.#remoteBangCutinShown = true;
+      await this.cutin("台パン発動！", this.#gameManager.audio.bang_cut, 1000);
     });
 
     this.#gameManager.addEventListener("game_over", async (e) => {
@@ -395,7 +408,7 @@ export default class DOMManager {
           () => {},
           20,
         );
-        await this.cutin("たたけ!", this.#gameManager.audio.bang_cut, 1000);
+        await this.cutin("たたけ！", this.#gameManager.audio.bang_cut, 1000);
       },
       { signal: this.#DOMEventController.signal },
     );

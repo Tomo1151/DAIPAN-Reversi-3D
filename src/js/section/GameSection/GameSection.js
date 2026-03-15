@@ -206,7 +206,6 @@ export default class GameSection extends Section {
           y: this.cameraManager.position.y,
           z: this.cameraManager.position.z,
         };
-        this.gameManager.audio.bang_cut.cloneNode().play();
         this.cameraManager.moveTo(
           0,
           100,
